@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "429645705382",
+    "project_id": "se-bu-passport",
+    "storage_bucket": "se-bu-passport.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429645705382:android:9f0f8af5edb9341147c467",
+        "android_client_info": {
+          "package_name": "com.example.bu_passport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoIG5QDtwfePSWyYQWOBZQgMLy3RPetc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
