@@ -1,6 +1,11 @@
-# TEMPLATE-base-repo
+# Project Architecture
 
-# Add Users
-To add yourself to the repository, open a Pull Request modifying `COLLABORATORS`, entering your GitHub username in a newline.
+![alt text](./passportArchitecture.png)
 
-All Pull Requests must follow the Pull Request Template, with a title formatted like such `[Project Name]: <Descriptive Title>`
+# Directory Structure:
+
+auth/  
+Handles authentication of user by checking if they are logged in or not
+  
+pages/  
+All separate pages will be under this directory
