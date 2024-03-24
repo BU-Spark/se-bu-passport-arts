@@ -18,78 +18,67 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _userSchool = TextEditingController();
   TextEditingController _userYear = TextEditingController();
 
-  // Subject to change schools and years
-
-  final List<String> schools = <String>[
-    'CAS',
-    'COM',
-    'CFA',
-    'CEIT',
-    'COS',
-    'COE',
-    'COB',
-    'CBA',
-    'CON',
-    'CIT',
-    'COT',
-    'COP'
-  ];
-  final List<String> years = <String>['1', '2', '3', '4', '5'];
-
   final db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
+
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(edgeInsets),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _firstNameController, // Controller for first name
                 decoration: const InputDecoration(
                   labelText: 'First Name',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _lastNameController, // Controller for last name
                 decoration: const InputDecoration(
                   labelText: 'Last Name',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _buIDController,
                 decoration: const InputDecoration(
                   labelText: 'BU ID',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _userSchool,
                 decoration: const InputDecoration(
                   labelText: 'School',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _userYear,
                 decoration: const InputDecoration(
                   labelText: 'Year',
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _passwordController,
                 decoration: const InputDecoration(
@@ -97,7 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 obscureText: true,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               ElevatedButton(
                 onPressed: () async {
                   String email = _emailController.text;

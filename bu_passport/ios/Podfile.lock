@@ -161,6 +161,11 @@ CHECKOUT OPTIONS:
     :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
     :tag: 10.22.0
 
+CHECKOUT OPTIONS:
+  FirebaseFirestore:
+    :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
+    :tag: 10.20.0
+
 SPEC CHECKSUMS:
   cloud_firestore: 800217bf456c0f55fcf3c5a2e5d44d4533aeb002
   Firebase: 797fd7297b7e1be954432743a0b3f90038e45a71
@@ -191,6 +196,6 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
 
-PODFILE CHECKSUM: f30163ccbb8c61c3b7bb0e5de496f3d54363e761
+PODFILE CHECKSUM: e628240452b7d293d6aebf94f1c2fe67662a703f
 
 COCOAPODS: 1.15.2
