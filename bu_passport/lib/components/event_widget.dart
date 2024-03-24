@@ -13,6 +13,11 @@ class EventWidget extends StatefulWidget {
 class _EventWidgetState extends State<EventWidget> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
     return GestureDetector(
       onTap: () {
         // Navigate to the event page
@@ -24,7 +29,7 @@ class _EventWidgetState extends State<EventWidget> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(edgeInsets),
         child: Stack(
           children: [
             // Background image
@@ -49,7 +54,7 @@ class _EventWidgetState extends State<EventWidget> {
                       color: Colors.white, // Text color on top of the image
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  SizedBox(height: sizedBoxHeight),
                   Text(
                     '${widget.event.eventLocation}',
                     style: TextStyle(fontSize: 16.0, color: Colors.white),

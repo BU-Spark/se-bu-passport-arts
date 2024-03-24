@@ -50,14 +50,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   labelText: 'Last Name',
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: sizedBoxHeight),
               TextField(
                 controller: _buIDController,
                 decoration: const InputDecoration(
