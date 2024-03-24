@@ -54,11 +54,6 @@ class _EventWidgetState extends State<EventWidget> {
                     '${widget.event.eventLocation}',
                     style: TextStyle(fontSize: 16.0, color: Colors.white),
                   ),
-                  // SizedBox(height: 8.0),
-                  // Text(
-                  //   'Date: ${widget.event.eventTime.toString()}',
-                  //   style: TextStyle(fontSize: 16.0, color: Colors.white),
-                  // ),
                 ],
               ),
             ),

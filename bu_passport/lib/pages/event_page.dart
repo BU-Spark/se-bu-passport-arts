@@ -16,6 +16,12 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.event.eventName),
@@ -31,7 +37,7 @@ class _EventPageState extends State<EventPage> {
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(edgeInsets),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -42,12 +48,12 @@ class _EventPageState extends State<EventPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: sizedBoxHeight),
                   Text(
                     'Location: ${widget.event.eventLocation}',
                     style: TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: sizedBoxHeight),
                   Text(
                     'Time: ${widget.event.eventTime.toString()}',
                     style: TextStyle(fontSize: 16),
@@ -58,7 +64,7 @@ class _EventPageState extends State<EventPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(edgeInsets),
             child: ElevatedButton(
               onPressed: () {
                 setState(() {

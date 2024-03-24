@@ -15,15 +15,18 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
       home: Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(edgeInsets),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -33,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: 'Email',
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: sizedBoxHeight),
                 TextField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
@@ -41,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   obscureText: true,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: sizedBoxHeight),
                 ElevatedButton(
                   onPressed: () {
                     // Implement your sign-in logic here
@@ -55,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                   child: const Text('Sign In'),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: sizedBoxHeight),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

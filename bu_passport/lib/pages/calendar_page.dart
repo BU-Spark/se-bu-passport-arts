@@ -23,6 +23,10 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
     return Scaffold(
       appBar: AppBar(
         title: Text('Calendar'),
@@ -50,7 +54,7 @@ class _CalendarPageState extends State<CalendarPage> {
               });
             },
           ),
-          SizedBox(height: 20),
+          SizedBox(height: sizedBoxHeight),
           Text(
             'Selected Day: $_selectedDay',
             style: TextStyle(fontSize: 20),
