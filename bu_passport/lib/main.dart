@@ -1,6 +1,7 @@
 import 'package:bu_passport/firebase_options.dart';
 import 'package:bu_passport/pages/login_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
+import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'auth/main_page.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const MainPage(),
       routes: {
+        '/onboarding' : (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
         '/home': (context) => const MainPage(),
