@@ -1,18 +1,21 @@
 import 'package:bu_passport/firebase_options.dart';
+import 'package:bu_passport/pages/navigation_page.dart';
 import 'package:bu_passport/pages/login_page.dart';
+import 'package:bu_passport/pages/calendar_page.dart';
+import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'auth/auth_gate.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

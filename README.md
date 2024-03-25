@@ -18,4 +18,3 @@ All classes will be here
 
 components/
 Reusable widgets such as an event_widget will be placed here
-

@@ -1,11 +1,10 @@
 import 'package:bu_passport/pages/onboarding_page.dart';
+import 'package:bu_passport/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../pages/navigation_page.dart';
 import '../pages/home_page.dart';
-
-
+import '../pages/login_page.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({Key? key}) : super(key: key);
@@ -22,5 +21,6 @@ class AuthGate extends StatelessWidget {
         }
       },
     ));
+
   }
 }
