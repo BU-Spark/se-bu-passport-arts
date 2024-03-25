@@ -4,7 +4,7 @@ import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'auth/main_page.dart';
+import 'auth/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
         '/onboarding' : (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
-        '/home': (context) => const AuthGate(),
       },
     );
   }
