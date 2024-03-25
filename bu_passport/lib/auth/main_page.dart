@@ -2,12 +2,13 @@ import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../pages/navigation_page.dart';
 import '../pages/home_page.dart';
 
 
 
-class MainPage extends StatelessWidget {
-  const MainPage({Key? key}) : super(key: key);
+class AuthGate extends StatelessWidget {
+  const AuthGate({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +16,7 @@ class MainPage extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return const HomePage();
+          return const NavigationPage();
         } else {
           return const OnboardingPage();
         }

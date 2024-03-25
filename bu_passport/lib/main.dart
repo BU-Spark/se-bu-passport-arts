@@ -24,12 +24,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const MainPage(),
+      home: const AuthGate(),
       routes: {
         '/onboarding' : (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
-        '/home': (context) => const MainPage(),
+        '/home': (context) => const AuthGate(),
       },
     );
   }
