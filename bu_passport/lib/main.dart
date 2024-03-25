@@ -4,6 +4,7 @@ import 'package:bu_passport/pages/login_page.dart';
 import 'package:bu_passport/pages/calendar_page.dart';
 import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
+import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'auth/auth_gate.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const AuthGate(),
       routes: {
+        '/onboarding' : (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
       },
