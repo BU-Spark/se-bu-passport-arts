@@ -151,6 +151,12 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    
     DocumentReference userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
 
@@ -200,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage>
                   children: <Widget>[
                     if (selectedImageFile != null) ...[
                       Image.file(selectedImageFile!),
-                      SizedBox(height: 8),
+                      SizedBox(height: sizedBoxHeight),
                     ],
                     GestureDetector(
                       onTap: () {
@@ -221,11 +227,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 ) as ImageProvider,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    // ElevatedButton(
-                    //     // onPressed: _handleImageSelection,
-                    //     onPressed: selectImage,
-                    //     child: Text('Upload Profile Picture')), // This was the upload profile picture button
+                    SizedBox(height: sizedBoxHeight),
                     if (_isEditing) ...[
                       TextField(
                         controller: _firstNameController,
