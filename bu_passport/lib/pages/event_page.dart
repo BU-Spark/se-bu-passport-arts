@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bu_passport/classes/event.dart';
+import 'package:bu_passport/services/firebase_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EventPage extends StatefulWidget {
   final Event event;
@@ -13,6 +15,28 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   bool _isRegistered =
       false; // Track whether the user is registered for the event
+
+// Checks if user is registered -- if so, the button will reflect that
+  @override
+  void initState() {
+    super.initState();
+    checkIfUserIsRegistered();
+  }
+
+  void checkIfUserIsRegistered() async {
+    String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+    // Ensure there's a user logged in
+    if (userUID.isEmpty) {
+      print("User is not logged in.");
+      return;
+    }
+    bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
+        userUID, widget.event.eventId);
+    setState(() {
+      _isRegistered = isRegistered;
+    });
+  }
+//
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +90,17 @@ class _EventPageState extends State<EventPage> {
           Padding(
             padding: EdgeInsets.all(edgeInsets),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+                String eventId = widget.event.eventId;
+                bool isRegistered =
+                    await FirebaseService.isUserRegisteredForEvent(
+                        userUID, eventId);
+                if (isRegistered) {
+                  FirebaseService.unregisterFromEvent(userUID, eventId);
+                } else {
+                  FirebaseService.registerForEvent(userUID, eventId);
+                }
                 setState(() {
                   _isRegistered = !_isRegistered; // Toggle registration status
                 });
