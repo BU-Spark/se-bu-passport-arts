@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:geolocator/geolocator.dart';
@@ -44,21 +45,18 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
-  bool isEventToday(DateTime eventDateTimeStart) {
+  bool isEventToday(DateTime eventDateTimestamp) {
+    // DateTime? eventDateTimeStart = convertEventStartTime(eventDateTimeStartStr);
     // Ensuring that it is EST
 
-    if (eventDateTimeStart != null) {
-      final eventDateTimeLocal =
-          tz.TZDateTime.from(eventDateTimeStart, tz.local);
-      final nowLocal = tz.TZDateTime.now(tz.local);
+    // DateTime eventDateTimeStart = eventDateTimestamp.toDate();
 
-      return nowLocal.year == eventDateTimeLocal.year &&
-          nowLocal.month == eventDateTimeLocal.month &&
-          nowLocal.day == eventDateTimeLocal.day;
-    } else {
-      print("Datetime parsing error");
-      return false;
-    }
+    final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
+    final nowLocal = tz.TZDateTime.now(tz.local);
+
+    return nowLocal.year == eventDateTimeLocal.year &&
+        nowLocal.month == eventDateTimeLocal.month &&
+        nowLocal.day == eventDateTimeLocal.day;
   }
 
   Future<void> checkIn() async {
@@ -166,7 +164,7 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: _isRegistered
+                  onPressed: _isRegistered && isEventToday(widget.event.eventStartTime)
                       ? checkIn
                       : null, // Check-in function is called here if registered
                   child: Text('Check In'),

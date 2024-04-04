@@ -152,6 +152,14 @@ class FirebaseService {
     final List<Event> upcomingEvents = [];
 
     for (Event event in fetchedEvents) {
+      // List<String> splittedTime = event.eventStartTime.split(",");
+      // String day = splittedTime[splittedTime.length - 2]
+      //     .trim(); // Get the penultimate element
+      // String year =
+      //     splittedTime[splittedTime.length - 1].trim(); // Get the last element
+      // // get last 2
+      // DateFormat format = new DateFormat("MMMM dd, yyyy");
+
       if (event.eventStartTime.isBefore(now)) {
         // Event has already occurred (attended)
         attendedEvents.add(event);
