@@ -4,6 +4,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
 
 class EventPage extends StatefulWidget {
   final Event event;
@@ -41,8 +44,48 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
+  DateTime? convertEventStartTime(String startTime) {
+    // Date format is always <time> <am/pm> on <day of week>, <M> <D>, <Y>
+    print(startTime);
+    final format = DateFormat("h:mm a 'on' EEEE, MMMM d, yyyy");
+
+    try {
+      // Parse the string into a DateTime type with the format
+      final DateTime dateTime = format.parse(startTime, true);
+      return dateTime;
+    } catch (e) {
+      // Handle or log error if parsing fails
+      print("Error parsing date time: $e");
+      return null;
+    }
+  }
+
+  bool isEventToday(String eventDateTimeStartStr) {
+    DateTime? eventDateTimeStart = convertEventStartTime(eventDateTimeStartStr);
+    // Ensuring that it is EST
+
+    if (eventDateTimeStart != null) {
+      final eventDateTimeLocal =
+          tz.TZDateTime.from(eventDateTimeStart, tz.local);
+      final nowLocal = tz.TZDateTime.now(tz.local);
+
+      return nowLocal.year == eventDateTimeLocal.year &&
+          nowLocal.month == eventDateTimeLocal.month &&
+          nowLocal.day == eventDateTimeLocal.day;
+    } else {
+      print("Datetime parsing error");
+      return false;
+    }
+  }
+
   Future<void> checkIn() async {
     try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print("Location permission not granted");
+        return;
+      }
+
       // Calling getAddressCoordinates to calculate event location coords
       final eventCoords = await geocodingService
           .getAddressCoordinates(widget.event.eventLocation);
@@ -137,7 +180,8 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: _isRegistered
+                  onPressed: _isRegistered &&
+                          isEventToday(widget.event.eventStartTime)
                       ? checkIn
                       : null, // Check-in function is called here if registered
                   child: Text('Check In'),

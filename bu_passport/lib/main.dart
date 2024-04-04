@@ -6,6 +6,9 @@ import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'auth/auth_gate.dart';
@@ -16,6 +19,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Timezone initialization for check in 
+  tz.initializeTimeZones();
+  var estLocation = tz.getLocation('America/New_York');
+  // Setting local location to EST (since all BU events are in EST)
+  tz.setLocalLocation(estLocation);
   runApp(MyApp());
 }
 
@@ -30,7 +39,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const AuthGate(),
       routes: {
-        '/onboarding' : (context) => const OnboardingPage(),
+        '/onboarding': (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
       },
