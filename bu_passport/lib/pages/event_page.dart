@@ -23,6 +23,7 @@ class _EventPageState extends State<EventPage> {
 
   bool _isRegistered =
       false; // Track whether the user is registered for the event
+  bool _isCheckedIn = false; // To track if the user has checked in
 
 // Checks if user is registered -- if so, the button will reflect that
   @override
@@ -59,12 +60,12 @@ class _EventPageState extends State<EventPage> {
         nowLocal.day == eventDateTimeLocal.day;
   }
 
-  Future<void> checkIn() async {
+  Future<bool> checkIn() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         print("Location permission not granted");
-        return;
+        return false;
       }
 
       // Calling getAddressCoordinates to calculate event location coords
@@ -92,13 +93,19 @@ class _EventPageState extends State<EventPage> {
       // Distance radius checking
       if (distance <= 400) {
         // Check-in success
+        setState(() {
+          _isCheckedIn = true;
+        });
         print("Checked in successfully!");
+        return true;
       } else {
         // Too far from location
         print("Too far from the event location to check in.");
+        return false;
       }
     } catch (e) {
       print("An error occurred during check-in: $e");
+      return false;
     }
   }
 
@@ -164,15 +171,26 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: _isRegistered && isEventToday(widget.event.eventStartTime)
-                      ? checkIn
-                      : null, // Check-in function is called here if registered
-                  child: Text('Check In'),
+                  onPressed: (!_isRegistered ||
+                          !isEventToday(widget.event.eventStartTime) ||
+                          _isCheckedIn)
+                      ? null
+                      : () async {
+                          // Your check-in logic here. On successful check-in, update the _isCheckedIn state.
+                          bool success = await checkIn();
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("Checked in successfully!")));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Unable to check in.")));
+                          }
+                        },
+                  child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isRegistered
-                        ? Colors.blue
-                        : Colors
-                            .grey, // Change color based on registration status
+                    backgroundColor: _isCheckedIn
+                        ? Colors.grey
+                        : (_isRegistered ? Colors.blue : Colors.grey),
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight), // Optional spacing
