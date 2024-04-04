@@ -19,16 +19,16 @@ class FirebaseService {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
           eventID: doc.id,
-          eventTitle: eventData['eventTitle'],
-          eventPhoto: eventData['eventPhoto'],
-          eventLocation: eventData['eventLocation'],
-          eventStartTime: (eventData['eventStartTime'] as Timestamp).toDate(),
-          eventEndTime: (eventData['eventEndTime'] as Timestamp).toDate(),
-          eventDescription: eventData['eventDescription'],
-          // eventTags: List<String>.from(eventData['eventTags'] ?? []),
+          eventTitle: eventData['eventTitle'] ?? '',
+          eventPhoto: eventData['eventPhoto'] ?? '',
+          eventLocation: eventData['eventLocation'] ?? '',
+          eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+          eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+          eventDescription: eventData['eventDescription'] ?? '',
           registeredUsers:
               List<String>.from(eventData['registeredUsers'] ?? []),
         );
+
         eventList.add(event);
       });
       return eventList;

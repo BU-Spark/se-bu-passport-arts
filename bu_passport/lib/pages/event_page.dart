@@ -119,7 +119,7 @@ class _EventPageState extends State<EventPage> {
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.network(
+          Image.asset(
             widget.event.eventPhoto,
             fit: BoxFit.cover,
             width: double.infinity,
@@ -144,12 +144,12 @@ class _EventPageState extends State<EventPage> {
                 ),
                 SizedBox(height: sizedBoxHeight),
                 Text(
-                  'Start Time: ${widget.event.eventStartTime.toString()}',
+                  'Start Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventStartTime)}',
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: sizedBoxHeight),
                 Text(
-                  'End Time: ${widget.event.eventEndTime.toString()}',
+                  'End Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventEndTime)}',
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: sizedBoxHeight),
@@ -166,7 +166,8 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: _isRegistered
+                  onPressed: _isRegistered &&
+                          isEventToday(widget.event.eventStartTime)
                       ? checkIn
                       : null, // Check-in function is called here if registered
                   child: Text('Check In'),

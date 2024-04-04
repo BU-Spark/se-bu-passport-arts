@@ -17,6 +17,20 @@ db = firestore.client()
 
 import time
 import hashlib
+import random
+
+event_photos = [
+    'image1',
+    'image2',
+    'image3',
+    'image4',
+    'image5',
+    'image6',
+    'image7',
+    'image8',
+    'image9',
+    'image10'
+]
 
 service = Service(executable_path='/Users/saisriram/Desktop/BUPassport/chromedriver')
 driver = webdriver.Chrome(service=service)
@@ -28,6 +42,13 @@ WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, '
 eventLinks = driver.find_elements(By.CLASS_NAME, 'event-link')
 
 for eventLink in eventLinks:
+    # generate a random number between 0 and 9
+    random_number = random.randint(0, 9)
+
+    random_image = event_photos[random_number]
+
+    eventPhoto = f"assets/images/arts/{random_image}.jpeg"
+
     event_title_element = eventLink.find_element(By.CSS_SELECTOR, '.event-link a')
     eventTitle = event_title_element.text.strip()
     print(eventTitle)
@@ -127,7 +148,7 @@ for eventLink in eventLinks:
                     'eventLocation': location_room_address if location_room_address else None,  # Assign None if location doesn't exist
                     'eventDescription': eventDescription if eventDescription else None,  # Assign None if description doesn't exist
                     'eventID': eventID if eventID else None,  # Assign None if event ID doesn't exist
-                    'eventPhoto': 'https://firebasestorage.googleapis.com/v0/b/se-bu-passport.appspot.com/o/eventPictures%2Fabstract.png?alt=media&token=daef975f-193b-49ab-b2ef-254b16c8436d',
+                    'eventPhoto': eventPhoto if eventPhoto else None,  # Assign None if photo doesn't exist
                     'registeredUsers': [],
                 }
 
