@@ -1,19 +1,24 @@
 class Event {
-  final String eventId;
-  final String eventName;
+  final String eventID;
+  final String eventTitle;
   final String eventPhoto;
   final String eventLocation;
-  final DateTime eventTime;
-  final List<String> eventTags;
+  final String eventDescription;
+  final String eventStartTime;
+  final String eventEndTime;
+
+  // final List<String> eventTags;
   final List<String> registeredUsers;
 
   Event({
-    required this.eventId,
-    required this.eventName,
+    required this.eventID,
+    required this.eventTitle,
     required this.eventPhoto,
     required this.eventLocation,
-    required this.eventTime,
-    required this.eventTags,
+    required this.eventStartTime,
+    required this.eventEndTime,
+    required this.eventDescription,
+    // required this.eventTags,
     required this.registeredUsers,
   });
 }

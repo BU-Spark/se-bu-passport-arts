@@ -1,7 +1,6 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class FirebaseService {
   static Future<List<Event>> fetchEvents() async {
     final db = FirebaseFirestore.instance;
@@ -12,13 +11,16 @@ class FirebaseService {
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
-          eventId: doc.id,
-          eventName: eventData['eventName'],
+          eventID: doc.id,
+          eventTitle: eventData['eventTitle'],
           eventPhoto: eventData['eventPhoto'],
           eventLocation: eventData['eventLocation'],
-          eventTime: (eventData['eventTime'] as Timestamp).toDate(),
-          eventTags: List<String>.from(eventData['eventTags'] ?? []),
-          registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+          eventStartTime: eventData['eventStartTime'],
+          eventEndTime: eventData['eventEndTime'],
+          eventDescription: eventData['eventDescription'],
+          // eventTags: List<String>.from(eventData['eventTags'] ?? []),
+          registeredUsers:
+              List<String>.from(eventData['registeredUsers'] ?? []),
         );
         eventList.add(event);
       });
@@ -34,7 +36,7 @@ class FirebaseService {
       return events;
     }
     return events.where((event) {
-      return event.eventName.toLowerCase().contains(query.toLowerCase());
+      return event.eventTitle.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
 }

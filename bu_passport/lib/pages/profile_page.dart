@@ -1,3 +1,5 @@
+import 'package:bu_passport/services/firebase_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -39,6 +41,13 @@ class ProfilePage extends StatelessWidget {
                 // Add action to edit profile
               },
               child: Text('Edit Profile'),
+            ),
+            // Sign out
+            ElevatedButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+              },
+              child: Text('Sign Out'),
             ),
           ],
         ),
