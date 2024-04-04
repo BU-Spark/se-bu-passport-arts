@@ -21,7 +21,8 @@ class FirebaseService {
           eventName: eventData['eventName'],
           eventPhoto: eventData['eventPhoto'],
           eventLocation: eventData['eventLocation'],
-          eventTime: (eventData['eventTime'] as Timestamp).toDate(),
+          eventTime: (eventData['eventStartTime'] as Timestamp).toDate(),
+          // eventTime: eventData['eventStartTime'],
           eventTags: List<String>.from(eventData['eventTags'] ?? []),
           registeredUsers:
               List<String>.from(eventData['registeredUsers'] ?? []),

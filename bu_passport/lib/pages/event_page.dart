@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:bu_passport/services/location_service.dart';
+import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,7 +38,34 @@ class _EventPageState extends State<EventPage> {
       _isRegistered = isRegistered;
     });
   }
-//
+
+  Future<void> attemptCheckIn(String eventAddress) async {
+    try {
+      final geocodingService = GeocodingService();
+      final locations =
+          await geocodingService.getCoordinatesFromAddress(eventAddress);
+      if (locations.isNotEmpty) {
+        final location = locations.first;
+        final locationService = LocationService();
+        const double checkInRadius =
+            100.0; // Define your radius, e.g., 100 meters
+
+        bool withinRadius = await locationService.isWithinRadius(
+            location.latitude, location.longitude, checkInRadius);
+        if (withinRadius) {
+          // Handle successful check-in, e.g., update Firestore document
+          print("Check-in successful.");
+        } else {
+          print("You are not close enough to the event location.");
+        }
+      } else {
+        print("Address could not be geocoded.");
+      }
+    } catch (e) {
+      print("Error during check-in: $e");
+      print("Geocoding address: $eventAddress");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +137,10 @@ class _EventPageState extends State<EventPage> {
               child: Text(_isRegistered ? 'Unregister' : 'Register'),
             ),
           ),
+          ElevatedButton(
+            onPressed: () => attemptCheckIn("38 Parsons Street, Brighton"),
+            child: Text('Check In to Event'),
+          )
         ],
       ),
     );
