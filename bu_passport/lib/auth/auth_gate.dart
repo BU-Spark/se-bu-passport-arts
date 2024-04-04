@@ -1,7 +1,7 @@
+import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:bu_passport/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../pages/navigation_page.dart';
 import '../pages/login_page.dart';
 
