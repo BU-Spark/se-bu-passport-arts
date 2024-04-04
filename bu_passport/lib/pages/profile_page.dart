@@ -151,18 +151,16 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
-    
+
     DocumentReference userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
         actions: <Widget>[
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
@@ -176,6 +174,14 @@ class _ProfilePageState extends State<ProfilePage>
               setState(() {
                 _isEditing = !_isEditing;
               });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacementNamed(
+                  '/login'); // Replace with your login route
             },
           ),
         ],

@@ -29,6 +29,10 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                "assets/images/onboarding/BU art logo.png",
+                fit: BoxFit.contain,
+              ),
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
