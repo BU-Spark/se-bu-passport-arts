@@ -172,14 +172,13 @@ class FirebaseService {
     if (snapshot.exists && snapshot.data() != null) {
       Map<String, dynamic> eventData = snapshot.data()!;
       Event event = Event(
-        eventID: eventData['eventID'],
-        eventTitle: eventData['eventTitle'],
-        eventPhoto: eventData['eventPhoto'],
-        eventLocation: eventData['eventLocation'],
-        eventStartTime: (eventData['eventStartTime'] as Timestamp).toDate(),
-        eventEndTime: (eventData['eventEndTime'] as Timestamp).toDate(),
-        eventDescription: eventData['eventDescription'],
-        // eventTags: List<String>.from(eventData['eventTags'] ?? []),
+        eventID: eventData['eventID'] ?? '',
+        eventTitle: eventData['eventTitle'] ?? '',
+        eventPhoto: eventData['eventPhoto'] ?? '',
+        eventLocation: eventData['eventLocation'] ?? '',
+        eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+        eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+        eventDescription: eventData['eventDescription'] ?? '',
         registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
       );
       return event;
