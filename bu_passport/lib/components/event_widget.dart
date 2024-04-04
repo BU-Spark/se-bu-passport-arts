@@ -47,7 +47,7 @@ class _EventWidgetState extends State<EventWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.event.eventName,
+                    widget.event.eventTitle,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,

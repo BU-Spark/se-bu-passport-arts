@@ -33,7 +33,7 @@ class _EventPageState extends State<EventPage> {
       return;
     }
     bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
-        userUID, widget.event.eventId);
+        userUID, widget.event.eventID);
     setState(() {
       _isRegistered = isRegistered;
     });
@@ -77,43 +77,51 @@ class _EventPageState extends State<EventPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.event.eventName),
+        title: Text(widget.event.eventTitle),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: ListView(
+        // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: Image.network(
-              widget.event.eventPhoto,
-            ),
+          Image.network(
+            widget.event.eventPhoto,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: screenHeight * 0.4, // Adjust the height as needed
           ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: EdgeInsets.all(edgeInsets),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.event.eventName,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+          Padding(
+            padding: EdgeInsets.all(edgeInsets),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.event.eventTitle,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  SizedBox(height: sizedBoxHeight),
-                  Text(
-                    'Location: ${widget.event.eventLocation}',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: sizedBoxHeight),
-                  Text(
-                    'Time: ${widget.event.eventTime.toString()}',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  // Add more event details as needed
-                ],
-              ),
+                ),
+                SizedBox(height: sizedBoxHeight),
+                Text(
+                  'Location: ${widget.event.eventLocation}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: sizedBoxHeight),
+                Text(
+                  'Start Time: ${widget.event.eventStartTime.toString()}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: sizedBoxHeight),
+                Text(
+                  'End Time: ${widget.event.eventEndTime.toString()}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: sizedBoxHeight),
+                Text(
+                  'Description: ${widget.event.eventDescription}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                // Add more event details as needed
+              ],
             ),
           ),
           Padding(
@@ -121,7 +129,7 @@ class _EventPageState extends State<EventPage> {
             child: ElevatedButton(
               onPressed: () async {
                 String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
-                String eventId = widget.event.eventId;
+                String eventId = widget.event.eventID;
                 bool isRegistered =
                     await FirebaseService.isUserRegisteredForEvent(
                         userUID, eventId);

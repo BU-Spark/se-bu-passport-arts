@@ -6,6 +6,7 @@ import 'package:bu_passport/classes/event.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class FirebaseService {
   static Future<List<Event>> fetchEvents() async {
@@ -17,13 +18,14 @@ class FirebaseService {
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
-          eventId: doc.id,
-          eventName: eventData['eventName'],
+          eventID: doc.id,
+          eventTitle: eventData['eventTitle'],
           eventPhoto: eventData['eventPhoto'],
           eventLocation: eventData['eventLocation'],
-          eventTime: (eventData['eventStartTime'] as Timestamp).toDate(),
-          // eventTime: eventData['eventStartTime'],
-          eventTags: List<String>.from(eventData['eventTags'] ?? []),
+          eventStartTime: eventData['eventStartTime'],
+          eventEndTime: eventData['eventEndTime'],
+          eventDescription: eventData['eventDescription'],
+          // eventTags: List<String>.from(eventData['eventTags'] ?? []),
           registeredUsers:
               List<String>.from(eventData['registeredUsers'] ?? []),
         );
@@ -41,7 +43,7 @@ class FirebaseService {
       return events;
     }
     return events.where((event) {
-      return event.eventName.toLowerCase().contains(query.toLowerCase());
+      return event.eventTitle.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
 
@@ -145,10 +147,28 @@ class FirebaseService {
         .toList(); // Ensure only non-null Events are kept
 
     final now = DateTime.now();
-    final attendedEvents =
-        fetchedEvents.where((event) => event.eventTime.isBefore(now)).toList();
-    final upcomingEvents =
-        fetchedEvents.where((event) => !event.eventTime.isBefore(now)).toList();
+
+    final List<Event> attendedEvents = [];
+    final List<Event> upcomingEvents = [];
+
+    for (Event event in fetchedEvents) {
+      List<String> splittedTime = event.eventStartTime.split(",");
+      String day = splittedTime[splittedTime.length - 2]
+          .trim(); // Get the penultimate element
+      String year =
+          splittedTime[splittedTime.length - 1].trim(); // Get the last element
+      // get last 2
+      DateFormat format = new DateFormat("MMMM dd, yyyy");
+      var startTime = format.parse(day + ", " + year);
+
+      if (startTime.isBefore(now)) {
+        // Event has already occurred (attended)
+        attendedEvents.add(event);
+      } else {
+        // Event is upcoming
+        upcomingEvents.add(event);
+      }
+    }
 
     return CategorizedEvents(
         attendedEvents: attendedEvents, upcomingEvents: upcomingEvents);
@@ -160,7 +180,18 @@ class FirebaseService {
         await _db.collection('events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
       Map<String, dynamic> eventData = snapshot.data()!;
-      return Event.fromFirestore(eventData);
+      Event event = Event(
+        eventID: eventData['eventID'],
+        eventTitle: eventData['eventTitle'],
+        eventPhoto: eventData['eventPhoto'],
+        eventLocation: eventData['eventLocation'],
+        eventStartTime: eventData['eventStartTime'],
+        eventEndTime: eventData['eventEndTime'],
+        eventDescription: eventData['eventDescription'],
+        // eventTags: List<String>.from(eventData['eventTags'] ?? []),
+        registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+      );
+      return event;
     }
     throw Exception("Event not found");
   }
