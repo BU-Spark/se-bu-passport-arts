@@ -1,3 +1,6 @@
+import datetime
+from datetime import datetime
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -106,13 +109,20 @@ for eventLink in eventLinks:
             # Check if eventID already exists in Firebase
             event_ref = db.collection('events').document(eventID)
             event_doc = event_ref.get()
+
+            # parse eventStartTime and eventEndTime to datetime objects
+            eventDateTimeStartTime = datetime.strptime(eventStartTime, '%I:%M %p on %A, %B %d, %Y')
+            eventDateTimeEndTime = datetime.strptime(eventEndTime, '%I:%M %p on %A, %B %d, %Y')
+
+            print("Event Start Time:", eventDateTimeStartTime)
+
             if event_doc.exists:
                 print(f"Event with ID {eventID} already exists. Skipping...")
             else:
                 event_data = {
                     'eventTitle': eventTitle if eventTitle else None,  # Assign None if title doesn't exist
-                    'eventStartTime': eventStartTime if eventStartTime else None,  # Assign None if start time doesn't exist
-                    'eventEndTime': eventEndTime if eventEndTime else None,  # Assign None if end time doesn't exist
+                    'eventStartTime': eventDateTimeStartTime if eventStartTime else None,  # Assign None if start time doesn't exist
+                    'eventEndTime': eventDateTimeEndTime if eventEndTime else None,  # Assign None if end time doesn't exist
                     'eventURL': eventURL if eventURL else None,  # Assign None if URL doesn't exist
                     'eventLocation': location_room_address if location_room_address else None,  # Assign None if location doesn't exist
                     'eventDescription': eventDescription if eventDescription else None,  # Assign None if description doesn't exist

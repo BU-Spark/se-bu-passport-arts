@@ -6,8 +6,8 @@ class Event {
   final String eventPhoto;
   final String eventLocation;
   final String eventDescription;
-  final String eventStartTime;
-  final String eventEndTime;
+  final DateTime eventStartTime;
+  final DateTime eventEndTime;
 
   // final List<String> eventTags;
   final List<String> registeredUsers;

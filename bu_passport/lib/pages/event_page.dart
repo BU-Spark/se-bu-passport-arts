@@ -44,24 +44,7 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
-  DateTime? convertEventStartTime(String startTime) {
-    // Date format is always <time> <am/pm> on <day of week>, <M> <D>, <Y>
-    print(startTime);
-    final format = DateFormat("h:mm a 'on' EEEE, MMMM d, yyyy");
-
-    try {
-      // Parse the string into a DateTime type with the format
-      final DateTime dateTime = format.parse(startTime, true);
-      return dateTime;
-    } catch (e) {
-      // Handle or log error if parsing fails
-      print("Error parsing date time: $e");
-      return null;
-    }
-  }
-
-  bool isEventToday(String eventDateTimeStartStr) {
-    DateTime? eventDateTimeStart = convertEventStartTime(eventDateTimeStartStr);
+  bool isEventToday(DateTime eventDateTimeStart) {
     // Ensuring that it is EST
 
     if (eventDateTimeStart != null) {
@@ -96,6 +79,8 @@ class _EventPageState extends State<EventPage> {
       // User's current location
       final currentPosition = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
+      print("Event coords: $eventCoords");
+      print("Current position: $currentPosition");
 
       // Calculate the distance between event to user
       final double distance = Geolocator.distanceBetween(
@@ -104,6 +89,7 @@ class _EventPageState extends State<EventPage> {
         eventCoords['lat'],
         eventCoords['lng'],
       );
+      print("Distance: $distance meters");
 
       // Distance radius checking
       if (distance <= 400) {
@@ -180,8 +166,7 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: _isRegistered &&
-                          isEventToday(widget.event.eventStartTime)
+                  onPressed: _isRegistered
                       ? checkIn
                       : null, // Check-in function is called here if registered
                   child: Text('Check In'),

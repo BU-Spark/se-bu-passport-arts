@@ -22,8 +22,8 @@ class FirebaseService {
           eventTitle: eventData['eventTitle'],
           eventPhoto: eventData['eventPhoto'],
           eventLocation: eventData['eventLocation'],
-          eventStartTime: eventData['eventStartTime'],
-          eventEndTime: eventData['eventEndTime'],
+          eventStartTime: (eventData['eventStartTime'] as Timestamp).toDate(),
+          eventEndTime: (eventData['eventEndTime'] as Timestamp).toDate(),
           eventDescription: eventData['eventDescription'],
           // eventTags: List<String>.from(eventData['eventTags'] ?? []),
           registeredUsers:
@@ -152,16 +152,7 @@ class FirebaseService {
     final List<Event> upcomingEvents = [];
 
     for (Event event in fetchedEvents) {
-      List<String> splittedTime = event.eventStartTime.split(",");
-      String day = splittedTime[splittedTime.length - 2]
-          .trim(); // Get the penultimate element
-      String year =
-          splittedTime[splittedTime.length - 1].trim(); // Get the last element
-      // get last 2
-      DateFormat format = new DateFormat("MMMM dd, yyyy");
-      var startTime = format.parse(day + ", " + year);
-
-      if (startTime.isBefore(now)) {
+      if (event.eventStartTime.isBefore(now)) {
         // Event has already occurred (attended)
         attendedEvents.add(event);
       } else {
@@ -185,8 +176,8 @@ class FirebaseService {
         eventTitle: eventData['eventTitle'],
         eventPhoto: eventData['eventPhoto'],
         eventLocation: eventData['eventLocation'],
-        eventStartTime: eventData['eventStartTime'],
-        eventEndTime: eventData['eventEndTime'],
+        eventStartTime: (eventData['eventStartTime'] as Timestamp).toDate(),
+        eventEndTime: (eventData['eventEndTime'] as Timestamp).toDate(),
         eventDescription: eventData['eventDescription'],
         // eventTags: List<String>.from(eventData['eventTags'] ?? []),
         registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
