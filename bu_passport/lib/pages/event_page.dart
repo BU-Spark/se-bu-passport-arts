@@ -183,7 +183,7 @@ class _EventPageState extends State<EventPage> {
                                 content: Text("Checked in successfully!")));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Unable to check in.")));
+                                SnackBar(content: Text("Unable to check in: location too far!")));
                           }
                         },
                   child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
