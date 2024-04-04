@@ -119,6 +119,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>GoogleMaps.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>GoogleUtilities-GoogleUtilities_Privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -174,22 +179,22 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>geocoding_ios-geocoding_ios_privacy.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>geocoding_ios.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>geolocator_apple-geolocator_apple_privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
 		<key>geolocator_apple.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>google_maps_flutter_ios-google_maps_flutter_ios_privacy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>google_maps_flutter_ios.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -210,11 +215,6 @@
 			<false/>
 		</dict>
 		<key>leveldb-library.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>location.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

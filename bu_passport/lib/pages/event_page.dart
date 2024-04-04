@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bu_passport/services/location_service.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +15,8 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+  GeocodingService geocodingService = GeocodingService();
+
   bool _isRegistered =
       false; // Track whether the user is registered for the event
 
@@ -39,31 +41,37 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
-  Future<void> attemptCheckIn(String eventAddress) async {
+  Future<void> checkIn() async {
     try {
-      final geocodingService = GeocodingService();
-      final locations =
-          await geocodingService.getCoordinatesFromAddress(eventAddress);
-      if (locations.isNotEmpty) {
-        final location = locations.first;
-        final locationService = LocationService();
-        const double checkInRadius =
-            100.0; // Define your radius, e.g., 100 meters
+      // Calling getAddressCoordinates to calculate event location coords
+      final eventCoords = await geocodingService
+          .getAddressCoordinates(widget.event.eventLocation);
+      if (eventCoords == null) {
+        throw Exception("Failed to get event coordinates.");
+      }
 
-        bool withinRadius = await locationService.isWithinRadius(
-            location.latitude, location.longitude, checkInRadius);
-        if (withinRadius) {
-          // Handle successful check-in, e.g., update Firestore document
-          print("Check-in successful.");
-        } else {
-          print("You are not close enough to the event location.");
-        }
+      // User's current location
+      final currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // Calculate the distance between event to user
+      final double distance = Geolocator.distanceBetween(
+        currentPosition.latitude,
+        currentPosition.longitude,
+        eventCoords['lat'],
+        eventCoords['lng'],
+      );
+
+      // Distance radius checking
+      if (distance <= 400) {
+        // Check-in success
+        print("Checked in successfully!");
       } else {
-        print("Address could not be geocoded.");
+        // Too far from location
+        print("Too far from the event location to check in.");
       }
     } catch (e) {
-      print("Error during check-in: $e");
-      print("Geocoding address: $eventAddress");
+      print("An error occurred during check-in: $e");
     }
   }
 
@@ -126,29 +134,44 @@ class _EventPageState extends State<EventPage> {
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets),
-            child: ElevatedButton(
-              onPressed: () async {
-                String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
-                String eventId = widget.event.eventID;
-                bool isRegistered =
-                    await FirebaseService.isUserRegisteredForEvent(
-                        userUID, eventId);
-                if (isRegistered) {
-                  FirebaseService.unregisterFromEvent(userUID, eventId);
-                } else {
-                  FirebaseService.registerForEvent(userUID, eventId);
-                }
-                setState(() {
-                  _isRegistered = !_isRegistered; // Toggle registration status
-                });
-              },
-              child: Text(_isRegistered ? 'Unregister' : 'Register'),
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: _isRegistered
+                      ? checkIn
+                      : null, // Check-in function is called here if registered
+                  child: Text('Check In'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isRegistered
+                        ? Colors.blue
+                        : Colors
+                            .grey, // Change color based on registration status
+                  ),
+                ),
+                SizedBox(height: sizedBoxHeight), // Optional spacing
+                ElevatedButton(
+                  onPressed: () async {
+                    String userUID =
+                        FirebaseAuth.instance.currentUser?.uid ?? "";
+                    String eventId = widget.event.eventID;
+                    bool isRegistered =
+                        await FirebaseService.isUserRegisteredForEvent(
+                            userUID, eventId);
+                    if (isRegistered) {
+                      FirebaseService.unregisterFromEvent(userUID, eventId);
+                    } else {
+                      FirebaseService.registerForEvent(userUID, eventId);
+                    }
+                    setState(() {
+                      _isRegistered =
+                          !_isRegistered; // Toggle registration status
+                    });
+                  },
+                  child: Text(_isRegistered ? 'Unregister' : 'Register'),
+                ),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => attemptCheckIn("38 Parsons Street, Brighton"),
-            child: Text('Check In to Event'),
-          )
         ],
       ),
     );
