@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,7 +6,7 @@ import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventPage extends StatefulWidget {
   final Event event;
@@ -21,8 +20,8 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   GeocodingService geocodingService = GeocodingService();
 
-  bool _isRegistered =
-      false; // Track whether the user is registered for the event
+  bool _isInterested =
+      false; // Track whether the user is interested in the event
   bool _isCheckedIn = false; // To track if the user has checked in
 
 // Checks if user is registered -- if so, the button will reflect that
@@ -42,7 +41,8 @@ class _EventPageState extends State<EventPage> {
     bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
         userUID, widget.event.eventID);
     setState(() {
-      _isRegistered = isRegistered;
+      // changing registered to Interested
+      _isInterested = isRegistered;
     });
   }
 
@@ -54,7 +54,6 @@ class _EventPageState extends State<EventPage> {
 
     final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
     final nowLocal = tz.TZDateTime.now(tz.local);
-
     return nowLocal.year == eventDateTimeLocal.year &&
         nowLocal.month == eventDateTimeLocal.month &&
         nowLocal.day == eventDateTimeLocal.day;
@@ -158,6 +157,22 @@ class _EventPageState extends State<EventPage> {
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: sizedBoxHeight),
+                GestureDetector(
+                  onTap: () async {
+                    var url = Uri.parse(widget.event.eventURL);
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Text(
+                    'Event URL: ${widget.event.eventURL}',
+                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                  ),
+                ),
+
+                SizedBox(height: sizedBoxHeight),
                 Text(
                   'Description: ${widget.event.eventDescription}',
                   style: TextStyle(fontSize: 16),
@@ -171,7 +186,7 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: (!_isRegistered ||
+                  onPressed: (!_isInterested ||
                           !isEventToday(widget.event.eventStartTime) ||
                           _isCheckedIn)
                       ? null
@@ -182,15 +197,16 @@ class _EventPageState extends State<EventPage> {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Unable to check in: location too far!")));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    "Unable to check in: location too far or permission denied.")));
                           }
                         },
                   child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isRegistered ? Colors.blue : Colors.grey),
+                        : (_isInterested ? Colors.blue : Colors.grey),
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight), // Optional spacing
@@ -208,11 +224,11 @@ class _EventPageState extends State<EventPage> {
                       FirebaseService.registerForEvent(userUID, eventId);
                     }
                     setState(() {
-                      _isRegistered =
-                          !_isRegistered; // Toggle registration status
+                      _isInterested =
+                          !_isInterested; // Toggle registration status
                     });
                   },
-                  child: Text(_isRegistered ? 'Unregister' : 'Register'),
+                  child: Text(_isInterested ? 'Not Interested' : 'Interested'),
                 ),
               ],
             ),

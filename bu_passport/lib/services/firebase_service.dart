@@ -1,12 +1,9 @@
-import 'dart:ffi';
-
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/classes/categorized_events.dart';
 import 'package:bu_passport/classes/event.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 
 class FirebaseService {
   static Future<List<Event>> fetchEvents() async {
@@ -20,6 +17,7 @@ class FirebaseService {
         Event event = Event(
           eventID: doc.id,
           eventTitle: eventData['eventTitle'] ?? '',
+          eventURL: eventData['eventURL'] ?? '',
           eventPhoto: eventData['eventPhoto'] ?? '',
           eventLocation: eventData['eventLocation'] ?? '',
           eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
@@ -152,14 +150,6 @@ class FirebaseService {
     final List<Event> upcomingEvents = [];
 
     for (Event event in fetchedEvents) {
-      // List<String> splittedTime = event.eventStartTime.split(",");
-      // String day = splittedTime[splittedTime.length - 2]
-      //     .trim(); // Get the penultimate element
-      // String year =
-      //     splittedTime[splittedTime.length - 1].trim(); // Get the last element
-      // // get last 2
-      // DateFormat format = new DateFormat("MMMM dd, yyyy");
-
       if (event.eventStartTime.isBefore(now)) {
         // Event has already occurred (attended)
         attendedEvents.add(event);
@@ -186,6 +176,7 @@ class FirebaseService {
         eventLocation: eventData['eventLocation'] ?? '',
         eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
         eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+        eventURL: eventData['eventURL'] ?? '',
         eventDescription: eventData['eventDescription'] ?? '',
         registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
       );

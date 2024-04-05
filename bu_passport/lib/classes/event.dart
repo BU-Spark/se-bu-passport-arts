@@ -6,6 +6,7 @@ class Event {
   final String eventPhoto;
   final String eventLocation;
   final String eventDescription;
+  final String eventURL;
   final DateTime eventStartTime;
   final DateTime eventEndTime;
 
@@ -20,6 +21,7 @@ class Event {
     required this.eventStartTime,
     required this.eventEndTime,
     required this.eventDescription,
+    required this.eventURL,
     // required this.eventTags,
     required this.registeredUsers,
   });

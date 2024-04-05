@@ -1,8 +1,6 @@
-import 'package:bu_passport/pages/navigation_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,6 +11,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +46,19 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 obscureText: true,
               ),
+              if (_errorMessage != null)
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Colors.red),
+                ),
               SizedBox(height: sizedBoxHeight),
               ElevatedButton(
                 onPressed: () async {
+                  // Reset error message
+                  setState(() {
+                    _errorMessage = null;
+                  });
+
                   // Implement your sign-in logic here
                   String email = _emailController.text;
                   String password = _passwordController.text;
@@ -63,6 +72,10 @@ class _LoginPageState extends State<LoginPage> {
                   } catch (e) {
                     // Handle login errors
                     print('Login error: $e');
+                    setState(() {
+                      _errorMessage =
+                          'Login failed. Please check your email and password.';
+                    });
                   }
                 },
                 child: const Text('Sign In'),
