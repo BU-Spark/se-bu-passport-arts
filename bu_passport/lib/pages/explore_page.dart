@@ -35,19 +35,13 @@ class _HomePageState extends State<ExplorePage> {
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Events'),
+      ),
       body: Center(
         child: ListView(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: sizedBoxHeight),
-            Text(
-              'Events',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: sizedBoxHeight),
             // Search bar
             TextField(
               onChanged: (value) {

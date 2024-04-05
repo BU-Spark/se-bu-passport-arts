@@ -1,7 +1,6 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class EventWidget extends StatefulWidget {
   final Event event;

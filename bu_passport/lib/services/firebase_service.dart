@@ -36,6 +36,14 @@ class FirebaseService {
     }
   }
 
+  static List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
+    return events.where((event) {
+      return event.eventStartTime.day == date.day &&
+          event.eventStartTime.month == date.month &&
+          event.eventStartTime.year == date.year;
+    }).toList();
+  }
+
   static List<Event> filterEvents(List<Event> events, String query) {
     if (query.isEmpty) {
       return events;
