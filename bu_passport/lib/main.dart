@@ -1,8 +1,5 @@
 import 'package:bu_passport/firebase_options.dart';
-import 'package:bu_passport/pages/navigation_page.dart';
 import 'package:bu_passport/pages/login_page.dart';
-import 'package:bu_passport/pages/calendar_page.dart';
-import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 
@@ -20,7 +17,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Timezone initialization for check in 
+  // Timezone initialization for check in
   tz.initializeTimeZones();
   var estLocation = tz.getLocation('America/New_York');
   // Setting local location to EST (since all BU events are in EST)
@@ -35,7 +32,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        useMaterial3: true,
+
+        // Define the default brightness and colors.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFFCC0000),
+          brightness: Brightness.light,
+        ),
       ),
       home: const AuthGate(),
       routes: {
