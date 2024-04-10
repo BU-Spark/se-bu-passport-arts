@@ -149,7 +149,7 @@ for eventLink in eventLinks:
                     'eventDescription': eventDescription if eventDescription else None,  # Assign None if description doesn't exist
                     'eventID': eventID if eventID else None,  # Assign None if event ID doesn't exist
                     'eventPhoto': eventPhoto if eventPhoto else None,  # Assign None if photo doesn't exist
-                    'registeredUsers': [],
+                    'savedUsers': [],
                 }
 
                 db.collection('events').document(eventID).set(event_data)

@@ -24,7 +24,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   List<Event> attendedEvents = [];
-  List<Event> upcomingEvents = [];
+  List<Event> userSavedEvents = [];
   bool isLoading = true;
 
   final TextEditingController _firstNameController = TextEditingController();
@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage>
           await FirebaseService.fetchAndCategorizeEvents();
       setState(() {
         attendedEvents = categorizedEvents.attendedEvents;
-        upcomingEvents = categorizedEvents.upcomingEvents;
+        userSavedEvents = categorizedEvents.userSavedEvents;
       });
     } catch (e) {
       print("Error fetching events: $e");
@@ -270,8 +270,8 @@ class _ProfilePageState extends State<ProfilePage>
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildEventsList(upcomingEvents), // Attended events list
-                    _buildEventsList(attendedEvents), // Upcoming events list
+                    _buildEventsList(userSavedEvents), // Saved events list
+                    _buildEventsList(attendedEvents), // Attended events list
                   ],
                 ),
               ),

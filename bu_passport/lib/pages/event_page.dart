@@ -288,7 +288,7 @@ class _EventPageState extends State<EventPage> {
                       FirebaseService.saveEvent(eventId);
                     }
                     setState(() {
-                      _isSaved = !_isSaved; // Toggle registration status
+                      _isSaved = !_isSaved; // Toggle saved status
                     });
                   },
                   child: Text(_isSaved ? 'Unsave' : 'Save'),

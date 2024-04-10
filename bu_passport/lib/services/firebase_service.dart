@@ -23,7 +23,7 @@ class FirebaseService {
           eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
           eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
           eventDescription: eventData['eventDescription'] ?? '',
-          savedUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -73,7 +73,7 @@ class FirebaseService {
           userPoints: userData['userPoints'],
           userPreferences: List<String>.from(userData['userPreferences'] ?? []),
           userSavedEvents:
-              Map<String, dynamic>.from(userData['userRegisteredEvents'] ?? {}),
+              Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
         );
         return user;
       }
@@ -92,10 +92,10 @@ class FirebaseService {
       // Atomically add the new event ID to the user's saved events list
       // Atomically add the new event ID to the user's saved events map with value `false`
       await userDoc.update({
-        'userRegisteredEvents.$eventId': false,
+        'userSavedEvents.$eventId': false,
       });
       await db.collection('events').doc(eventId).update({
-        'registeredUsers': FieldValue.arrayUnion([userUID]),
+        'savedUsers': FieldValue.arrayUnion([userUID]),
       });
       print("Event saved successfully");
     } catch (error) {
@@ -111,10 +111,10 @@ class FirebaseService {
     try {
       // Atomically remove the event ID from the user's saved events list
       await userDoc.update({
-        'userRegisteredEvents.$eventId': FieldValue.delete(),
+        'userSavedEvents.$eventId': FieldValue.delete(),
       });
       await db.collection('events').doc(eventId).update({
-        'registeredUsers': FieldValue.arrayRemove([userUID]),
+        'savedUsers': FieldValue.arrayRemove([userUID]),
       });
       print("Event unsaving successful");
     } catch (error) {
@@ -129,8 +129,8 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      print(userData['userRegisteredEvents']);
-      Map<String, dynamic> savedEvents = userData['userRegisteredEvents'] ?? [];
+      print(userData['userSavedEvents']);
+      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? [];
 
       // Check if the eventId exists in the list
       return savedEvents.containsKey(eventId);
@@ -153,13 +153,13 @@ class FirebaseService {
 
     final userData = userDoc.data();
 
-    Map<String, dynamic> savedEvents = userData!['userRegisteredEvents'] ?? [];
+    Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? [];
 
     final now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
 
     final List<Event> attendedEvents = [];
-    final List<Event> upcomingEvents = [];
+    final List<Event> userSavedEvents = [];
 
     await Future.forEach(savedEvents.entries,
         (MapEntry<String, dynamic> entry) async {
@@ -175,13 +175,13 @@ class FirebaseService {
           attendedEvents.add(event);
         } else {
           // Event is upcoming
-          upcomingEvents.add(event);
+          userSavedEvents.add(event);
         }
       }
     });
 
     return CategorizedEvents(
-        attendedEvents: attendedEvents, upcomingEvents: upcomingEvents);
+        attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
   }
 
   static Future<Event?> fetchEventById(String eventId) async {
@@ -199,7 +199,7 @@ class FirebaseService {
         eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
         eventURL: eventData['eventURL'] ?? '',
         eventDescription: eventData['eventDescription'] ?? '',
-        savedUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+        savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
       );
       return event;
     }
@@ -216,9 +216,9 @@ class FirebaseService {
     final userDoc = db.collection('users').doc(userUID);
 
     try {
-      // Atomically add the new event ID to the user's registered events list
+      // Atomically add the new event ID to the user's saved events list
       userDoc.update({
-        'userRegisteredEvents.$eventID': true,
+        'userSavedEvents.$eventID': true,
       });
       print("Event check-in successful");
     } catch (error) {
@@ -234,7 +234,7 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      Map<String, dynamic> savedEvents = userData['userRegisteredEvents'] ?? [];
+      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? [];
 
       // Check if the eventId exists in the list
       return savedEvents.containsKey(eventId) && savedEvents[eventId];
