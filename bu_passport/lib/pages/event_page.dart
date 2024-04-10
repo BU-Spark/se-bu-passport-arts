@@ -29,6 +29,7 @@ class _EventPageState extends State<EventPage> {
   void initState() {
     super.initState();
     checkIfUserIsRegistered();
+    checkIfUserIsCheckedIn();
   }
 
   void checkIfUserIsRegistered() async {
@@ -43,6 +44,20 @@ class _EventPageState extends State<EventPage> {
     setState(() {
       // changing registered to saved
       _isSaved = isRegistered;
+    });
+  }
+
+  void checkIfUserIsCheckedIn() async {
+    String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+    // Ensure there's a user logged in
+    if (userUID.isEmpty) {
+      print("User is not logged in.");
+      return;
+    }
+    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
+        userUID, widget.event.eventID);
+    setState(() {
+      _isCheckedIn = isCheckedIn;
     });
   }
 
@@ -128,7 +143,7 @@ class _EventPageState extends State<EventPage> {
             height: screenHeight * 0.4, // Adjust the height as needed
           ),
           Padding(
-            padding: EdgeInsets.all(edgeInsets*2.5),
+            padding: EdgeInsets.all(edgeInsets * 2.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

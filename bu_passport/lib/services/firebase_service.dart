@@ -235,4 +235,21 @@ class FirebaseService {
       print("Failed to check-in for event: $error");
     }
   }
+
+  static Future<bool> isUserCheckedInForEvent(
+      String userUID, String eventId) async {
+    final db = FirebaseFirestore.instance;
+    DocumentSnapshot userDocSnapshot =
+        await db.collection('users').doc(userUID).get();
+
+    if (userDocSnapshot.exists) {
+      final userData = userDocSnapshot.data() as Map<String, dynamic>;
+      Map<String, dynamic> registeredEvents =
+          userData['userRegisteredEvents'] ?? [];
+
+      // Check if the eventId exists in the list
+      return registeredEvents.containsKey(eventId) && registeredEvents[eventId];
+    }
+    return false;
+  }
 }
