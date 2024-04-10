@@ -25,7 +25,11 @@ class _HomePageState extends State<ExplorePage> {
     fetchEventsFuture = FirebaseService.fetchEvents();
   }
 
-  void updateEventPage() {}
+  void updateEventPage() {
+    setState(() {
+      fetchEventsFuture = FirebaseService.fetchEvents();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
