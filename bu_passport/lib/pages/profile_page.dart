@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage>
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     double verticalMargin = screenHeight * 0.01; // 1% of screen height
-    double horizontalMargin = screenWidth * 0.02; // 2% of screen width
+    double horizontalMargin = screenWidth * 0.035; // 2% of screen width
 
     print(events);
     return ListView.builder(
