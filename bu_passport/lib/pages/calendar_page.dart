@@ -16,8 +16,9 @@ class _CalendarPageState extends State<CalendarPage> {
   late CalendarFormat _calendarFormat;
   late DateTime _focusedDay;
   late DateTime _selectedDay;
-  late List<Event> _allEvents; // List to store events
-  late List<Event> _selectedEvents; // List to store events for the selected day
+  List<Event> _allEvents = []; // List to store events
+// List to store events for the selected day
+  late Future<List<Event>> _allEventsFuture;
 
   @override
   void initState() {
@@ -25,24 +26,14 @@ class _CalendarPageState extends State<CalendarPage> {
     _calendarFormat = CalendarFormat.month;
     _focusedDay = DateTime.now();
     _selectedDay = DateTime.now();
-    _allEvents = []; // Initialize the events list
-    _selectedEvents = []; // Initialize the events list
-    _fetchEvents(); // Fetch all events
-    _fetchEventsForSelectedDay(); // Fetch events for the selected day
+    _fetchEvents(); // Initialize the future to fetch events
+    _allEventsFuture = FirebaseService.fetchEvents();
   }
 
   Future<void> _fetchEvents() async {
     List<Event> allEvents = await FirebaseService.fetchEvents();
     setState(() {
       _allEvents = allEvents;
-    });
-  }
-
-  Future<void> _fetchEventsForSelectedDay() async {
-    List<Event> selectedEvents =
-        await FirebaseService.fetchEventsForDay(_selectedDay, _allEvents);
-    setState(() {
-      _selectedEvents = selectedEvents;
     });
   }
 
@@ -56,63 +47,90 @@ class _CalendarPageState extends State<CalendarPage> {
     double itemHorizontalMargin = screenWidth * 0.02;
 
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Calendar'),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            calendarFormat: _calendarFormat,
-            focusedDay: _focusedDay,
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            startingDayOfWeek: StartingDayOfWeek.sunday,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onFormatChanged: (format) {
-              setState(() {
-                _calendarFormat = format;
-              });
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-                _fetchEventsForSelectedDay(); // Fetch events for the selected day
-              });
-            },
-            // Provide events to the calendar
-            eventLoader: (day) {
-              return _allEvents
-                  .where((event) =>
-                      event.eventStartTime.year == day.year &&
-                      event.eventStartTime.month == day.month &&
-                      event.eventStartTime.day == day.day)
-                  .toList();
-            },
-          ),
-          SizedBox(height: sizedBoxHeight),
-          Text(
-            '${DateFormat('EEEE, MMMM d, y').format(_selectedDay)}',
-            style: TextStyle(fontSize: 20),
-          ),
-          Expanded(
-              child: Padding(
-                  padding: EdgeInsets.all(defaultPadding),
-                  child: ListView.builder(
-                    itemCount: _selectedEvents.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: EdgeInsets.symmetric(
+      body: FutureBuilder<List<Event>>(
+        future: _allEventsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else {
+            List<Event>? events = snapshot.data;
+            if (events == null || events.isEmpty) {
+              return Center(
+                child: Text('No events found.'),
+              );
+            }
+            List<Event> selectedEvents =
+                FirebaseService.fetchEventsForDay(_selectedDay, events);
+            print('Selected events: $selectedEvents');
+            return Column(
+              children: [
+                TableCalendar(
+                  calendarFormat: _calendarFormat,
+                  focusedDay: _focusedDay,
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  startingDayOfWeek: StartingDayOfWeek.sunday,
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDay, day);
+                  },
+                  onFormatChanged: (format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  // Provide events to the calendar
+                  eventLoader: (day) {
+                    return _allEvents
+                        .where((event) =>
+                            event.eventStartTime.year == day.year &&
+                            event.eventStartTime.month == day.month &&
+                            event.eventStartTime.day == day.day)
+                        .toList();
+                  },
+                ),
+                SizedBox(height: sizedBoxHeight),
+                Text(
+                  '${DateFormat('EEEE, MMMM d, y').format(_selectedDay)}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: ListView.builder(
+                      itemCount: selectedEvents.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.symmetric(
                             vertical: itemVerticalMargin,
-                            horizontal: itemHorizontalMargin),
-                        child: EventWidget(event: _selectedEvents[index]),
-                      );
-                    },
-                  ))),
-        ],
+                            horizontal: itemHorizontalMargin,
+                          ),
+                          child: EventWidget(event: selectedEvents[index]),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
       ),
     );
   }

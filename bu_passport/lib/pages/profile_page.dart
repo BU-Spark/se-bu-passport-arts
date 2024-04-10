@@ -151,8 +151,7 @@ class _ProfilePageState extends State<ProfilePage>
         final event = events[index];
         return Card(
             margin: EdgeInsets.symmetric(
-              vertical: verticalMargin,
-            horizontal: horizontalMargin),
+                vertical: verticalMargin, horizontal: horizontalMargin),
             child: EventWidget(event: event));
         // Use your EventWidget to display each event
       },
@@ -171,6 +170,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         actions: <Widget>[
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
@@ -190,8 +190,7 @@ class _ProfilePageState extends State<ProfilePage>
             icon: Icon(Icons.logout),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushReplacementNamed(
-                  '/login'); // Replace with your login route
+              Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
         ],

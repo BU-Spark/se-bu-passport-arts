@@ -169,8 +169,11 @@ class FirebaseService {
       Event? event = await fetchEventById(eventId);
       print(event?.eventTitle);
       if (event != null) {
-        DateTime startOfDayEvent = DateTime(event.eventStartTime.year, event.eventStartTime.month, event.eventStartTime.day);
-        if ((startOfDayEvent.isBefore(now) || startOfDayEvent.isAtSameMomentAs(today)) && isCheckedIn) {
+        DateTime startOfDayEvent = DateTime(event.eventStartTime.year,
+            event.eventStartTime.month, event.eventStartTime.day);
+        if ((startOfDayEvent.isBefore(now) ||
+                startOfDayEvent.isAtSameMomentAs(today)) &&
+            isCheckedIn) {
           // Event has already occurred (attended)
           attendedEvents.add(event);
         } else {

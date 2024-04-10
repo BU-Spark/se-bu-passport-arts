@@ -1,5 +1,6 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -36,6 +37,24 @@ class _EventWidgetState extends State<EventWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0), // Apply border radius
           border: Border.all(color: Colors.grey), // Add border
+          // color: Color(0xFFCC0000),
+          image: DecorationImage(
+            image: AssetImage(widget.event.eventPhoto),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5), // Background blend mode color
+              BlendMode.dstATop, // Choose your blend mode
+            ),
+          ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Color(0xFFCC0000),
+            ],
+            stops: [0.0, 1.0],
+          ),
         ),
         child: Column(
           children: [
@@ -57,8 +76,7 @@ class _EventWidgetState extends State<EventWidget> {
             ),
             SizedBox(height: sizedBoxHeight * 0.5),
             Padding(
-              padding:
-                  EdgeInsets.fromLTRB(edgeInsets, edgeInsets, edgeInsets, 0),
+              padding: EdgeInsets.fromLTRB(edgeInsets, 0, edgeInsets, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -66,10 +84,11 @@ class _EventWidgetState extends State<EventWidget> {
                     child: Text(
                       widget.event.eventTitle,
                       style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -81,7 +100,7 @@ class _EventWidgetState extends State<EventWidget> {
                       style: TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                       children: <TextSpan>[
                         TextSpan(
@@ -89,7 +108,7 @@ class _EventWidgetState extends State<EventWidget> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                       ],
