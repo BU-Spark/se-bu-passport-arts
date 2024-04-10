@@ -24,7 +24,7 @@ class _EventPageState extends State<EventPage> {
   bool _isSaved = false; // Track whether the user is interested in the event
   bool _isCheckedIn = false; // To track if the user has checked in
 
-// Checks if user is registered -- if so, the button will reflect that
+// Checks if user saved event -- if so, the button will reflect that
   @override
   void initState() {
     super.initState();
@@ -39,11 +39,11 @@ class _EventPageState extends State<EventPage> {
       print("User is not logged in.");
       return;
     }
-    bool isRegistered = await FirebaseService.hasUserSavedEvent(
+    bool isSaved = await FirebaseService.hasUserSavedEvent(
         userUID, widget.event.eventID);
     setState(() {
-      // changing registered to saved
-      _isSaved = isRegistered;
+      // changing save to saved
+      _isSaved = isSaved;
     });
   }
 
@@ -279,10 +279,10 @@ class _EventPageState extends State<EventPage> {
                     String userUID =
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
-                    bool isRegistered =
+                    bool isSaved =
                         await FirebaseService.hasUserSavedEvent(
                             userUID, eventId);
-                    if (isRegistered) {
+                    if (isSaved) {
                       FirebaseService.unsaveEvent(eventId);
                     } else {
                       FirebaseService.saveEvent(eventId);

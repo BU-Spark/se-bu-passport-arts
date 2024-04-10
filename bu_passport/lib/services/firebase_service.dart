@@ -23,8 +23,7 @@ class FirebaseService {
           eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
           eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
           eventDescription: eventData['eventDescription'] ?? '',
-          registeredUsers:
-              List<String>.from(eventData['registeredUsers'] ?? []),
+          savedUsers: List<String>.from(eventData['registeredUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -73,7 +72,7 @@ class FirebaseService {
           userYear: userData['userYear'],
           userPoints: userData['userPoints'],
           userPreferences: List<String>.from(userData['userPreferences'] ?? []),
-          userRegisteredEvents:
+          userSavedEvents:
               Map<String, dynamic>.from(userData['userRegisteredEvents'] ?? {}),
         );
         return user;
@@ -90,8 +89,8 @@ class FirebaseService {
     final userDoc = db.collection('users').doc(userUID);
 
     try {
-      // Atomically add the new event ID to the user's registered events list
-      // Atomically add the new event ID to the user's registered events map with value `false`
+      // Atomically add the new event ID to the user's saved events list
+      // Atomically add the new event ID to the user's saved events map with value `false`
       await userDoc.update({
         'userRegisteredEvents.$eventId': false,
       });
@@ -110,7 +109,7 @@ class FirebaseService {
     final userDoc = db.collection('users').doc(userUID);
 
     try {
-      // Atomically remove the event ID from the user's registered events list
+      // Atomically remove the event ID from the user's saved events list
       await userDoc.update({
         'userRegisteredEvents.$eventId': FieldValue.delete(),
       });
@@ -123,8 +122,7 @@ class FirebaseService {
     }
   }
 
-  static Future<bool> hasUserSavedEvent(
-      String userUID, String eventId) async {
+  static Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
     final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
         await db.collection('users').doc(userUID).get();
@@ -132,11 +130,10 @@ class FirebaseService {
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
       print(userData['userRegisteredEvents']);
-      Map<String, dynamic> registeredEvents =
-          userData['userRegisteredEvents'] ?? [];
+      Map<String, dynamic> savedEvents = userData['userRegisteredEvents'] ?? [];
 
       // Check if the eventId exists in the list
-      return registeredEvents.containsKey(eventId);
+      return savedEvents.containsKey(eventId);
     }
     return false;
   }
@@ -156,15 +153,15 @@ class FirebaseService {
 
     final userData = userDoc.data();
 
-    Map<String, dynamic> registeredEvents =
-        userData!['userRegisteredEvents'] ?? [];
+    Map<String, dynamic> savedEvents = userData!['userRegisteredEvents'] ?? [];
 
     final now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
 
     final List<Event> attendedEvents = [];
     final List<Event> upcomingEvents = [];
 
-    await Future.forEach(registeredEvents.entries,
+    await Future.forEach(savedEvents.entries,
         (MapEntry<String, dynamic> entry) async {
       String eventId = entry.key;
       bool isCheckedIn = entry.value;
@@ -172,7 +169,8 @@ class FirebaseService {
       Event? event = await fetchEventById(eventId);
       print(event?.eventTitle);
       if (event != null) {
-        if (event.eventStartTime.isBefore(now) && isCheckedIn) {
+        DateTime startOfDayEvent = DateTime(event.eventStartTime.year, event.eventStartTime.month, event.eventStartTime.day);
+        if ((startOfDayEvent.isBefore(now) || startOfDayEvent.isAtSameMomentAs(today)) && isCheckedIn) {
           // Event has already occurred (attended)
           attendedEvents.add(event);
         } else {
@@ -201,7 +199,7 @@ class FirebaseService {
         eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
         eventURL: eventData['eventURL'] ?? '',
         eventDescription: eventData['eventDescription'] ?? '',
-        registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+        savedUsers: List<String>.from(eventData['registeredUsers'] ?? []),
       );
       return event;
     }
@@ -236,11 +234,10 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      Map<String, dynamic> registeredEvents =
-          userData['userRegisteredEvents'] ?? [];
+      Map<String, dynamic> savedEvents = userData['userRegisteredEvents'] ?? [];
 
       // Check if the eventId exists in the list
-      return registeredEvents.containsKey(eventId) && registeredEvents[eventId];
+      return savedEvents.containsKey(eventId) && savedEvents[eventId];
     }
     return false;
   }
