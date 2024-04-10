@@ -68,6 +68,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double basePadding = screenWidth * 0.05;
+
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -90,7 +94,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             children: _pages,
           ),
           Positioned(
-              bottom: 10,
+              bottom: basePadding,
               left: 0,
               right: 0,
               child: Row(
@@ -99,13 +103,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       (int index) {
                     return AnimatedContainer(
                       duration: Duration(milliseconds: 300),
-                      height: 10,
-                      width: _currentPage == index ? 30 : 10,
+                      height: screenHeight * 0.009,
+                      width: _currentPage == index
+                          ? screenWidth * 0.02
+                          : screenWidth * 0.02,
                       margin: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         color: _currentPage == index
-                            ? Colors.blue
+                            ? Colors.red
                             : Colors.grey.withOpacity(0.5),
                       ),
                     );
@@ -155,16 +161,25 @@ class OnboardingPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
+      padding: EdgeInsets.all(screenWidth * 0.05),
       color: color,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image(image: image.image),
+          Container(
+            width: screenWidth * 0.8,
+            child: Image(image: image.image),
+          ),
           Text(title,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           SizedBox(height: 20),
-          Text(description, textAlign: TextAlign.center),
+          Text(description,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: screenWidth * 0.035)),
         ],
       ),
     );
