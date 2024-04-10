@@ -39,8 +39,8 @@ class _EventPageState extends State<EventPage> {
       print("User is not logged in.");
       return;
     }
-    bool isSaved = await FirebaseService.hasUserSavedEvent(
-        userUID, widget.event.eventID);
+    bool isSaved =
+        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
@@ -211,7 +211,7 @@ class _EventPageState extends State<EventPage> {
                       style: TextStyle(fontSize: 16.0, color: Colors.black),
                       children: [
                         TextSpan(
-                          text: 'Event URL: ',
+                          text: 'Event URL: \n',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         TextSpan(
@@ -228,7 +228,7 @@ class _EventPageState extends State<EventPage> {
                     style: TextStyle(fontSize: 16.0, color: Colors.black),
                     children: [
                       TextSpan(
-                        text: 'Description: ',
+                        text: 'Description: \n',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
@@ -279,9 +279,8 @@ class _EventPageState extends State<EventPage> {
                     String userUID =
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
-                    bool isSaved =
-                        await FirebaseService.hasUserSavedEvent(
-                            userUID, eventId);
+                    bool isSaved = await FirebaseService.hasUserSavedEvent(
+                        userUID, eventId);
                     if (isSaved) {
                       FirebaseService.unsaveEvent(eventId);
                     } else {

@@ -138,24 +138,30 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
-  Widget _buildEventsList(List<Event> events) {
+  Widget _buildEventsList(List<Event> events, String emptyMessage) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     double verticalMargin = screenHeight * 0.01; // 1% of screen height
     double horizontalMargin = screenWidth * 0.035; // 2% of screen width
 
     print(events);
-    return ListView.builder(
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
-        return Card(
-            margin: EdgeInsets.symmetric(
-                vertical: verticalMargin, horizontal: horizontalMargin),
-            child: EventWidget(event: event));
-        // Use your EventWidget to display each event
-      },
-    );
+
+    if (events.isEmpty) {
+      return Center(child: Text(emptyMessage, style: TextStyle(fontSize: 20)));
+    } else {
+      return ListView.builder(
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          final event = events[index];
+          return Card(
+              margin: EdgeInsets.symmetric(
+                  vertical: verticalMargin, horizontal: horizontalMargin),
+              child: EventWidget(event: event));
+          // Use your EventWidget to display each event
+        },
+      );
+    }
+      
   }
 
   @override
@@ -278,8 +284,8 @@ class _ProfilePageState extends State<ProfilePage>
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildEventsList(userSavedEvents), // Saved events list
-                    _buildEventsList(attendedEvents), // Attended events list
+                    _buildEventsList(userSavedEvents, "No saved events."), // Saved events list
+                    _buildEventsList(attendedEvents, "No attended events."), // Attended events list
                   ],
                 ),
               ),
