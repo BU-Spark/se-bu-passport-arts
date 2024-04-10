@@ -139,6 +139,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _buildEventsList(List<Event> events) {
+    print(events);
     return ListView.builder(
       itemCount: events.length,
       itemBuilder: (context, index) {
@@ -207,6 +208,7 @@ class _ProfilePageState extends State<ProfilePage>
                 var userData = snapshot.data!.data() as Map<String, dynamic>;
                 String fullName =
                     '${userData['firstName'] ?? 'Not set'} ${userData['lastName'] ?? ''}';
+                int userPoints = userData['points'] ?? 0;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -245,6 +247,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ] else ...[
                       Text(fullName, style: TextStyle(fontSize: 20)),
+                      Text(userPoints.toString() + ' points'),
                     ],
                   ],
                 );

@@ -20,8 +20,7 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   GeocodingService geocodingService = GeocodingService();
 
-  bool _isInterested =
-      false; // Track whether the user is interested in the event
+  bool _isSaved = false; // Track whether the user is interested in the event
   bool _isCheckedIn = false; // To track if the user has checked in
 
 // Checks if user is registered -- if so, the button will reflect that
@@ -41,8 +40,8 @@ class _EventPageState extends State<EventPage> {
     bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
         userUID, widget.event.eventID);
     setState(() {
-      // changing registered to Interested
-      _isInterested = isRegistered;
+      // changing registered to saved
+      _isSaved = isRegistered;
     });
   }
 
@@ -186,7 +185,7 @@ class _EventPageState extends State<EventPage> {
             child: Column(
               children: [
                 ElevatedButton(
-                  onPressed: (!_isInterested ||
+                  onPressed: (!_isSaved ||
                           !isEventToday(widget.event.eventStartTime) ||
                           _isCheckedIn)
                       ? null
@@ -196,6 +195,8 @@ class _EventPageState extends State<EventPage> {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
+                            FirebaseService.checkInUserForEvent(
+                                widget.event.eventID);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
@@ -206,7 +207,7 @@ class _EventPageState extends State<EventPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isInterested ? Colors.blue : Colors.grey),
+                        : (_isSaved ? Colors.red : Colors.grey),
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight), // Optional spacing
@@ -219,16 +220,15 @@ class _EventPageState extends State<EventPage> {
                         await FirebaseService.isUserRegisteredForEvent(
                             userUID, eventId);
                     if (isRegistered) {
-                      FirebaseService.unregisterFromEvent(userUID, eventId);
+                      FirebaseService.unregisterFromEvent(eventId);
                     } else {
-                      FirebaseService.registerForEvent(userUID, eventId);
+                      FirebaseService.registerForEvent(eventId);
                     }
                     setState(() {
-                      _isInterested =
-                          !_isInterested; // Toggle registration status
+                      _isSaved = !_isSaved; // Toggle registration status
                     });
                   },
-                  child: Text(_isInterested ? 'Not Interested' : 'Interested'),
+                  child: Text(_isSaved ? 'Unsave' : 'Save'),
                 ),
               ],
             ),

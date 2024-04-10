@@ -112,14 +112,14 @@ class _SignUpPageState extends State<SignUpPage> {
                       'userSchool': school,
                       'userYear': year,
                       'userBUID': buID,
-                      'userRegisteredEvents': [],
-                      'userPreferences': [],
+                      'userPoints': 0,
+                      'userRegisteredEvents': Map<String, bool>(),
                     };
                     await db
                         .collection('users')
                         .doc(userCredential.user!.uid)
                         .set(user);
-                    Navigator.pushNamed(context, '/home');
+                    Navigator.pushNamed(context, '/onboarding');
                   } catch (e) {
                     print(e);
                   }

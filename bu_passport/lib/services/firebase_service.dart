@@ -71,9 +71,10 @@ class FirebaseService {
           userSchool: userData['userSchool'],
           userUID: userData['userUID'],
           userYear: userData['userYear'],
+          userPoints: userData['userPoints'],
           userPreferences: List<String>.from(userData['userPreferences'] ?? []),
           userRegisteredEvents:
-              List<String>.from(userData['userRegisteredEvents'] ?? []),
+              Map<String, dynamic>.from(userData['userRegisteredEvents'] ?? {}),
         );
         return user;
       }
@@ -83,14 +84,19 @@ class FirebaseService {
     return null;
   }
 
-  static Future<void> registerForEvent(String userUID, String eventId) async {
+  static Future<void> registerForEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
+    final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
 
     try {
       // Atomically add the new event ID to the user's registered events list
+      // Atomically add the new event ID to the user's registered events map with value `false`
       await userDoc.update({
-        'userRegisteredEvents': FieldValue.arrayUnion([eventId]),
+        'userRegisteredEvents.$eventId': false,
+      });
+      await db.collection('events').doc(eventId).update({
+        'registeredUsers': FieldValue.arrayUnion([userUID]),
       });
       print("Event registration successful");
     } catch (error) {
@@ -98,15 +104,18 @@ class FirebaseService {
     }
   }
 
-  static Future<void> unregisterFromEvent(
-      String userUID, String eventId) async {
+  static Future<void> unregisterFromEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
+    final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
 
     try {
       // Atomically remove the event ID from the user's registered events list
       await userDoc.update({
-        'userRegisteredEvents': FieldValue.arrayRemove([eventId]),
+        'userRegisteredEvents.$eventId': FieldValue.delete(),
+      });
+      await db.collection('events').doc(eventId).update({
+        'registeredUsers': FieldValue.arrayRemove([userUID]),
       });
       print("Event unregistration successful");
     } catch (error) {
@@ -122,10 +131,12 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      List<dynamic> registeredEvents = userData['userRegisteredEvents'] ?? [];
+      print(userData['userRegisteredEvents']);
+      Map<String, dynamic> registeredEvents =
+          userData['userRegisteredEvents'] ?? [];
 
       // Check if the eventId exists in the list
-      return registeredEvents.contains(eventId);
+      return registeredEvents.containsKey(eventId);
     }
     return false;
   }
@@ -144,28 +155,32 @@ class FirebaseService {
     }
 
     final userData = userDoc.data();
-    final List<dynamic> registeredEventIds =
-        userData?['userRegisteredEvents'] ?? [];
 
-    List<Event> fetchedEvents = (await Future.wait(registeredEventIds.map(
-            (eventId) => FirebaseService.fetchEventById(eventId as String))))
-        .whereType<Event>()
-        .toList(); // Ensure only non-null Events are kept
+    Map<String, dynamic> registeredEvents =
+        userData!['userRegisteredEvents'] ?? [];
 
     final now = DateTime.now();
 
     final List<Event> attendedEvents = [];
     final List<Event> upcomingEvents = [];
 
-    for (Event event in fetchedEvents) {
-      if (event.eventStartTime.isBefore(now)) {
-        // Event has already occurred (attended)
-        attendedEvents.add(event);
-      } else {
-        // Event is upcoming
-        upcomingEvents.add(event);
+    await Future.forEach(registeredEvents.entries,
+        (MapEntry<String, dynamic> entry) async {
+      String eventId = entry.key;
+      bool isCheckedIn = entry.value;
+
+      Event? event = await fetchEventById(eventId);
+      print(event?.eventTitle);
+      if (event != null) {
+        if (event.eventStartTime.isBefore(now) && isCheckedIn) {
+          // Event has already occurred (attended)
+          attendedEvents.add(event);
+        } else {
+          // Event is upcoming
+          upcomingEvents.add(event);
+        }
       }
-    }
+    });
 
     return CategorizedEvents(
         attendedEvents: attendedEvents, upcomingEvents: upcomingEvents);
@@ -199,5 +214,25 @@ class FirebaseService {
     List<String> registeredEventIds =
         List<String>.from(userDoc.data()?['registeredEvents'] ?? []);
     return registeredEventIds;
+  }
+
+  static void checkInUserForEvent(String eventID) {
+    final userUID = FirebaseAuth.instance.currentUser?.uid;
+    if (userUID == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final db = FirebaseFirestore.instance;
+    final userDoc = db.collection('users').doc(userUID);
+
+    try {
+      // Atomically add the new event ID to the user's registered events list
+      userDoc.update({
+        'userRegisteredEvents.$eventID': true,
+      });
+      print("Event check-in successful");
+    } catch (error) {
+      print("Failed to check-in for event: $error");
+    }
   }
 }
