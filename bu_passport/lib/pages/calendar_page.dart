@@ -111,21 +111,26 @@ class _CalendarPageState extends State<CalendarPage> {
                   style: TextStyle(fontSize: 20),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(defaultPadding),
-                    child: ListView.builder(
-                      itemCount: selectedEvents.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: itemVerticalMargin,
-                            horizontal: itemHorizontalMargin,
+                  child: selectedEvents.isEmpty
+                      ? Center(
+                          child: Text('No events for today.',
+                              style: TextStyle(fontSize: 20)))
+                      : Padding(
+                          padding: EdgeInsets.all(defaultPadding),
+                          child: ListView.builder(
+                            itemCount: selectedEvents.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: itemVerticalMargin,
+                                  horizontal: itemHorizontalMargin,
+                                ),
+                                child:
+                                    EventWidget(event: selectedEvents[index]),
+                              );
+                            },
                           ),
-                          child: EventWidget(event: selectedEvents[index]),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
                 ),
               ],
             );
