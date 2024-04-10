@@ -28,18 +28,18 @@ class _EventPageState extends State<EventPage> {
   @override
   void initState() {
     super.initState();
-    checkIfUserIsRegistered();
+    checkIfUserSaved();
     checkIfUserIsCheckedIn();
   }
 
-  void checkIfUserIsRegistered() async {
+  void checkIfUserSaved() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
       print("User is not logged in.");
       return;
     }
-    bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
+    bool isRegistered = await FirebaseService.hasUserSavedEvent(
         userUID, widget.event.eventID);
     setState(() {
       // changing registered to saved
@@ -62,11 +62,6 @@ class _EventPageState extends State<EventPage> {
   }
 
   bool isEventToday(DateTime eventDateTimestamp) {
-    // DateTime? eventDateTimeStart = convertEventStartTime(eventDateTimeStartStr);
-    // Ensuring that it is EST
-
-    // DateTime eventDateTimeStart = eventDateTimestamp.toDate();
-
     final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
     final nowLocal = tz.TZDateTime.now(tz.local);
     return nowLocal.year == eventDateTimeLocal.year &&
@@ -285,12 +280,12 @@ class _EventPageState extends State<EventPage> {
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
                     bool isRegistered =
-                        await FirebaseService.isUserRegisteredForEvent(
+                        await FirebaseService.hasUserSavedEvent(
                             userUID, eventId);
                     if (isRegistered) {
-                      FirebaseService.unregisterFromEvent(eventId);
+                      FirebaseService.unsaveEvent(eventId);
                     } else {
-                      FirebaseService.registerForEvent(eventId);
+                      FirebaseService.saveEvent(eventId);
                     }
                     setState(() {
                       _isSaved = !_isSaved; // Toggle registration status

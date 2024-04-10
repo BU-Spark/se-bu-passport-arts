@@ -84,7 +84,7 @@ class FirebaseService {
     return null;
   }
 
-  static Future<void> registerForEvent(String eventId) async {
+  static Future<void> saveEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
@@ -98,13 +98,13 @@ class FirebaseService {
       await db.collection('events').doc(eventId).update({
         'registeredUsers': FieldValue.arrayUnion([userUID]),
       });
-      print("Event registration successful");
+      print("Event saved successfully");
     } catch (error) {
-      print("Failed to register for event: $error");
+      print("Failed to save event: $error");
     }
   }
 
-  static Future<void> unregisterFromEvent(String eventId) async {
+  static Future<void> unsaveEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
@@ -117,13 +117,13 @@ class FirebaseService {
       await db.collection('events').doc(eventId).update({
         'registeredUsers': FieldValue.arrayRemove([userUID]),
       });
-      print("Event unregistration successful");
+      print("Event unsaving successful");
     } catch (error) {
-      print("Failed to unregister from event: $error");
+      print("Failed to unsave event: $error");
     }
   }
 
-  static Future<bool> isUserRegisteredForEvent(
+  static Future<bool> hasUserSavedEvent(
       String userUID, String eventId) async {
     final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
@@ -206,14 +206,6 @@ class FirebaseService {
       return event;
     }
     throw Exception("Event not found");
-  }
-
-  static Future<List<String>> fetchUserRegisteredEventIds(String userId) async {
-    var userDoc =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    List<String> registeredEventIds =
-        List<String>.from(userDoc.data()?['registeredEvents'] ?? []);
-    return registeredEventIds;
   }
 
   static void checkInUserForEvent(String eventID) {

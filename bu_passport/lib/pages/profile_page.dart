@@ -263,15 +263,15 @@ class _ProfilePageState extends State<ProfilePage>
                 appBar: TabBar(
                   controller: _tabController,
                   tabs: [
+                    Tab(text: 'Saved'),
                     Tab(text: 'Attended'),
-                    Tab(text: 'Upcoming'),
                   ],
                 ),
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildEventsList(attendedEvents), // Attended events list
-                    _buildEventsList(upcomingEvents), // Upcoming events list
+                    _buildEventsList(upcomingEvents), // Attended events list
+                    _buildEventsList(attendedEvents), // Upcoming events list
                   ],
                 ),
               ),
