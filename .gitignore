@@ -170,3 +170,5 @@ $RECYCLE.BIN/
 .nfs*
 
 GoogleService-Info.plist
+
+bu_passport/lib/config/secrets.dart

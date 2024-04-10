@@ -119,6 +119,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>GoogleMaps.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>GoogleUtilities-GoogleUtilities_Privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -174,6 +179,26 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>geolocator_apple-geolocator_apple_privacy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>geolocator_apple.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>google_maps_flutter_ios-google_maps_flutter_ios_privacy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>google_maps_flutter_ios.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>image_picker_ios-image_picker_ios_privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -195,6 +220,16 @@
 			<false/>
 		</dict>
 		<key>nanopb.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>permission_handler_apple-permission_handler_apple_privacy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>permission_handler_apple.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

@@ -188,9 +188,11 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/RecaptchaInterop/RecaptchaInterop.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/geolocator_apple/geolocator_apple.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/image_picker_ios/image_picker_ios.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/url_launcher_ios/url_launcher_ios.framework"
 fi
 if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/FirebaseAppCheckInterop/FirebaseAppCheckInterop.framework"
@@ -205,9 +207,11 @@ if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/RecaptchaInterop/RecaptchaInterop.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/geolocator_apple/geolocator_apple.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/image_picker_ios/image_picker_ios.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/url_launcher_ios/url_launcher_ios.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/FirebaseAppCheckInterop/FirebaseAppCheckInterop.framework"
@@ -222,9 +226,11 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/RecaptchaInterop/RecaptchaInterop.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/geolocator_apple/geolocator_apple.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/image_picker_ios/image_picker_ios.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/url_launcher_ios/url_launcher_ios.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait

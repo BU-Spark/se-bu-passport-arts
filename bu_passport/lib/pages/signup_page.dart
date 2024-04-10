@@ -25,7 +25,7 @@ class _SignUpPageState extends State<SignUpPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
     return Scaffold(

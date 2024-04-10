@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/classes/categorized_events.dart';
 import 'package:bu_passport/classes/event.dart';
@@ -17,15 +15,18 @@ class FirebaseService {
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
-          eventId: doc.id,
-          eventName: eventData['eventName'],
-          eventPhoto: eventData['eventPhoto'],
-          eventLocation: eventData['eventLocation'],
-          eventTime: (eventData['eventTime'] as Timestamp).toDate(),
-          eventTags: List<String>.from(eventData['eventTags'] ?? []),
+          eventID: doc.id,
+          eventTitle: eventData['eventTitle'] ?? '',
+          eventURL: eventData['eventURL'] ?? '',
+          eventPhoto: eventData['eventPhoto'] ?? '',
+          eventLocation: eventData['eventLocation'] ?? '',
+          eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+          eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+          eventDescription: eventData['eventDescription'] ?? '',
           registeredUsers:
               List<String>.from(eventData['registeredUsers'] ?? []),
         );
+
         eventList.add(event);
       });
       return eventList;
@@ -40,7 +41,7 @@ class FirebaseService {
       return events;
     }
     return events.where((event) {
-      return event.eventName.toLowerCase().contains(query.toLowerCase());
+      return event.eventTitle.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
 
@@ -144,10 +145,19 @@ class FirebaseService {
         .toList(); // Ensure only non-null Events are kept
 
     final now = DateTime.now();
-    final attendedEvents =
-        fetchedEvents.where((event) => event.eventTime.isBefore(now)).toList();
-    final upcomingEvents =
-        fetchedEvents.where((event) => !event.eventTime.isBefore(now)).toList();
+
+    final List<Event> attendedEvents = [];
+    final List<Event> upcomingEvents = [];
+
+    for (Event event in fetchedEvents) {
+      if (event.eventStartTime.isBefore(now)) {
+        // Event has already occurred (attended)
+        attendedEvents.add(event);
+      } else {
+        // Event is upcoming
+        upcomingEvents.add(event);
+      }
+    }
 
     return CategorizedEvents(
         attendedEvents: attendedEvents, upcomingEvents: upcomingEvents);
@@ -159,7 +169,18 @@ class FirebaseService {
         await _db.collection('events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
       Map<String, dynamic> eventData = snapshot.data()!;
-      return Event.fromFirestore(eventData);
+      Event event = Event(
+        eventID: eventData['eventID'] ?? '',
+        eventTitle: eventData['eventTitle'] ?? '',
+        eventPhoto: eventData['eventPhoto'] ?? '',
+        eventLocation: eventData['eventLocation'] ?? '',
+        eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+        eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+        eventURL: eventData['eventURL'] ?? '',
+        eventDescription: eventData['eventDescription'] ?? '',
+        registeredUsers: List<String>.from(eventData['registeredUsers'] ?? []),
+      );
+      return event;
     }
     throw Exception("Event not found");
   }

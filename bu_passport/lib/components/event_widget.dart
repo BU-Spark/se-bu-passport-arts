@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class EventWidget extends StatefulWidget {
   final Event event;
@@ -18,6 +19,7 @@ class _EventWidgetState extends State<EventWidget> {
 
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
+
     return GestureDetector(
       onTap: () {
         // Navigate to the event page
@@ -32,8 +34,7 @@ class _EventWidgetState extends State<EventWidget> {
         padding: EdgeInsets.all(edgeInsets),
         child: Stack(
           children: [
-            // Background image
-            Image.network(
+            Image.asset(
               widget.event.eventPhoto,
               width: double.infinity, // Use full width
               fit: BoxFit.cover, // Cover the container with the image
@@ -47,7 +48,7 @@ class _EventWidgetState extends State<EventWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.event.eventName,
+                    widget.event.eventTitle,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,

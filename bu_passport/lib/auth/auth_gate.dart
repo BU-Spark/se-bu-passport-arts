@@ -1,5 +1,3 @@
-import 'package:bu_passport/pages/onboarding_page.dart';
-import 'package:bu_passport/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../pages/navigation_page.dart';
@@ -16,10 +14,9 @@ class AuthGate extends StatelessWidget {
         if (snapshot.hasData) {
           return const NavigationPage();
         } else {
-          return const OnboardingPage();
+          return const LoginPage();
         }
       },
     ));
-
   }
 }

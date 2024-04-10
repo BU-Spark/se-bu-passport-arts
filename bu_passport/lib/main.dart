@@ -1,10 +1,10 @@
 import 'package:bu_passport/firebase_options.dart';
-import 'package:bu_passport/pages/navigation_page.dart';
 import 'package:bu_passport/pages/login_page.dart';
-import 'package:bu_passport/pages/calendar_page.dart';
-import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
+
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,6 +16,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Timezone initialization for check in
+  tz.initializeTimeZones();
+  var estLocation = tz.getLocation('America/New_York');
+  // Setting local location to EST (since all BU events are in EST)
+  tz.setLocalLocation(estLocation);
   runApp(MyApp());
 }
 
@@ -26,11 +32,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        useMaterial3: true,
+
+        // Define the default brightness and colors.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFFCC0000),
+          brightness: Brightness.light,
+        ),
       ),
       home: const AuthGate(),
       routes: {
-        '/onboarding' : (context) => const OnboardingPage(),
+        '/onboarding': (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
       },
