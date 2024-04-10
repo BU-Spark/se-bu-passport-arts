@@ -12,7 +12,10 @@ import 'package:url_launcher/url_launcher.dart';
 class EventPage extends StatefulWidget {
   final Event event;
 
-  const EventPage({Key? key, required this.event}) : super(key: key);
+  const EventPage(
+      {Key? key, required this.event, required this.onUpdateEventPage})
+      : super(key: key);
+  final Function onUpdateEventPage;
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -154,23 +157,23 @@ class _EventPageState extends State<EventPage> {
                   text: TextSpan(
                     style: TextStyle(fontSize: 16.0, color: Colors.black),
                     children: [
-                      TextSpan(
-                        text: 'Location: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      WidgetSpan(
+                        child: Icon(Icons.location_on),
                       ),
                       TextSpan(
-                        text: widget.event.eventLocation,
+                        text: " ${widget.event.eventLocation}",
                       ),
                     ],
                   ),
                 ),
+
                 SizedBox(height: sizedBoxHeight),
                 RichText(
                   text: TextSpan(
                     style: TextStyle(fontSize: 16.0, color: Colors.black),
                     children: [
                       TextSpan(
-                        text: 'Start Time: ',
+                        text: 'Start: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
@@ -186,7 +189,7 @@ class _EventPageState extends State<EventPage> {
                     style: TextStyle(fontSize: 16.0, color: Colors.black),
                     children: [
                       TextSpan(
-                        text: 'End Time: ',
+                        text: 'End: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
@@ -210,12 +213,11 @@ class _EventPageState extends State<EventPage> {
                     text: TextSpan(
                       style: TextStyle(fontSize: 16.0, color: Colors.black),
                       children: [
-                        TextSpan(
-                          text: 'Event URL: \n',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        WidgetSpan(
+                          child: Icon(Icons.link),
                         ),
                         TextSpan(
-                          text: widget.event.eventURL,
+                          text: "  ${widget.event.eventURL}",
                           style: TextStyle(color: Colors.blue),
                         ),
                       ],
@@ -260,6 +262,7 @@ class _EventPageState extends State<EventPage> {
                                 content: Text("Checked in successfully!")));
                             FirebaseService.checkInUserForEvent(
                                 widget.event.eventID);
+                            widget.onUpdateEventPage();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
@@ -289,6 +292,7 @@ class _EventPageState extends State<EventPage> {
                     setState(() {
                       _isSaved = !_isSaved; // Toggle saved status
                     });
+                    widget.onUpdateEventPage();
                   },
                   child: Text(_isSaved ? 'Unsave' : 'Save'),
                 ),
