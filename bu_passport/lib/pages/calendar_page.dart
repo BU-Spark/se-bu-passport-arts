@@ -51,6 +51,10 @@ class _CalendarPageState extends State<CalendarPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+    double defaultPadding = screenWidth * 0.02;
+    double itemVerticalMargin = screenHeight * 0.005;
+    double itemHorizontalMargin = screenWidth * 0.02;
+
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
     return Scaffold(
       appBar: AppBar(
@@ -95,13 +99,19 @@ class _CalendarPageState extends State<CalendarPage> {
             style: TextStyle(fontSize: 20),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _selectedEvents.length,
-              itemBuilder: (context, index) {
-                return EventWidget(event: _selectedEvents[index]);
-              },
-            ),
-          ),
+              child: Padding(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: ListView.builder(
+                    itemCount: _selectedEvents.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: itemVerticalMargin,
+                            horizontal: itemHorizontalMargin),
+                        child: EventWidget(event: _selectedEvents[index]),
+                      );
+                    },
+                  ))),
         ],
       ),
     );
