@@ -166,7 +166,6 @@ class _EventPageState extends State<EventPage> {
                     ],
                   ),
                 ),
-
                 SizedBox(height: sizedBoxHeight),
                 RichText(
                   text: TextSpan(
@@ -239,8 +238,6 @@ class _EventPageState extends State<EventPage> {
                     ],
                   ),
                 ),
-
-                // Add more event details as needed
               ],
             ),
           ),

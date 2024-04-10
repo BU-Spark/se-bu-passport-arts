@@ -25,6 +25,8 @@ class _HomePageState extends State<ExplorePage> {
     fetchEventsFuture = FirebaseService.fetchEvents();
   }
 
+  void updateEventPage() {}
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -78,7 +80,10 @@ class _HomePageState extends State<ExplorePage> {
                         },
                         itemBuilder: (BuildContext context, int index) {
                           // Return your EventWidget
-                          return EventWidget(event: filteredEvents[index]);
+                          return EventWidget(
+                            event: filteredEvents[index],
+                            onUpdateEventPage: updateEventPage,
+                          );
                         },
                       ),
                     );

@@ -82,6 +82,10 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  void updateEventPage() {
+    fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -156,7 +160,8 @@ class _ProfilePageState extends State<ProfilePage>
           return Card(
               margin: EdgeInsets.symmetric(
                   vertical: verticalMargin, horizontal: horizontalMargin),
-              child: EventWidget(event: event));
+              child: EventWidget(
+                  event: event, onUpdateEventPage: updateEventPage));
           // Use your EventWidget to display each event
         },
       );

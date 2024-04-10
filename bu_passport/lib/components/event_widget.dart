@@ -2,13 +2,16 @@ import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 
 class EventWidget extends StatefulWidget {
   final Event event;
-  const EventWidget({Key? key, required this.event}) : super(key: key);
+  final Function onUpdateEventPage;
+  const EventWidget(
+      {Key? key, required this.event, required this.onUpdateEventPage})
+      : super(key: key);
 
   @override
   _EventWidgetState createState() => _EventWidgetState();
@@ -23,6 +26,7 @@ class _EventWidgetState extends State<EventWidget> {
   void initState() {
     checkIfUserSaved();
     checkIfUserCheckedIn();
+    super.initState();
   }
 
   void checkIfUserSaved() async {
@@ -74,97 +78,99 @@ class _EventWidgetState extends State<EventWidget> {
           context,
           MaterialPageRoute(
             builder: (context) => EventPage(
-              event: widget.event,
-              onUpdateEventPage: updateEventPage,
-            ),
+                event: widget.event,
+                onUpdateEventPage: widget.onUpdateEventPage),
           ),
         );
       },
       child: Container(
-        height: widgetHeight, // Set the height of the widget
+        height: widgetHeight,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0), // Apply border radius
-          border: Border.all(color: Colors.grey), // Add border
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: Colors.grey),
           image: DecorationImage(
             image: AssetImage(widget.event.eventPhoto),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.5), // Background blend mode color
-              BlendMode.dstATop, // Choose your blend mode
-            ),
+                Colors.black.withOpacity(0.3), BlendMode.multiply),
           ),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Color(0xFFCC0000),
-            ],
-            stops: [0.0, 1.0],
-          ),
+          // put a black gradient
         ),
         child: Stack(
           children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: widgetHeight * 0.7,
-                  width: double.infinity,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      topRight: Radius.circular(10.0),
-                    ),
-                    child: Image.asset(
-                      widget.event.eventPhoto,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            Positioned(
+              bottom: sizedBoxHeight,
+              left: edgeInsets,
+              right: edgeInsets,
+              child: Container(
+                padding: EdgeInsets.all(edgeInsets),
+                decoration: BoxDecoration(
+                  color: Colors.transparent, // Make background transparent
                 ),
-                SizedBox(height: sizedBoxHeight * 0.5),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(edgeInsets, 0, edgeInsets, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          widget.event.eventTitle,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          text: '30',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: ' pts',
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // Align text left
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: screenWidth * 0.65,
+                              child: Text(
+                                widget.event.eventTitle,
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(height: sizedBoxHeight * 0.5),
+                            Text(
+                              DateFormat.yMMMd()
+                                  .format(widget.event.eventStartTime),
                               style: TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
+                        RichText(
+                          text: TextSpan(
+                            // text: '${widget.event.points}',
+                            text: '30',
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: ' pts',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: sizedBoxHeight * 0.5),
+                  ],
                 ),
-              ],
+              ),
             ),
+            // Positioned Heart Icon remains the same
             Positioned(
               top: sizedBoxHeight,
               right: sizedBoxHeight,

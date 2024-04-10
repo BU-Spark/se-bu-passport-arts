@@ -37,6 +37,8 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
+  void updateEventPage() {}
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -125,8 +127,9 @@ class _CalendarPageState extends State<CalendarPage> {
                                   vertical: itemVerticalMargin,
                                   horizontal: itemHorizontalMargin,
                                 ),
-                                child:
-                                    EventWidget(event: selectedEvents[index]),
+                                child: EventWidget(
+                                    event: selectedEvents[index],
+                                    onUpdateEventPage: updateEventPage),
                               );
                             },
                           ),
