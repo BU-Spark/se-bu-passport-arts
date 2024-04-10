@@ -1,8 +1,9 @@
 import 'package:bu_passport/pages/explore_page.dart';
+import 'package:bu_passport/pages/leaderboard_page.dart'; // Uncomment this line
+import 'package:bu_passport/pages/calendar_page.dart';
+import 'package:bu_passport/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'calendar_page.dart';
-import 'profile_page.dart';
 
 class NavigationPage extends StatelessWidget {
   const NavigationPage({Key? key}) : super(key: key);
@@ -24,9 +25,10 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
   final user = FirebaseAuth.instance.currentUser!;
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static List<Widget> _pages = <Widget>[
     ExplorePage(),
     CalendarPage(),
+    LeaderboardPage(), // Add LeaderboardPage here
     ProfilePage(),
   ];
 
@@ -43,9 +45,10 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
         child: _pages[_selectedIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Events',
@@ -53,6 +56,10 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.emoji_events),
+            label: 'Leaderboard',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

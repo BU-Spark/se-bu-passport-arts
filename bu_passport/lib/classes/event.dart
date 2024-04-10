@@ -9,6 +9,7 @@ class Event {
   final String eventURL;
   final DateTime eventStartTime;
   final DateTime eventEndTime;
+  final int eventPoints;
   final List<String> savedUsers;
 
   Event({
@@ -19,6 +20,7 @@ class Event {
     required this.eventStartTime,
     required this.eventEndTime,
     required this.eventDescription,
+    required this.eventPoints,
     required this.eventURL,
     required this.savedUsers,
   });

@@ -25,6 +25,8 @@ class _HomePageState extends State<ExplorePage> {
     fetchEventsFuture = FirebaseService.fetchEvents();
   }
 
+  // not the most effiicent solution need to improve **
+
   void updateEventPage() {
     setState(() {
       fetchEventsFuture = FirebaseService.fetchEvents();
