@@ -139,13 +139,22 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _buildEventsList(List<Event> events) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double verticalMargin = screenHeight * 0.01; // 1% of screen height
+    double horizontalMargin = screenWidth * 0.02; // 2% of screen width
+
     print(events);
     return ListView.builder(
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];
-        return EventWidget(
-            event: event); // Use your EventWidget to display each event
+        return Card(
+            margin: EdgeInsets.symmetric(
+              vertical: verticalMargin,
+            horizontal: horizontalMargin),
+            child: EventWidget(event: event));
+        // Use your EventWidget to display each event
       },
     );
   }
