@@ -33,6 +33,7 @@ class _HomePageState extends State<ExplorePage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
     return Scaffold(
       appBar: AppBar(
@@ -67,12 +68,21 @@ class _HomePageState extends State<ExplorePage> {
                   if (events != null && events.isNotEmpty) {
                     List<Event> filteredEvents =
                         FirebaseService.filterEvents(events, _searchQuery);
-                    return ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: filteredEvents.map((event) {
-                        return EventWidget(event: event);
-                      }).toList(),
+                    return Padding(
+                      padding: EdgeInsets.all(edgeInsets*1.5),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: filteredEvents.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          // Add vertical space between items
+                          return SizedBox(height: sizedBoxHeight*0.4);
+                        },
+                        itemBuilder: (BuildContext context, int index) {
+                          // Return your EventWidget
+                          return EventWidget(event: filteredEvents[index]);
+                        },
+                      ),
                     );
                   } else {
                     return Text('No events found');

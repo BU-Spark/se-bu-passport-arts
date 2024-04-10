@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/services/firebase_service.dart';
@@ -116,9 +117,7 @@ class _EventPageState extends State<EventPage> {
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.event.eventTitle),
-      ),
+      appBar: AppBar(),
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -129,7 +128,7 @@ class _EventPageState extends State<EventPage> {
             height: screenHeight * 0.4, // Adjust the height as needed
           ),
           Padding(
-            padding: EdgeInsets.all(edgeInsets),
+            padding: EdgeInsets.all(edgeInsets*2.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -141,19 +140,51 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Location: ${widget.event.eventLocation}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Location: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: widget.event.eventLocation,
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Start Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventStartTime)}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Start Time: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                            .format(widget.event.eventStartTime),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'End Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventEndTime)}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'End Time: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                            .format(widget.event.eventEndTime),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
                 GestureDetector(
@@ -165,24 +196,46 @@ class _EventPageState extends State<EventPage> {
                       throw 'Could not launch $url';
                     }
                   },
-                  child: Text(
-                    'Event URL: ${widget.event.eventURL}',
-                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                      children: [
+                        TextSpan(
+                          text: 'Event URL: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: widget.event.eventURL,
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: sizedBoxHeight),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Description: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: widget.event.eventDescription,
+                      ),
+                    ],
                   ),
                 ),
 
-                SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Description: ${widget.event.eventDescription}',
-                  style: TextStyle(fontSize: 16),
-                ),
                 // Add more event details as needed
               ],
             ),
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: (!_isSaved ||
@@ -210,7 +263,7 @@ class _EventPageState extends State<EventPage> {
                         : (_isSaved ? Colors.red : Colors.grey),
                   ),
                 ),
-                SizedBox(height: sizedBoxHeight), // Optional spacing
+                SizedBox(width: sizedBoxHeight * 3), // Optional spacing
                 ElevatedButton(
                   onPressed: () async {
                     String userUID =
