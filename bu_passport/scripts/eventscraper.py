@@ -56,6 +56,7 @@ for eventLink in eventLinks:
     print(event_url)
     driver.get(event_url)    
 
+
     WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'eventDetail')))
 
     try:
@@ -67,12 +68,18 @@ for eventLink in eventLinks:
                 eventStartTime = event_tabular.find_element(By.XPATH, './dt[text()="Starts:"]/following-sibling::dd').text
                 print("Starts:", eventStartTime)
             except NoSuchElementException:
+                # set to start of month
+                eventStartTime = "12:00 AM on " + datetime.now().strftime('%A, %B 1, %Y')
+                print(eventStartTime)
                 print("Starts: Not provided")
 
             try:
                 eventEndTime = event_detail.find_element(By.XPATH, '//dt[text()="Ends:"]/following-sibling::dd').text
                 print("Ends:", eventEndTime)
             except NoSuchElementException:
+                # set to end of month
+                eventEndTime = "11:59 PM on " + datetime.now().strftime('%A, %B 28, %Y')
+                print(eventEndTime)
                 print("Ends: Not provided")
             
             try:
@@ -149,7 +156,7 @@ for eventLink in eventLinks:
                     'eventDescription': eventDescription if eventDescription else None,  # Assign None if description doesn't exist
                     'eventID': eventID if eventID else None,  # Assign None if event ID doesn't exist
                     'eventPhoto': eventPhoto if eventPhoto else None,  # Assign None if photo doesn't exist
-                    'eventPoints': 30,
+                    'eventPoints': 30,  # Default points to 0
                     'savedUsers': [],
                 }
 
