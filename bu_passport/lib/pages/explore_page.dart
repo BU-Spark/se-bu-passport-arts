@@ -22,14 +22,14 @@ class _HomePageState extends State<ExplorePage> {
   @override
   void initState() {
     super.initState();
-    fetchEventsFuture = FirebaseService.fetchEvents();
+    fetchEventsFuture = FirebaseService.fetchEventsFromNow();
   }
 
   // not the most effiicent solution need to improve **
 
   void updateEventPage() {
     setState(() {
-      fetchEventsFuture = FirebaseService.fetchEvents();
+      fetchEventsFuture = FirebaseService.fetchEventsFromNow();
     });
   }
 

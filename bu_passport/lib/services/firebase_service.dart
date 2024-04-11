@@ -268,38 +268,67 @@ class FirebaseService {
     }
   }
 
-  static Future<List<Users>> fetchTopUsers() async {
+  static Future<List<Event>> fetchEventsFromNow() async {
     final db = FirebaseFirestore.instance;
+    final now = DateTime.now();
+    List<Event> eventList = [];
 
     try {
-      QuerySnapshot<Map<String, dynamic>> snapshot = await db
-          .collection('users')
-          .orderBy('userPoints', descending: true)
-          .limit(1)
-          .get();
+      QuerySnapshot snapshot = await db.collection('events').get();
+      snapshot.docs.forEach((doc) {
+        final eventData = doc.data() as Map<String, dynamic>;
+        Event event = Event(
+          eventID: doc.id,
+          eventTitle: eventData['eventTitle'] ?? '',
+          eventURL: eventData['eventURL'] ?? '',
+          eventPhoto: eventData['eventPhoto'] ?? '',
+          eventLocation: eventData['eventLocation'] ?? '',
+          eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+          eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+          eventDescription: eventData['eventDescription'] ?? '',
+          eventPoints: eventData['eventPoints'] ?? 0,
+          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+        );
 
-      List<Users> topUsers = snapshot.docs.map((doc) {
+        eventList.add(event);
+      });
+      eventList =
+          eventList.where((event) => event.eventEndTime.isAfter(now)).toList();
+      return eventList;
+    } catch (error) {
+      print("Failed to fetch events: $error");
+      return [];
+    }
+  }
+
+  static Future<List<Users>> fetchAllUsers() async {
+    final db = FirebaseFirestore.instance;
+    List<Users> users = [];
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await db.collection('users').get();
+      snapshot.docs.forEach((doc) {
         final userData = doc.data();
         print(userData);
-
-        return Users(
+        Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
-          userProfileURL: userData['userProfileURL'],
           userBUID: userData['userBUID'],
           userEmail: userData['userEmail'],
           userSchool: userData['userSchool'],
           userUID: userData['userUID'],
           userYear: userData['userYear'],
-          userPoints: userData['userPoints'],
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userPoints: userData['userPoints'],
+          userProfileURL: userData['userProfileURL'],
         );
-      }).toList();
-
-      return topUsers;
+        users.add(user);
+      });
+      return users;
     } catch (error) {
-      print("Failed to fetch top users: $error");
+      print("Failed to fetch all users: $error");
       return [];
     }
   }

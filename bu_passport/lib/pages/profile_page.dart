@@ -84,6 +84,12 @@ class _ProfilePageState extends State<ProfilePage>
 
   void updateEventPage() {
     fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
+    setState(() {
+      _userProfileFuture = FirebaseFirestore.instance
+          .collection('users')
+          .doc(finalUser!.uid)
+          .get();
+    });
   }
 
   @override
