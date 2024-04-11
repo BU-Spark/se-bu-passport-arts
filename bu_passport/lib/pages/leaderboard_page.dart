@@ -1,4 +1,5 @@
 import 'package:bu_passport/classes/user.dart';
+import 'package:bu_passport/components/user_widget.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +96,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   }
 
   int calculatePointsForNextTicket(int points) {
-    return 100 - (points % 100);
+    return (points % 100);
   }
 
   String calculateLeague(int points) {
@@ -198,22 +199,35 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 16.0),
-                Text(
-                  "Current Points: $userPoints",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                // SizedBox(height: 16.0),
+                // Text(
+                //   "Current Points: $userPoints",
+                //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                // ),
+                SizedBox(height: 8.0),
+                Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    LinearProgressIndicator(
+                      value: calculateProgressPercentage(userPoints),
+                      color: Colors.red[400],
+                      backgroundColor: Colors.grey[300],
+                      minHeight: screenHeight * 0.03,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Image.asset(
+                        'assets/images/leaderboard/ticket.png', // Adjust the path to your image
+                        width: 60, // Adjust the width of the image
+                        height: 60, // Adjust the height of the image
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 8.0),
-                LinearProgressIndicator(
-                  value: calculateProgressPercentage(userPoints),
-                  color: Colors.red[400],
-                  backgroundColor: Colors.grey[300],
-                  minHeight: screenHeight * 0.03,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                SizedBox(height: 8.0),
                 Text(
-                  "Points for Next Ticket: ${calculatePointsForNextTicket(userPoints)}",
+                  "${calculatePointsForNextTicket(userPoints)}/100 pts",
                   style: TextStyle(fontSize: 16),
                 ),
               ],
@@ -221,30 +235,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           ),
           SizedBox(height: 20),
           Expanded(
-            child: ListView.builder(
-              itemCount: topUsers.length,
-              itemBuilder: (context, index) {
-                Users user = topUsers[index];
-                TextStyle nameTextStyle = TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: index < 3
-                      ? FontWeight.bold
-                      : FontWeight.normal, // Bold for top 3 users,
-                  color: index < 3
-                      ? const Color(0xFFCC0000)
-                      : Colors.black, // Red for top 3 users
-                );
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.userProfileURL),
-                  ),
-                  title: Text(
-                    user.firstName + " " + user.lastName,
-                    style: nameTextStyle, // Apply the defined TextStyle
-                  ),
-                  subtitle: Text("Tickets: ${user.userPoints ~/ 100}"),
-                );
-              },
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: ListView.separated(
+                itemCount: topUsers.length,
+                // physics: ClampingScrollPhysics(),
+                separatorBuilder: (BuildContext context, int index) {
+                  // Add vertical space between items
+                  return SizedBox(height: screenHeight * 0.02);
+                },
+                itemBuilder: (context, index) {
+                  Users user = topUsers[index];
+                  TextStyle nameTextStyle = TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: index < 3
+                        ? FontWeight.bold
+                        : FontWeight.normal, // Bold for top 3 users,
+                    color: index < 3
+                        ? const Color(0xFFCC0000)
+                        : Colors.black, // Red for top 3 users
+                  );
+                  return UserRankWidget(rank: index + 1, user: user);
+                },
+              ),
             ),
           ),
         ],
