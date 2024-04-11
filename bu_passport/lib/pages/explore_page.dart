@@ -1,5 +1,3 @@
-// home page welcoming user with sign out button
-
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +23,12 @@ class _HomePageState extends State<ExplorePage> {
   void initState() {
     super.initState();
     fetchEventsFuture = FirebaseService.fetchEvents();
+  }
+
+  void updateEventPage() {
+    setState(() {
+      fetchEventsFuture = FirebaseService.fetchEvents();
+    });
   }
 
   @override
@@ -69,18 +73,21 @@ class _HomePageState extends State<ExplorePage> {
                     List<Event> filteredEvents =
                         FirebaseService.filterEvents(events, _searchQuery);
                     return Padding(
-                      padding: EdgeInsets.all(edgeInsets*1.5),
+                      padding: EdgeInsets.all(edgeInsets * 1.5),
                       child: ListView.separated(
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         itemCount: filteredEvents.length,
                         separatorBuilder: (BuildContext context, int index) {
                           // Add vertical space between items
-                          return SizedBox(height: sizedBoxHeight*0.4);
+                          return SizedBox(height: sizedBoxHeight * 0.4);
                         },
                         itemBuilder: (BuildContext context, int index) {
                           // Return your EventWidget
-                          return EventWidget(event: filteredEvents[index]);
+                          return EventWidget(
+                            event: filteredEvents[index],
+                            onUpdateEventPage: updateEventPage,
+                          );
                         },
                       ),
                     );

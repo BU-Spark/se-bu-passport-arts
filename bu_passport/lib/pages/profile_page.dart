@@ -82,6 +82,10 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  void updateEventPage() {
+    fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -138,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
-  Widget _buildEventsList(List<Event> events, String emptyMessage) {
+  Widget _buildEventsList(List<Event> events, String message) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     double verticalMargin = screenHeight * 0.01; // 1% of screen height
@@ -147,7 +151,7 @@ class _ProfilePageState extends State<ProfilePage>
     print(events);
 
     if (events.isEmpty) {
-      return Center(child: Text(emptyMessage, style: TextStyle(fontSize: 20)));
+      return Center(child: Text(message, style: TextStyle(fontSize: 20)));
     } else {
       return ListView.builder(
         itemCount: events.length,
@@ -156,12 +160,12 @@ class _ProfilePageState extends State<ProfilePage>
           return Card(
               margin: EdgeInsets.symmetric(
                   vertical: verticalMargin, horizontal: horizontalMargin),
-              child: EventWidget(event: event));
+              child: EventWidget(
+                  event: event, onUpdateEventPage: updateEventPage));
           // Use your EventWidget to display each event
         },
       );
     }
-      
   }
 
   @override
@@ -284,8 +288,10 @@ class _ProfilePageState extends State<ProfilePage>
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildEventsList(userSavedEvents, "No saved events."), // Saved events list
-                    _buildEventsList(attendedEvents, "No attended events."), // Attended events list
+                    _buildEventsList(userSavedEvents,
+                        "No saved events."), // Saved events list
+                    _buildEventsList(attendedEvents,
+                        "No attended events."), // Attended events list
                   ],
                 ),
               ),
