@@ -115,6 +115,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    double edgeInsets = screenWidth * 0.05;
+    double sizedBoxHeight = screenHeight * 0.02;
+    double imageWidth = screenWidth * 0.1;
+    double imageHeight = screenHeight * 0.1;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Leaderboard"),
@@ -123,14 +128,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(edgeInsets),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Widget for displaying user points
-
                 Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  padding: EdgeInsets.all(edgeInsets),
                   child: Column(
                     children: [
                       Text(
@@ -143,7 +146,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       ),
                       SizedBox(
                           height:
-                              20), // Add some vertical space between the text and the next widget
+                              sizedBoxHeight), // Add some vertical space between the text and the next widget
                       Text(
                         "Rank",
                         style: TextStyle(
@@ -172,7 +175,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 ),
                 // Widget for displaying user tickets
                 Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  padding: EdgeInsets.all(edgeInsets),
                   child: Column(
                     children: [
                       Text(
@@ -185,7 +188,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       ),
                       SizedBox(
                           height:
-                              20), // Add some vertical space between the text and the next widge
+                              sizedBoxHeight), // Add some vertical space between the text and the next widge
                       Icon(Icons.confirmation_number),
                     ],
                   ),
@@ -193,18 +196,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               ],
             ),
           ),
-          SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: edgeInsets),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // SizedBox(height: 16.0),
-                // Text(
-                //   "Current Points: $userPoints",
-                //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                // ),
-                SizedBox(height: 8.0),
+                SizedBox(height: sizedBoxHeight * 0.5),
                 Stack(
                   alignment: Alignment.centerRight,
                   children: [
@@ -216,16 +213,15 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
+                      padding: EdgeInsets.only(right: edgeInsets * 0.5),
                       child: Image.asset(
-                        'assets/images/leaderboard/ticket.png', // Adjust the path to your image
-                        width: 60, // Adjust the width of the image
-                        height: 60, // Adjust the height of the image
+                        'assets/images/leaderboard/ticket.png',
+                        width: imageWidth * 1.2,
+                        height: imageHeight * 0.6,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8.0),
                 Text(
                   "${calculatePointsForNextTicket(userPoints)}/100 pts",
                   style: TextStyle(fontSize: 16),
@@ -233,10 +229,10 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               ],
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: sizedBoxHeight),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(edgeInsets * 0.75),
               child: ListView.separated(
                 itemCount: topUsers.length,
                 // physics: ClampingScrollPhysics(),
