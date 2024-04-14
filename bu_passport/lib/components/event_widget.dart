@@ -145,6 +145,7 @@ class _EventWidgetState extends State<EventWidget> {
                         RichText(
                           text: TextSpan(
                             // text: '${widget.event.points}',
+                            // It will be replaced with real value in future development
                             text: '30',
                             style: TextStyle(
                               fontSize: 24.0,
