@@ -24,7 +24,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   List<Event> attendedEvents = [];
-  List<Event> upcomingEvents = [];
+  List<Event> userSavedEvents = [];
   bool isLoading = true;
 
   final TextEditingController _firstNameController = TextEditingController();
@@ -75,11 +75,15 @@ class _ProfilePageState extends State<ProfilePage>
           await FirebaseService.fetchAndCategorizeEvents();
       setState(() {
         attendedEvents = categorizedEvents.attendedEvents;
-        upcomingEvents = categorizedEvents.upcomingEvents;
+        userSavedEvents = categorizedEvents.userSavedEvents;
       });
     } catch (e) {
       print("Error fetching events: $e");
     }
+  }
+
+  void updateEventPage() {
+    fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
   }
 
   @override
@@ -138,15 +142,30 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
-  Widget _buildEventsList(List<Event> events) {
-    return ListView.builder(
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
-        return EventWidget(
-            event: event); // Use your EventWidget to display each event
-      },
-    );
+  Widget _buildEventsList(List<Event> events, String message) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double verticalMargin = screenHeight * 0.01; // 1% of screen height
+    double horizontalMargin = screenWidth * 0.035; // 2% of screen width
+
+    print(events);
+
+    if (events.isEmpty) {
+      return Center(child: Text(message, style: TextStyle(fontSize: 20)));
+    } else {
+      return ListView.builder(
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          final event = events[index];
+          return Card(
+              margin: EdgeInsets.symmetric(
+                  vertical: verticalMargin, horizontal: horizontalMargin),
+              child: EventWidget(
+                  event: event, onUpdateEventPage: updateEventPage));
+          // Use your EventWidget to display each event
+        },
+      );
+    }
   }
 
   @override
@@ -161,6 +180,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         actions: <Widget>[
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
@@ -180,8 +200,7 @@ class _ProfilePageState extends State<ProfilePage>
             icon: Icon(Icons.logout),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushReplacementNamed(
-                  '/login'); // Replace with your login route
+              Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
         ],
@@ -207,6 +226,7 @@ class _ProfilePageState extends State<ProfilePage>
                 var userData = snapshot.data!.data() as Map<String, dynamic>;
                 String fullName =
                     '${userData['firstName'] ?? 'Not set'} ${userData['lastName'] ?? ''}';
+                int userPoints = userData['points'] ?? 0;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -245,6 +265,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ] else ...[
                       Text(fullName, style: TextStyle(fontSize: 20)),
+                      Text(userPoints.toString() + ' points'),
                     ],
                   ],
                 );
@@ -260,15 +281,17 @@ class _ProfilePageState extends State<ProfilePage>
                 appBar: TabBar(
                   controller: _tabController,
                   tabs: [
+                    Tab(text: 'Saved'),
                     Tab(text: 'Attended'),
-                    Tab(text: 'Upcoming'),
                   ],
                 ),
                 body: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildEventsList(attendedEvents), // Attended events list
-                    _buildEventsList(upcomingEvents), // Upcoming events list
+                    _buildEventsList(userSavedEvents,
+                        "No saved events."), // Saved events list
+                    _buildEventsList(attendedEvents,
+                        "No attended events."), // Attended events list
                   ],
                 ),
               ),

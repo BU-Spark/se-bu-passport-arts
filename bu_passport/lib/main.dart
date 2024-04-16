@@ -1,5 +1,7 @@
 import 'package:bu_passport/firebase_options.dart';
+import 'package:bu_passport/pages/explore_page.dart';
 import 'package:bu_passport/pages/login_page.dart';
+import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
+        '/home': (context) => const AuthGate(),
+        '/explore_page': (context) => const ExplorePage(),
+        '/profile_page': (context) => const ProfilePage(),
       },
     );
   }

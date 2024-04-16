@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/services/firebase_service.dart';
@@ -11,7 +12,10 @@ import 'package:url_launcher/url_launcher.dart';
 class EventPage extends StatefulWidget {
   final Event event;
 
-  const EventPage({Key? key, required this.event}) : super(key: key);
+  const EventPage(
+      {Key? key, required this.event, required this.onUpdateEventPage})
+      : super(key: key);
+  final Function onUpdateEventPage;
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -20,38 +24,47 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   GeocodingService geocodingService = GeocodingService();
 
-  bool _isInterested =
-      false; // Track whether the user is interested in the event
+  bool _isSaved = false; // Track whether the user is interested in the event
   bool _isCheckedIn = false; // To track if the user has checked in
 
-// Checks if user is registered -- if so, the button will reflect that
+// Checks if user saved event -- if so, the button will reflect that
   @override
   void initState() {
     super.initState();
-    checkIfUserIsRegistered();
+    checkIfUserSaved();
+    checkIfUserIsCheckedIn();
   }
 
-  void checkIfUserIsRegistered() async {
+  void checkIfUserSaved() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
       print("User is not logged in.");
       return;
     }
-    bool isRegistered = await FirebaseService.isUserRegisteredForEvent(
+    bool isSaved =
+        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+    setState(() {
+      // changing save to saved
+      _isSaved = isSaved;
+    });
+  }
+
+  void checkIfUserIsCheckedIn() async {
+    String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+    // Ensure there's a user logged in
+    if (userUID.isEmpty) {
+      print("User is not logged in.");
+      return;
+    }
+    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
         userUID, widget.event.eventID);
     setState(() {
-      // changing registered to Interested
-      _isInterested = isRegistered;
+      _isCheckedIn = isCheckedIn;
     });
   }
 
   bool isEventToday(DateTime eventDateTimestamp) {
-    // DateTime? eventDateTimeStart = convertEventStartTime(eventDateTimeStartStr);
-    // Ensuring that it is EST
-
-    // DateTime eventDateTimeStart = eventDateTimestamp.toDate();
-
     final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
     final nowLocal = tz.TZDateTime.now(tz.local);
     return nowLocal.year == eventDateTimeLocal.year &&
@@ -117,9 +130,7 @@ class _EventPageState extends State<EventPage> {
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.event.eventTitle),
-      ),
+      appBar: AppBar(),
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -130,7 +141,7 @@ class _EventPageState extends State<EventPage> {
             height: screenHeight * 0.4, // Adjust the height as needed
           ),
           Padding(
-            padding: EdgeInsets.all(edgeInsets),
+            padding: EdgeInsets.all(edgeInsets * 2.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -142,19 +153,50 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Location: ${widget.event.eventLocation}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      WidgetSpan(
+                        child: Icon(Icons.location_on),
+                      ),
+                      TextSpan(
+                        text: " ${widget.event.eventLocation}",
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Start Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventStartTime)}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Start: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                            .format(widget.event.eventStartTime),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'End Time: ${DateFormat('h:mm a, EEEE, MMMM d, y').format(widget.event.eventEndTime)}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'End: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                            .format(widget.event.eventEndTime),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: sizedBoxHeight),
                 GestureDetector(
@@ -166,27 +208,46 @@ class _EventPageState extends State<EventPage> {
                       throw 'Could not launch $url';
                     }
                   },
-                  child: Text(
-                    'Event URL: ${widget.event.eventURL}',
-                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                      children: [
+                        WidgetSpan(
+                          child: Icon(Icons.link),
+                        ),
+                        TextSpan(
+                          text: "  ${widget.event.eventURL}",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-
                 SizedBox(height: sizedBoxHeight),
-                Text(
-                  'Description: ${widget.event.eventDescription}',
-                  style: TextStyle(fontSize: 16),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Description: \n',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: widget.event.eventDescription,
+                      ),
+                    ],
+                  ),
                 ),
-                // Add more event details as needed
               ],
             ),
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: (!_isInterested ||
+                  onPressed: (!_isSaved ||
                           !isEventToday(widget.event.eventStartTime) ||
                           _isCheckedIn)
                       ? null
@@ -196,6 +257,9 @@ class _EventPageState extends State<EventPage> {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
+                            FirebaseService.checkInUserForEvent(
+                                widget.event.eventID);
+                            widget.onUpdateEventPage();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(
@@ -206,29 +270,28 @@ class _EventPageState extends State<EventPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isInterested ? Colors.blue : Colors.grey),
+                        : (_isSaved ? Colors.red : Colors.grey),
                   ),
                 ),
-                SizedBox(height: sizedBoxHeight), // Optional spacing
+                SizedBox(width: sizedBoxHeight * 3), // Optional spacing
                 ElevatedButton(
                   onPressed: () async {
                     String userUID =
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
-                    bool isRegistered =
-                        await FirebaseService.isUserRegisteredForEvent(
-                            userUID, eventId);
-                    if (isRegistered) {
-                      FirebaseService.unregisterFromEvent(userUID, eventId);
+                    bool isSaved = await FirebaseService.hasUserSavedEvent(
+                        userUID, eventId);
+                    if (isSaved) {
+                      FirebaseService.unsaveEvent(eventId);
                     } else {
-                      FirebaseService.registerForEvent(userUID, eventId);
+                      FirebaseService.saveEvent(eventId);
                     }
                     setState(() {
-                      _isInterested =
-                          !_isInterested; // Toggle registration status
+                      _isSaved = !_isSaved; // Toggle saved status
                     });
+                    widget.onUpdateEventPage();
                   },
-                  child: Text(_isInterested ? 'Not Interested' : 'Interested'),
+                  child: Text(_isSaved ? 'Unsave' : 'Save'),
                 ),
               ],
             ),

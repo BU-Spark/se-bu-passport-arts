@@ -2,10 +2,10 @@ import "package:bu_passport/classes/event.dart";
 
 class CategorizedEvents {
   final List<Event> attendedEvents;
-  final List<Event> upcomingEvents;
+  final List<Event> userSavedEvents;
 
   CategorizedEvents({
     required this.attendedEvents, 
-    required this.upcomingEvents,
+    required this.userSavedEvents,
   });
 }

@@ -9,9 +9,7 @@ class Event {
   final String eventURL;
   final DateTime eventStartTime;
   final DateTime eventEndTime;
-
-  // final List<String> eventTags;
-  final List<String> registeredUsers;
+  final List<String> savedUsers;
 
   Event({
     required this.eventID,
@@ -22,7 +20,6 @@ class Event {
     required this.eventEndTime,
     required this.eventDescription,
     required this.eventURL,
-    // required this.eventTags,
-    required this.registeredUsers,
+    required this.savedUsers,
   });
 }

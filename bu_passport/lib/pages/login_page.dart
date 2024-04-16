@@ -58,17 +58,15 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _errorMessage = null;
                   });
-
-                  // Implement your sign-in logic here
                   String email = _emailController.text;
                   String password = _passwordController.text;
                   try {
-                    // Call your authentication method with email and password
-                    UserCredential userCredential =
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: email,
                       password: password,
                     );
+                    // Navigate to home page
+                    Navigator.pushNamed(context, '/home');
                   } catch (e) {
                     // Handle login errors
                     print('Login error: $e');

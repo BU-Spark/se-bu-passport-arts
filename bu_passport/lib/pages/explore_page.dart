@@ -1,5 +1,3 @@
-// home page welcoming user with sign out button
-
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,27 +25,28 @@ class _HomePageState extends State<ExplorePage> {
     fetchEventsFuture = FirebaseService.fetchEvents();
   }
 
+  void updateEventPage() {
+    setState(() {
+      fetchEventsFuture = FirebaseService.fetchEvents();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Events'),
+      ),
       body: Center(
         child: ListView(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: sizedBoxHeight),
-            Text(
-              'Events',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: sizedBoxHeight),
             // Search bar
             TextField(
               onChanged: (value) {
@@ -73,12 +72,24 @@ class _HomePageState extends State<ExplorePage> {
                   if (events != null && events.isNotEmpty) {
                     List<Event> filteredEvents =
                         FirebaseService.filterEvents(events, _searchQuery);
-                    return ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: filteredEvents.map((event) {
-                        return EventWidget(event: event);
-                      }).toList(),
+                    return Padding(
+                      padding: EdgeInsets.all(edgeInsets * 1.5),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: filteredEvents.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          // Add vertical space between items
+                          return SizedBox(height: sizedBoxHeight * 0.4);
+                        },
+                        itemBuilder: (BuildContext context, int index) {
+                          // Return your EventWidget
+                          return EventWidget(
+                            event: filteredEvents[index],
+                            onUpdateEventPage: updateEventPage,
+                          );
+                        },
+                      ),
                     );
                   } else {
                     return Text('No events found');

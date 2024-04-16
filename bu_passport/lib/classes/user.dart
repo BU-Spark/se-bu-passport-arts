@@ -1,5 +1,3 @@
-import "package:bu_passport/classes/event.dart";
-
 class Users {
   final String firstName;
   final String lastName;
@@ -9,8 +7,9 @@ class Users {
   final String userSchool;
   final String userUID;
   final int userYear;
+  final int userPoints;
   final List<String> userPreferences;
-  final List<String> userRegisteredEvents;
+  final Map<String, dynamic> userSavedEvents;
 
   Users({
     required this.firstName,
@@ -22,6 +21,7 @@ class Users {
     required this.userUID,
     required this.userYear,
     required this.userPreferences,
-    required this.userRegisteredEvents,
+    required this.userSavedEvents,
+    required this.userPoints,
   });
 }
