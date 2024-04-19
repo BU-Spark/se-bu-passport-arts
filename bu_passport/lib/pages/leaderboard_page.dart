@@ -17,6 +17,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   int userPoints = 0;
   int userTickets = 0;
   int? userRank; // Variable to store user rank
+  FirebaseService firebaseService = FirebaseService();
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
   Future<void> fetchAllUsers() async {
     try {
-      List<Users> users = await FirebaseService.fetchAllUsers();
+      List<Users> users = await firebaseService.fetchAllUsers();
       setState(() {
         allUsers = users;
       });
@@ -79,7 +80,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Future<void> fetchUserPointsAndTickets() async {
     try {
       String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
-      Users? user = await FirebaseService.fetchUser(userUID);
+      Users? user = await firebaseService.fetchUser(userUID);
       if (user != null) {
         setState(() {
           userPoints = user.userPoints;

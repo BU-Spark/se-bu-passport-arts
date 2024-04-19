@@ -17,6 +17,7 @@ class _CalendarPageState extends State<CalendarPage> {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
   List<Event> _allEvents = []; // List to store events
+  FirebaseService firebaseService = FirebaseService();
 // List to store events for the selected day
   late Future<List<Event>> _allEventsFuture;
 
@@ -27,11 +28,11 @@ class _CalendarPageState extends State<CalendarPage> {
     _focusedDay = DateTime.now();
     _selectedDay = DateTime.now();
     _fetchEvents(); // Initialize the future to fetch events
-    _allEventsFuture = FirebaseService.fetchEvents();
+    _allEventsFuture = firebaseService.fetchEvents();
   }
 
   Future<void> _fetchEvents() async {
-    List<Event> allEvents = await FirebaseService.fetchEvents();
+    List<Event> allEvents = await firebaseService.fetchEvents();
     setState(() {
       _allEvents = allEvents;
     });
@@ -73,7 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             }
             List<Event> selectedEvents =
-                FirebaseService.fetchEventsForDay(_selectedDay, events);
+                firebaseService.fetchEventsForDay(_selectedDay, events);
             print('Selected events: $selectedEvents');
             return Column(
               children: [

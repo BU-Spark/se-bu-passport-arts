@@ -22,6 +22,7 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+  FirebaseService firebaseService = FirebaseService();
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event
@@ -43,7 +44,7 @@ class _EventPageState extends State<EventPage> {
       return;
     }
     bool isSaved =
-        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+        await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
@@ -57,7 +58,7 @@ class _EventPageState extends State<EventPage> {
       print("User is not logged in.");
       return;
     }
-    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
+    bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
         userUID, widget.event.eventID);
     setState(() {
       _isCheckedIn = isCheckedIn;
@@ -257,9 +258,9 @@ class _EventPageState extends State<EventPage> {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
-                            FirebaseService.checkInUserForEvent(
-                                widget.event.eventID,widget.event.eventPoints);
-                              
+                            firebaseService.checkInUserForEvent(
+                                widget.event.eventID, widget.event.eventPoints);
+
                             widget.onUpdateEventPage();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -280,12 +281,12 @@ class _EventPageState extends State<EventPage> {
                     String userUID =
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
-                    bool isSaved = await FirebaseService.hasUserSavedEvent(
+                    bool isSaved = await firebaseService.hasUserSavedEvent(
                         userUID, eventId);
                     if (isSaved) {
-                      FirebaseService.unsaveEvent(eventId);
+                      firebaseService.unsaveEvent(eventId);
                     } else {
-                      FirebaseService.saveEvent(eventId);
+                      firebaseService.saveEvent(eventId);
                     }
                     setState(() {
                       _isSaved = !_isSaved; // Toggle saved status

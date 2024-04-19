@@ -20,7 +20,9 @@ class EventWidget extends StatefulWidget {
 class _EventWidgetState extends State<EventWidget> {
   bool _isSaved = false;
   bool _isCheckedIn = false;
-  String userUID = FirebaseAuth.instance.currentUser!.uid;
+  String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+  // Ensure there's a user logged in
+  FirebaseService firebaseService = FirebaseService();
 
   @override
   void initState() {
@@ -36,7 +38,7 @@ class _EventWidgetState extends State<EventWidget> {
       return;
     }
     bool isSaved =
-        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+        await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
@@ -49,7 +51,7 @@ class _EventWidgetState extends State<EventWidget> {
       print("User is not logged in.");
       return;
     }
-    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
+    bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
         userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
@@ -175,12 +177,12 @@ class _EventWidgetState extends State<EventWidget> {
               right: sizedBoxHeight,
               child: GestureDetector(
                 onTap: () async {
-                  _isSaved = await FirebaseService.hasUserSavedEvent(
+                  _isSaved = await firebaseService.hasUserSavedEvent(
                       userUID, widget.event.eventID);
                   if (_isSaved) {
-                    FirebaseService.unsaveEvent(widget.event.eventID);
+                    firebaseService.unsaveEvent(widget.event.eventID);
                   } else {
-                    FirebaseService.saveEvent(widget.event.eventID);
+                    firebaseService.saveEvent(widget.event.eventID);
                   }
                   setState(() {
                     _isSaved = !_isSaved; // Toggle saved status

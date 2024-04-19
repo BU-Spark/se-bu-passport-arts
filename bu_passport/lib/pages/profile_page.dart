@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage>
   List<Event> attendedEvents = [];
   List<Event> userSavedEvents = [];
   bool isLoading = true;
+  FirebaseService firebaseService = FirebaseService();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -72,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage>
   void fetchAndDisplayEvents() async {
     try {
       CategorizedEvents categorizedEvents =
-          await FirebaseService.fetchAndCategorizeEvents();
+          await firebaseService.fetchAndCategorizeEvents();
       setState(() {
         attendedEvents = categorizedEvents.attendedEvents;
         userSavedEvents = categorizedEvents.userSavedEvents;
@@ -130,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     if (user != null) {
       await user.updatePhotoURL(imageUrl);
-      await FirebaseService.updateUserProfileURL(imageUrl);
+      await firebaseService.updateUserProfileURL(imageUrl);
       await user.reload(); // Reload the user profile to reflect the update
     }
   }

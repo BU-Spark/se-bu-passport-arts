@@ -1,12 +1,11 @@
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/classes/categorized_events.dart';
 import 'package:bu_passport/classes/event.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseService {
-  static Future<List<Event>> fetchEvents() async {
+  Future<List<Event>> fetchEvents() async {
     final db = FirebaseFirestore.instance;
     List<Event> eventList = [];
 
@@ -36,7 +35,7 @@ class FirebaseService {
     }
   }
 
-  static List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
+  List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
     return events.where((event) {
       return event.eventStartTime.day == date.day &&
           event.eventStartTime.month == date.month &&
@@ -44,7 +43,7 @@ class FirebaseService {
     }).toList();
   }
 
-  static List<Event> filterEvents(List<Event> events, String query) {
+  List<Event> filterEvents(List<Event> events, String query) {
     if (query.isEmpty) {
       return events;
     }
@@ -53,7 +52,7 @@ class FirebaseService {
     }).toList();
   }
 
-  static Future<Users?> fetchUser(String userUID) async {
+  Future<Users?> fetchUser(String userUID) async {
     final db = FirebaseFirestore.instance;
 
     try {
@@ -83,7 +82,7 @@ class FirebaseService {
     return null;
   }
 
-  static Future<void> saveEvent(String eventId) async {
+  Future<void> saveEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
@@ -103,7 +102,7 @@ class FirebaseService {
     }
   }
 
-  static Future<void> unsaveEvent(String eventId) async {
+  Future<void> unsaveEvent(String eventId) async {
     final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = db.collection('users').doc(userUID);
@@ -122,7 +121,7 @@ class FirebaseService {
     }
   }
 
-  static Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
+  Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
     final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
         await db.collection('users').doc(userUID).get();
@@ -130,7 +129,7 @@ class FirebaseService {
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
       print(userData['userSavedEvents']);
-      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? [];
+      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? {};
 
       // Check if the eventId exists in the list
       return savedEvents.containsKey(eventId);
@@ -138,7 +137,7 @@ class FirebaseService {
     return false;
   }
 
-  static Future<CategorizedEvents> fetchAndCategorizeEvents() async {
+  Future<CategorizedEvents> fetchAndCategorizeEvents() async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
 
     if (userUID == null) {
@@ -153,7 +152,7 @@ class FirebaseService {
 
     final userData = userDoc.data();
 
-    Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? [];
+    Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? {};
 
     final now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
@@ -187,7 +186,7 @@ class FirebaseService {
         attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
   }
 
-  static Future<Event?> fetchEventById(String eventId) async {
+  Future<Event?> fetchEventById(String eventId) async {
     final FirebaseFirestore _db = FirebaseFirestore.instance;
     DocumentSnapshot<Map<String, dynamic>> snapshot =
         await _db.collection('events').doc(eventId).get();
@@ -210,7 +209,7 @@ class FirebaseService {
     throw Exception("Event not found");
   }
 
-  static void checkInUserForEvent(String eventID, int eventPoints) {
+  void checkInUserForEvent(String eventID, int eventPoints) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
       throw Exception("User is not logged in");
@@ -233,15 +232,14 @@ class FirebaseService {
     }
   }
 
-  static Future<bool> isUserCheckedInForEvent(
-      String userUID, String eventId) async {
+  Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
     final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
         await db.collection('users').doc(userUID).get();
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? [];
+      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? {};
 
       // Check if the eventId exists in the list
       return savedEvents.containsKey(eventId) && savedEvents[eventId];
@@ -249,7 +247,7 @@ class FirebaseService {
     return false;
   }
 
-  static Future<void> updateUserProfileURL(String profileURL) async {
+  Future<void> updateUserProfileURL(String profileURL) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
       throw Exception("User is not logged in");
@@ -268,7 +266,7 @@ class FirebaseService {
     }
   }
 
-  static Future<List<Event>> fetchEventsFromNow() async {
+  Future<List<Event>> fetchEventsFromNow() async {
     final db = FirebaseFirestore.instance;
     final now = DateTime.now();
     List<Event> eventList = [];
@@ -301,7 +299,7 @@ class FirebaseService {
     }
   }
 
-  static Future<List<Users>> fetchAllUsers() async {
+  Future<List<Users>> fetchAllUsers() async {
     final db = FirebaseFirestore.instance;
     List<Users> users = [];
 

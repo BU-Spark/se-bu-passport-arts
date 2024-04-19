@@ -18,18 +18,19 @@ class _HomePageState extends State<ExplorePage> {
   String _searchQuery = '';
   late Future<List<Event>> fetchEventsFuture;
   int _selectedIndex = 0;
+  FirebaseService firebaseService = FirebaseService();
 
   @override
   void initState() {
     super.initState();
-    fetchEventsFuture = FirebaseService.fetchEventsFromNow();
+    fetchEventsFuture = firebaseService.fetchEventsFromNow();
   }
 
   // not the most effiicent solution need to improve **
 
   void updateEventPage() {
     setState(() {
-      fetchEventsFuture = FirebaseService.fetchEventsFromNow();
+      fetchEventsFuture = firebaseService.fetchEventsFromNow();
     });
   }
 
@@ -73,7 +74,7 @@ class _HomePageState extends State<ExplorePage> {
                   List<Event>? events = snapshot.data;
                   if (events != null && events.isNotEmpty) {
                     List<Event> filteredEvents =
-                        FirebaseService.filterEvents(events, _searchQuery);
+                        firebaseService.filterEvents(events, _searchQuery);
                     return Padding(
                       padding: EdgeInsets.all(edgeInsets * 1.5),
                       child: ListView.separated(
