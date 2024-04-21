@@ -12,7 +12,7 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<ExplorePage> {
-  final user = FirebaseAuth.instance.currentUser!;
+  final user = FirebaseAuth.instance.currentUser?.uid ?? "";
   final db = FirebaseFirestore.instance;
   List<Event> eventList = []; // List to store events data
   String _searchQuery = '';
