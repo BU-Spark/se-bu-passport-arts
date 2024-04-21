@@ -167,6 +167,7 @@ class OnboardingPageWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.05),
       color: color,
+      child: SingleChildScrollView( // Makes the column scrollable
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -174,6 +175,7 @@ class OnboardingPageWidget extends StatelessWidget {
             width: screenWidth * 0.8,
             child: Image(image: image.image),
           ),
+          SizedBox(height: 20),
           Text(title,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           SizedBox(height: 20),
@@ -182,6 +184,7 @@ class OnboardingPageWidget extends StatelessWidget {
               style: TextStyle(fontSize: screenWidth * 0.035)),
         ],
       ),
+    ),
     );
   }
 }
