@@ -8,10 +8,10 @@ class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({Key? key}) : super(key: key);
 
   @override
-  _LeaderboardPageState createState() => _LeaderboardPageState();
+  LeaderboardPageState createState() => LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage> {
+class LeaderboardPageState extends State<LeaderboardPage> {
   List<Users> allUsers = []; // List to store all users
   List<Users> topUsers = []; // List to store top 5 users
   int userPoints = 0;
