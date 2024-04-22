@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:bu_passport/classes/categorized_events.dart';
 import 'package:bu_passport/components/event_widget.dart';
+import 'package:bu_passport/components/passport_widget.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
@@ -173,7 +174,7 @@ class _ProfilePageState extends State<ProfilePage>
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.01);
 
     DocumentReference userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
@@ -270,6 +271,13 @@ class _ProfilePageState extends State<ProfilePage>
                   ],
                 );
               },
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Container(
+              margin: EdgeInsets.only(bottom: sizedBoxHeight),  // Adjust this margin as needed
+              child: PassportBookWidget(),
             ),
           ),
           // This is the Events Menu
