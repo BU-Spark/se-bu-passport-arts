@@ -52,6 +52,11 @@ selected before running this command.
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
   - There is a leaderboard page to showcase the highest raffle ticket earners
 
+## Testing
+To run the automated tests for this project, execute the following command:
+```bash
+flutter test
+```
 
 ## Project Architecture
 
@@ -76,6 +81,29 @@ Handle services such as queries to Firebase and geolocation from here
 
 util/ \
 Handle in-app utilities such as profile image selection here
+
+scripts/ \
+Web scraper of BU events calendar here
+
+test/ \
+All automated testing files are in this directory
+
+# Future Scope
+
+## Features to be Implemented
+- **Passport and Stickers**: A passport where students can decorate with stickers to showcase their participation in events
+- **Reviews, Photos and Ratings for Events**: A system that allows students to express their thoughts of attended events with ratings, comments, and photos taken at the event
+- **Enhancing Points System**: Add more variability in how students can earn points
+- **Google/BU SSO Login**: Allow students to login using their BU credentials or Google email for authentication
+- **Events Filtering**: Allow students to filter for events based on category or tags of events
+- **Interests Page**: Develop a page where students can select their interests, and see events based on their interests
+- **Friends**: Develop a friends system where users can add friends and view each other's progress and participation levels
+
+## Pages that Still Need Updates
+- **Profile Page**: Adding a passport and additional features that have yet to be implemented, like a friends system
+- **Explore page**: Add an events filtering feature based on event tags
+
+## Additional Notes Moving Forward
 
 
 
