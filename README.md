@@ -41,13 +41,13 @@ Running this command will run the app locally, either via an Android simulator o
 selected before running this command.
 
 ## Features
-- Centralized Section for Events
+- **Centralized Section for Events**
   - Users are able to see upcoming and ongoing events either in a list view format in the explore page or in a calendar format
-- Event Saving
+- **Event Saving**
   - Users are able to save the events they are interested in, which will also be reflected onto their profile page
-- Geolocation Checkin
+- **Geolocation Checkin**
   - When it is the day of the event, and the user is within 400 meters to the event location, they are able to checkin and track their participation
-- Point Tracking
+- **Point Tracking**
   - When a user successfully checks in to an event, they are awarded points
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
   - There is a leaderboard page to showcase the highest raffle ticket earners
@@ -57,7 +57,7 @@ selected before running this command.
 
 ![alt text](./passportArchitecture.png)
 
-## Directory Structure:
+## Directory Structure
 
 auth/  
 Handles authentication of user by checking if they are logged in or not
