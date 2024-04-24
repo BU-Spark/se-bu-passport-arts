@@ -31,6 +31,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
+        child: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(edgeInsets),
           child: Column(
@@ -129,6 +130,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
