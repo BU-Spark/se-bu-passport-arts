@@ -99,7 +99,7 @@ class _EventWidgetState extends State<EventWidget> {
         child: Stack(
           children: [
             Positioned(
-              bottom: sizedBoxHeight,
+              bottom: widgetHeight * 0.01,
               left: edgeInsets,
               right: edgeInsets,
               child: Container(
@@ -144,9 +144,7 @@ class _EventWidgetState extends State<EventWidget> {
                         ),
                         RichText(
                           text: TextSpan(
-                            // text: '${widget.event.points}',
-                            // It will be replaced with real value in future development
-                            text: '30',
+                            text: '${widget.event.eventPoints}',
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.w800,

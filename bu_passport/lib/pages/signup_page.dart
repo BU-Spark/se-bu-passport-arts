@@ -113,6 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       'userYear': year,
                       'userBUID': buID,
                       'userPoints': 0,
+                      'userProfileURL': '',
                       'userSavedEvents': Map<String, bool>(),
                     };
                     await db

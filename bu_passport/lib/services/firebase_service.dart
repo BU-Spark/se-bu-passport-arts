@@ -23,6 +23,7 @@ class FirebaseService {
           eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
           eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
           eventDescription: eventData['eventDescription'] ?? '',
+          eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
         );
 
@@ -64,14 +65,13 @@ class FirebaseService {
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
-          profileImageUrl: userData['profileImageUrl'],
+          userProfileURL: userData['userProfileURL'],
           userBUID: userData['userBUID'],
           userEmail: userData['userEmail'],
           userSchool: userData['userSchool'],
           userUID: userData['userUID'],
           userYear: userData['userYear'],
           userPoints: userData['userPoints'],
-          userPreferences: List<String>.from(userData['userPreferences'] ?? []),
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
         );
@@ -202,6 +202,7 @@ class FirebaseService {
         eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
         eventURL: eventData['eventURL'] ?? '',
         eventDescription: eventData['eventDescription'] ?? '',
+        eventPoints: eventData['eventPoints'] ?? 0,
         savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
       );
       return event;
@@ -209,7 +210,7 @@ class FirebaseService {
     throw Exception("Event not found");
   }
 
-  static void checkInUserForEvent(String eventID) {
+  static void checkInUserForEvent(String eventID, int eventPoints) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
       throw Exception("User is not logged in");
@@ -222,6 +223,9 @@ class FirebaseService {
       // Atomically add the new event ID to the user's saved events list
       userDoc.update({
         'userSavedEvents.$eventID': true,
+      });
+      userDoc.update({
+        'userPoints': FieldValue.increment(eventPoints),
       });
       print("Event check-in successful");
     } catch (error) {
@@ -243,5 +247,89 @@ class FirebaseService {
       return savedEvents.containsKey(eventId) && savedEvents[eventId];
     }
     return false;
+  }
+
+  static Future<void> updateUserProfileURL(String profileURL) async {
+    final userUID = FirebaseAuth.instance.currentUser?.uid;
+    if (userUID == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final db = FirebaseFirestore.instance;
+    final userDoc = db.collection('users').doc(userUID);
+
+    try {
+      await userDoc.update({
+        'userProfileURL': profileURL,
+      });
+      print("Profile URL updated successfully");
+    } catch (error) {
+      print("Failed to update profile URL: $error");
+    }
+  }
+
+  static Future<List<Event>> fetchEventsFromNow() async {
+    final db = FirebaseFirestore.instance;
+    final now = DateTime.now();
+    List<Event> eventList = [];
+
+    try {
+      QuerySnapshot snapshot = await db.collection('events').get();
+      snapshot.docs.forEach((doc) {
+        final eventData = doc.data() as Map<String, dynamic>;
+        Event event = Event(
+          eventID: doc.id,
+          eventTitle: eventData['eventTitle'] ?? '',
+          eventURL: eventData['eventURL'] ?? '',
+          eventPhoto: eventData['eventPhoto'] ?? '',
+          eventLocation: eventData['eventLocation'] ?? '',
+          eventStartTime: (eventData['eventStartTime'] as Timestamp?)!.toDate(),
+          eventEndTime: (eventData['eventEndTime'] as Timestamp?)!.toDate(),
+          eventDescription: eventData['eventDescription'] ?? '',
+          eventPoints: eventData['eventPoints'] ?? 0,
+          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+        );
+
+        eventList.add(event);
+      });
+      eventList =
+          eventList.where((event) => event.eventEndTime.isAfter(now)).toList();
+      return eventList;
+    } catch (error) {
+      print("Failed to fetch events: $error");
+      return [];
+    }
+  }
+
+  static Future<List<Users>> fetchAllUsers() async {
+    final db = FirebaseFirestore.instance;
+    List<Users> users = [];
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await db.collection('users').get();
+      snapshot.docs.forEach((doc) {
+        final userData = doc.data();
+        print(userData);
+        Users user = Users(
+          firstName: userData['firstName'],
+          lastName: userData['lastName'],
+          userBUID: userData['userBUID'],
+          userEmail: userData['userEmail'],
+          userSchool: userData['userSchool'],
+          userUID: userData['userUID'],
+          userYear: userData['userYear'],
+          userSavedEvents:
+              Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userPoints: userData['userPoints'],
+          userProfileURL: userData['userProfileURL'],
+        );
+        users.add(user);
+      });
+      return users;
+    } catch (error) {
+      print("Failed to fetch all users: $error");
+      return [];
+    }
   }
 }

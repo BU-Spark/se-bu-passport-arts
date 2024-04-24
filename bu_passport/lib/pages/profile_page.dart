@@ -84,6 +84,12 @@ class _ProfilePageState extends State<ProfilePage>
 
   void updateEventPage() {
     fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
+    setState(() {
+      _userProfileFuture = FirebaseFirestore.instance
+          .collection('users')
+          .doc(finalUser!.uid)
+          .get();
+    });
   }
 
   @override
@@ -124,6 +130,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     if (user != null) {
       await user.updatePhotoURL(imageUrl);
+      await FirebaseService.updateUserProfileURL(imageUrl);
       await user.reload(); // Reload the user profile to reflect the update
     }
   }
@@ -226,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage>
                 var userData = snapshot.data!.data() as Map<String, dynamic>;
                 String fullName =
                     '${userData['firstName'] ?? 'Not set'} ${userData['lastName'] ?? ''}';
-                int userPoints = userData['points'] ?? 0;
+                int userPoints = userData['userPoints'] ?? 0;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
