@@ -27,6 +27,18 @@ flutter run
 Running this command will run the app locally, either via an Android simulator or iOS simulator. Ensure that you have either simulators installed and 
 selected before running this command.
 
+## Features
+- Centralized Section for Events:
+  - Users are able to see upcoming and ongoing events either in a list view format in the explore page or in a calendar format
+- Event Saving:
+  - Users are able to save the events they are interested in, which will also be reflected onto their profile page
+- Geolocation Checkin:
+  - When it is the day of the event, and the user is within 400 meters to the event location, they are able to checkin and track their participation
+- Point Tracking:
+  - When a user successfully checks in to an event, they are awarded points
+  - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
+  - There is a leaderboard page to showcase the highest raffle ticket earners
+
 ## Project Architecture
 
 ![alt text](./passportArchitecture.png)
