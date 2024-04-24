@@ -1,9 +1,22 @@
 # BU Arts Passport
 
 ## Description
-BU Arts Passport is a simple and lightweight mobile app developed using Flutter that tracks student engagement in arts events hosted by the BU Arts department. 
+BU Arts Passport is a simple and lightweight mobile app that tracks student engagement in arts events hosted by the BU Arts department. 
 This project aims to streamline the process of attending art events at school: starting from seeing the ongoing and upcoming events, 
 finding out the details of interested events, to finally checking in and tracking the participation to these events.
+
+## Prerequisites and Configuration
+Before you begin, ensure you have met the following requirements:
+- **Flutter**: Your system must have Flutter installed. This project was built using Flutter 3.19.2. Ensure that you are using this version or later. For installation instructions, see [Flutter's official installation guide](https://flutter.dev/docs/get-started/install).
+- **Dart SDK**: Dart 3.3.0 or later is required. However, this typically comes with the Flutter installation.
+- **Android or iOS Setup**: For Android, you must have Android SDK setup. For iOS, you need to Xcode installed to run the simulator. Ensure that these emulators are configured for your IDE of choice.
+- **Google Places API Key**: The Geolocation check in relies on the Google Places API, which requires an API key.
+  - Create a directory under 'bu_passport/lib' named 'config'
+  - Create a file named 'secrets.dart' and add your API key in this file as follows:
+  ```plaintext
+  final String googlePlacesApiKey =your_api_key_here;
+  ```
+  - The application is set up to read the API key from here, and it has already been added to the '.gitignore' file
 
 ## Installation and Usage
 1. Clone into the repository
@@ -38,6 +51,7 @@ selected before running this command.
   - When a user successfully checks in to an event, they are awarded points
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
   - There is a leaderboard page to showcase the highest raffle ticket earners
+
 
 ## Project Architecture
 
