@@ -1,11 +1,11 @@
 # BU Arts Passport
 
-## Description
+### Description
 BU Arts Passport is a simple and lightweight mobile app that tracks student engagement in arts events hosted by the BU Arts department. 
 This project aims to streamline the process of attending art events at school: starting from seeing the ongoing and upcoming events, 
 finding out the details of interested events, to finally checking in and tracking the participation to these events.
 
-## Prerequisites and Configuration
+### Prerequisites and Configuration
 Before you begin, ensure you have met the following requirements:
 - **Flutter**: Your system must have Flutter installed. This project was built using Flutter 3.19.2. Ensure that you are using this version or later. For installation instructions, see [Flutter's official installation guide](https://flutter.dev/docs/get-started/install).
 - **Dart SDK**: Dart 3.3.0 or later is required. However, this typically comes with the Flutter installation.
@@ -18,7 +18,7 @@ Before you begin, ensure you have met the following requirements:
   ```
   - The application is set up to read the API key from here, and it has already been added to the '.gitignore' file
 
-## Installation and Usage
+### Installation and Usage
 1. Clone into the repository
 ```bash
 # Use either HTTPS or SSH
@@ -40,7 +40,7 @@ flutter run
 Running this command will run the app locally, either via an Android simulator or iOS simulator. Ensure that you have either simulators installed and 
 selected before running this command.
 
-## Features
+### Features
 - **Centralized Section for Events**
   - Users are able to see upcoming and ongoing events either in a list view format in the explore page or in a calendar format
 - **Event Saving**
@@ -52,17 +52,17 @@ selected before running this command.
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
   - There is a leaderboard page to showcase the highest raffle ticket earners
 
-## Testing
+### Testing
 To run the automated tests for this project, execute the following command:
 ```bash
 flutter test
 ```
 
-## Project Architecture
+### Project Architecture
 
 ![alt text](./passportArchitecture.png)
 
-## Directory Structure
+### Directory Structure
 
 auth/ \
 Handles authentication of user by checking if they are logged in or not
@@ -90,7 +90,7 @@ All automated testing files are in this directory
 
 # Future Scope
 
-## Features to be Implemented
+### Features to be Implemented
 - **Passport and Stickers**: A passport where students can decorate with stickers to showcase their participation in events
 - **Reviews, Photos and Ratings for Events**: A system that allows students to express their thoughts of attended events with ratings, comments, and photos taken at the event
 - **Enhancing Points System**: Add more variability in how students can earn points
@@ -99,11 +99,11 @@ All automated testing files are in this directory
 - **Interests Page**: Develop a page where students can select their interests, and see events based on their interests
 - **Friends**: Develop a friends system where users can add friends and view each other's progress and participation levels
 
-## Pages that Still Need Updates
+### Pages that Still Need Updates
 - **Profile Page**: Adding a passport and additional features that have yet to be implemented, like a friends system
 - **Explore page**: Add an events filtering feature based on event tags
 
-## Additional Notes Moving Forward
+### Additional Notes Moving Forward
 
 
 
