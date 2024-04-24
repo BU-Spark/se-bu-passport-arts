@@ -88,7 +88,7 @@ Web scraper of BU events calendar here
 test/ \
 All automated testing files are in this directory
 
-# Future Scope
+## Future Scope
 
 ### Features to be Implemented
 - **Passport and Stickers**: A passport where students can decorate with stickers to showcase their participation in events
@@ -101,10 +101,11 @@ All automated testing files are in this directory
 
 ### Pages that Still Need Updates
 - **Profile Page**: Adding a passport and additional features that have yet to be implemented, like a friends system
-- **Explore page**: Add an events filtering feature based on event tags
+- **Explore page**: Add an events filtering feature based on event tags. How the events are displayed can be changed to, for example, instead of a list view format, the events can be sorted by date, or have some events be in a horizontal scroll format.
 
 ### Additional Notes Moving Forward
-
-
+- Do additional research if an admin side of the app is needed/necessary
+- Work on a new method of pulling events. Currently, events are pulled using a web scraper to fetch calendar data from the BU Arts calendar website. However, this likely wouldn't be the long-term solution. JSON or ICS files are avaliable, but additional research shows that these files may not be appropriate for the use case of this project (see JSON vs. ICS document on Google Drive). 
+- Find a way to generate tags for events. At the moment, BU has not generated any tags for their events. This may change in the future, but for now, a work around would be to discover a reliable method to generate tags for events. These tags are essential for implementing the interest page, event filtering page, and the passport page. Some additional insights are added to the 'JSON vs. ICS' document, but not comprehensive enough to implement a solution yet.
 
 
