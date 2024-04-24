@@ -59,17 +59,24 @@ selected before running this command.
 
 ## Directory Structure
 
-auth/  
+auth/ \
 Handles authentication of user by checking if they are logged in or not
-  
-pages/  
-All separate pages will be under this directory
 
-services/
-Handle services such as queries to Firebase from here
-
-classes/
+classes/ \
 All classes will be here
 
-components/
+components/ \
 Reusable widgets such as an event_widget will be placed here
+  
+pages/ \
+All separate pages will be under this directory
+
+services/ \
+Handle services such as queries to Firebase and geolocation from here
+
+util/ \
+Handle in-app utilities such as profile image selection here
+
+
+
+
