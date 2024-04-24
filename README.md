@@ -9,11 +9,11 @@ finding out the details of interested events, to finally checking in and trackin
 
 
 
-# Project Architecture
+## Project Architecture
 
 ![alt text](./passportArchitecture.png)
 
-# Directory Structure:
+## Directory Structure:
 
 auth/  
 Handles authentication of user by checking if they are logged in or not
