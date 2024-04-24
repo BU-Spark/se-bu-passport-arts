@@ -1,3 +1,14 @@
+# BU Arts Passport
+
+## Description
+BU Arts Passport is a simple and lightweight app that tracks student engagement in arts events hosted by the BU Arts department. 
+This project aims to streamline the process of attending art events at school: starting from seeing the ongoing and upcoming events, 
+finding out the details of interested events, to finally checking in and tracking the participation to these events.
+
+## Installation
+
+
+
 # Project Architecture
 
 ![alt text](./passportArchitecture.png)
