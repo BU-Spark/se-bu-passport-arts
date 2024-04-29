@@ -108,7 +108,23 @@ class _SignUpPageState extends State<SignUpPage> {
                     String lastName = _lastNameController.text;
                     String buID = _buIDController.text;
                     String school = _userSchool.text;
-                    int year = int.parse(_userYear.text);
+                    String year_text = _userYear.toString().trim();
+
+                    // Check if any of the fields are empty.
+                    if (email.isEmpty ||
+                        password.isEmpty ||
+                        firstName.isEmpty ||
+                        lastName.isEmpty ||
+                        buID.isEmpty ||
+                        school.isEmpty ||
+                        year_text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Please fill out all fields.')),
+                      );
+                      return;
+                    }
+                    int year = int.parse(year_text);
 
                     try {
                       // Firebase Auth call to create a new user with email and password.
