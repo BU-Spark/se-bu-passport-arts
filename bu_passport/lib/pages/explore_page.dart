@@ -18,8 +18,8 @@ class _HomePageState extends State<ExplorePage> {
   String _searchQuery = '';
   late Future<List<Event>> fetchEventsFuture;
   int _selectedIndex = 0;
-  FirebaseService firebaseService = FirebaseService();
-
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();

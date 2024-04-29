@@ -1,4 +1,5 @@
 import 'package:bu_passport/components/event_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,8 +18,9 @@ class _CalendarPageState extends State<CalendarPage> {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
   List<Event> _allEvents = []; // List to store events
-  FirebaseService firebaseService = FirebaseService();
-// List to store events for the selected day
+  FirebaseService firebaseService = FirebaseService(
+      db: FirebaseFirestore
+          .instance); // List to store events for the selected day
   late Future<List<Event>> _allEventsFuture;
 
   @override

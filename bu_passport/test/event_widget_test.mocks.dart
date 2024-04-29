@@ -3,12 +3,13 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i5;
 
-import 'package:bu_passport/classes/categorized_events.dart' as _i2;
-import 'package:bu_passport/classes/event.dart' as _i5;
-import 'package:bu_passport/classes/user.dart' as _i6;
-import 'package:bu_passport/services/firebase_service.dart' as _i3;
+import 'package:bu_passport/classes/categorized_events.dart' as _i3;
+import 'package:bu_passport/classes/event.dart' as _i6;
+import 'package:bu_passport/classes/user.dart' as _i7;
+import 'package:bu_passport/services/firebase_service.dart' as _i4;
+import 'package:cloud_firestore/cloud_firestore.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -24,9 +25,20 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeCategorizedEvents_0 extends _i1.SmartFake
-    implements _i2.CategorizedEvents {
-  _FakeCategorizedEvents_0(
+class _FakeFirebaseFirestore_0 extends _i1.SmartFake
+    implements _i2.FirebaseFirestore {
+  _FakeFirebaseFirestore_0(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeCategorizedEvents_1 extends _i1.SmartFake
+    implements _i3.CategorizedEvents {
+  _FakeCategorizedEvents_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -38,24 +50,33 @@ class _FakeCategorizedEvents_0 extends _i1.SmartFake
 /// A class which mocks [FirebaseService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
+class MockFirebaseService extends _i1.Mock implements _i4.FirebaseService {
   MockFirebaseService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<List<_i5.Event>> fetchEvents() => (super.noSuchMethod(
+  _i2.FirebaseFirestore get db => (super.noSuchMethod(
+        Invocation.getter(#db),
+        returnValue: _FakeFirebaseFirestore_0(
+          this,
+          Invocation.getter(#db),
+        ),
+      ) as _i2.FirebaseFirestore);
+
+  @override
+  _i5.Future<List<_i6.Event>> fetchEvents() => (super.noSuchMethod(
         Invocation.method(
           #fetchEvents,
           [],
         ),
-        returnValue: _i4.Future<List<_i5.Event>>.value(<_i5.Event>[]),
-      ) as _i4.Future<List<_i5.Event>>);
+        returnValue: _i5.Future<List<_i6.Event>>.value(<_i6.Event>[]),
+      ) as _i5.Future<List<_i6.Event>>);
 
   @override
-  List<_i5.Event> fetchEventsForDay(
+  List<_i6.Event> fetchEventsForDay(
     DateTime? date,
-    List<_i5.Event>? events,
+    List<_i6.Event>? events,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -65,12 +86,12 @@ class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
             events,
           ],
         ),
-        returnValue: <_i5.Event>[],
-      ) as List<_i5.Event>);
+        returnValue: <_i6.Event>[],
+      ) as List<_i6.Event>);
 
   @override
-  List<_i5.Event> filterEvents(
-    List<_i5.Event>? events,
+  List<_i6.Event> filterEvents(
+    List<_i6.Event>? events,
     String? query,
   ) =>
       (super.noSuchMethod(
@@ -81,40 +102,40 @@ class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
             query,
           ],
         ),
-        returnValue: <_i5.Event>[],
-      ) as List<_i5.Event>);
+        returnValue: <_i6.Event>[],
+      ) as List<_i6.Event>);
 
   @override
-  _i4.Future<_i6.Users?> fetchUser(String? userUID) => (super.noSuchMethod(
+  _i5.Future<_i7.Users?> fetchUser(String? userUID) => (super.noSuchMethod(
         Invocation.method(
           #fetchUser,
           [userUID],
         ),
-        returnValue: _i4.Future<_i6.Users?>.value(),
-      ) as _i4.Future<_i6.Users?>);
+        returnValue: _i5.Future<_i7.Users?>.value(),
+      ) as _i5.Future<_i7.Users?>);
 
   @override
-  _i4.Future<void> saveEvent(String? eventId) => (super.noSuchMethod(
+  _i5.Future<void> saveEvent(String? eventId) => (super.noSuchMethod(
         Invocation.method(
           #saveEvent,
           [eventId],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
-  _i4.Future<void> unsaveEvent(String? eventId) => (super.noSuchMethod(
+  _i5.Future<void> unsaveEvent(String? eventId) => (super.noSuchMethod(
         Invocation.method(
           #unsaveEvent,
           [eventId],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
-  _i4.Future<bool> hasUserSavedEvent(
+  _i5.Future<bool> hasUserSavedEvent(
     String? userUID,
     String? eventId,
   ) =>
@@ -126,34 +147,34 @@ class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
             eventId,
           ],
         ),
-        returnValue: _i4.Future<bool>.value(false),
-      ) as _i4.Future<bool>);
+        returnValue: _i5.Future<bool>.value(false),
+      ) as _i5.Future<bool>);
 
   @override
-  _i4.Future<_i2.CategorizedEvents> fetchAndCategorizeEvents() =>
+  _i5.Future<_i3.CategorizedEvents> fetchAndCategorizeEvents() =>
       (super.noSuchMethod(
         Invocation.method(
           #fetchAndCategorizeEvents,
           [],
         ),
         returnValue:
-            _i4.Future<_i2.CategorizedEvents>.value(_FakeCategorizedEvents_0(
+            _i5.Future<_i3.CategorizedEvents>.value(_FakeCategorizedEvents_1(
           this,
           Invocation.method(
             #fetchAndCategorizeEvents,
             [],
           ),
         )),
-      ) as _i4.Future<_i2.CategorizedEvents>);
+      ) as _i5.Future<_i3.CategorizedEvents>);
 
   @override
-  _i4.Future<_i5.Event?> fetchEventById(String? eventId) => (super.noSuchMethod(
+  _i5.Future<_i6.Event?> fetchEventById(String? eventId) => (super.noSuchMethod(
         Invocation.method(
           #fetchEventById,
           [eventId],
         ),
-        returnValue: _i4.Future<_i5.Event?>.value(),
-      ) as _i4.Future<_i5.Event?>);
+        returnValue: _i5.Future<_i6.Event?>.value(),
+      ) as _i5.Future<_i6.Event?>);
 
   @override
   void checkInUserForEvent(
@@ -172,7 +193,7 @@ class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
       );
 
   @override
-  _i4.Future<bool> isUserCheckedInForEvent(
+  _i5.Future<bool> isUserCheckedInForEvent(
     String? userUID,
     String? eventId,
   ) =>
@@ -184,35 +205,35 @@ class MockFirebaseService extends _i1.Mock implements _i3.FirebaseService {
             eventId,
           ],
         ),
-        returnValue: _i4.Future<bool>.value(false),
-      ) as _i4.Future<bool>);
+        returnValue: _i5.Future<bool>.value(false),
+      ) as _i5.Future<bool>);
 
   @override
-  _i4.Future<void> updateUserProfileURL(String? profileURL) =>
+  _i5.Future<void> updateUserProfileURL(String? profileURL) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateUserProfileURL,
           [profileURL],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
-  _i4.Future<List<_i5.Event>> fetchEventsFromNow() => (super.noSuchMethod(
+  _i5.Future<List<_i6.Event>> fetchEventsFromNow() => (super.noSuchMethod(
         Invocation.method(
           #fetchEventsFromNow,
           [],
         ),
-        returnValue: _i4.Future<List<_i5.Event>>.value(<_i5.Event>[]),
-      ) as _i4.Future<List<_i5.Event>>);
+        returnValue: _i5.Future<List<_i6.Event>>.value(<_i6.Event>[]),
+      ) as _i5.Future<List<_i6.Event>>);
 
   @override
-  _i4.Future<List<_i6.Users>> fetchAllUsers() => (super.noSuchMethod(
+  _i5.Future<List<_i7.Users>> fetchAllUsers() => (super.noSuchMethod(
         Invocation.method(
           #fetchAllUsers,
           [],
         ),
-        returnValue: _i4.Future<List<_i6.Users>>.value(<_i6.Users>[]),
-      ) as _i4.Future<List<_i6.Users>>);
+        returnValue: _i5.Future<List<_i7.Users>>.value(<_i7.Users>[]),
+      ) as _i5.Future<List<_i7.Users>>);
 }

@@ -5,12 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseService {
+  final FirebaseFirestore db;
+
+  const FirebaseService({required this.db});
+
   Future<List<Event>> fetchEvents() async {
-    final db = FirebaseFirestore.instance;
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await db.collection('events').get();
+      QuerySnapshot snapshot = await this.db.collection('events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
@@ -53,14 +56,15 @@ class FirebaseService {
   }
 
   Future<Users?> fetchUser(String userUID) async {
-    final db = FirebaseFirestore.instance;
-
     try {
       DocumentSnapshot snapshot =
-          await db.collection('users').doc(userUID).get();
+          await this.db.collection('users').doc(userUID).get();
 
       if (snapshot.exists) {
+        print('Snapshot exists');
         final userData = snapshot.data() as Map<String, dynamic>;
+        print('User Data: $userData'); // Print userData to see its contents
+
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
@@ -74,7 +78,10 @@ class FirebaseService {
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
         );
+        print(user);
         return user;
+      } else {
+        print('Snapshot does not exist');
       }
     } catch (error) {
       print("Failed to fetch user details: $error");
@@ -83,9 +90,8 @@ class FirebaseService {
   }
 
   Future<void> saveEvent(String eventId) async {
-    final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
-    final userDoc = db.collection('users').doc(userUID);
+    final userDoc = this.db.collection('users').doc(userUID);
 
     try {
       // Atomically add the new event ID to the user's saved events list
@@ -93,7 +99,7 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': false,
       });
-      await db.collection('events').doc(eventId).update({
+      await this.db.collection('events').doc(eventId).update({
         'savedUsers': FieldValue.arrayUnion([userUID]),
       });
       print("Event saved successfully");
@@ -103,16 +109,15 @@ class FirebaseService {
   }
 
   Future<void> unsaveEvent(String eventId) async {
-    final db = FirebaseFirestore.instance;
     final userUID = FirebaseAuth.instance.currentUser?.uid;
-    final userDoc = db.collection('users').doc(userUID);
+    final userDoc = this.db.collection('users').doc(userUID);
 
     try {
       // Atomically remove the event ID from the user's saved events list
       await userDoc.update({
         'userSavedEvents.$eventId': FieldValue.delete(),
       });
-      await db.collection('events').doc(eventId).update({
+      await this.db.collection('events').doc(eventId).update({
         'savedUsers': FieldValue.arrayRemove([userUID]),
       });
       print("Event unsaving successful");
@@ -122,9 +127,8 @@ class FirebaseService {
   }
 
   Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
-    final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
-        await db.collection('users').doc(userUID).get();
+        await this.db.collection('users').doc(userUID).get();
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
@@ -187,9 +191,8 @@ class FirebaseService {
   }
 
   Future<Event?> fetchEventById(String eventId) async {
-    final FirebaseFirestore _db = FirebaseFirestore.instance;
     DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await _db.collection('events').doc(eventId).get();
+        await this.db.collection('events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
       Map<String, dynamic> eventData = snapshot.data()!;
       Event event = Event(
@@ -215,8 +218,7 @@ class FirebaseService {
       throw Exception("User is not logged in");
     }
 
-    final db = FirebaseFirestore.instance;
-    final userDoc = db.collection('users').doc(userUID);
+    final userDoc = this.db.collection('users').doc(userUID);
 
     try {
       // Atomically add the new event ID to the user's saved events list
@@ -233,9 +235,8 @@ class FirebaseService {
   }
 
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
-    final db = FirebaseFirestore.instance;
     DocumentSnapshot userDocSnapshot =
-        await db.collection('users').doc(userUID).get();
+        await this.db.collection('users').doc(userUID).get();
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
@@ -253,8 +254,7 @@ class FirebaseService {
       throw Exception("User is not logged in");
     }
 
-    final db = FirebaseFirestore.instance;
-    final userDoc = db.collection('users').doc(userUID);
+    final userDoc = this.db.collection('users').doc(userUID);
 
     try {
       await userDoc.update({
@@ -267,12 +267,11 @@ class FirebaseService {
   }
 
   Future<List<Event>> fetchEventsFromNow() async {
-    final db = FirebaseFirestore.instance;
     final now = DateTime.now();
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await db.collection('events').get();
+      QuerySnapshot snapshot = await this.db.collection('events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
@@ -300,12 +299,11 @@ class FirebaseService {
   }
 
   Future<List<Users>> fetchAllUsers() async {
-    final db = FirebaseFirestore.instance;
     List<Users> users = [];
 
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot =
-          await db.collection('users').get();
+          await this.db.collection('users').get();
       snapshot.docs.forEach((doc) {
         final userData = doc.data();
         print(userData);

@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/components/user_widget.dart';
 import 'package:bu_passport/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,8 +18,8 @@ class LeaderboardPageState extends State<LeaderboardPage> {
   int userPoints = 0;
   int userTickets = 0;
   int? userRank; // Variable to store user rank
-  FirebaseService firebaseService = FirebaseService();
-
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();

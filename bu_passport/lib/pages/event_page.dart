@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:flutter/widgets.dart';
@@ -22,7 +23,8 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  FirebaseService firebaseService = FirebaseService();
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event

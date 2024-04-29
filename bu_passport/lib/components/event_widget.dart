@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,7 +23,8 @@ class _EventWidgetState extends State<EventWidget> {
   bool _isCheckedIn = false;
   String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
   // Ensure there's a user logged in
-  FirebaseService firebaseService = FirebaseService();
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
 
   @override
   void initState() {

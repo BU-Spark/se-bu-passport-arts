@@ -26,7 +26,8 @@ class _ProfilePageState extends State<ProfilePage>
   List<Event> attendedEvents = [];
   List<Event> userSavedEvents = [];
   bool isLoading = true;
-  FirebaseService firebaseService = FirebaseService();
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
