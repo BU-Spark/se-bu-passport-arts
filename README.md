@@ -14,7 +14,7 @@ Before you begin, ensure you have met the following requirements:
   - Create a directory under 'bu_passport/lib' named 'config'
   - Create a file named 'secrets.dart' and add your API key in this file as follows:
   ```plaintext
-  final String googlePlacesApiKey =your_api_key_here;
+  final String googlePlacesApiKey=your_api_key_here;
   ```
   - The application is set up to read the API key from here, and it has already been added to the '.gitignore' file
 
