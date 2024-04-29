@@ -448,6 +448,84 @@ void main() {
       expect(events.length, 1);
       expect(events.first.eventTitle, 'Now/Future Event');
     });
+
+    test('fetchAllUsers retrieves and constructs User object correctly',
+        () async {
+      print('Checking if all users are retrievable...');
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+
+      const String collectionPath = 'users';
+      const String userId1 = 'user1';
+      const String userId2 = 'user2';
+      const String userId3 = 'user3';
+
+      final Map<String, dynamic> data1 = {
+        'firstName': 'John',
+        'lastName': 'Doe',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU123456',
+        'userEmail': 'john@example.com',
+        'userSchool': 'School of Engineering',
+        'userUID': 'user1',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': false, 'event2': false},
+      };
+
+      final Map<String, dynamic> data2 = {
+        'firstName': 'Ben',
+        'lastName': 'Clark',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU654321',
+        'userEmail': 'ben@example.com',
+        'userSchool': 'School of Arts',
+        'userUID': 'user2',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': false, 'event2': false},
+      };
+
+      final Map<String, dynamic> data3 = {
+        'firstName': 'Marc',
+        'lastName': 'Malone',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU132446',
+        'userEmail': 'marc@example.com',
+        'userSchool': 'School of Communications',
+        'userUID': 'user3',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': false, 'event2': false},
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(userId1)
+          .set(data1);
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(userId2)
+          .set(data2);
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(userId3)
+          .set(data3);
+
+      List<Users> users = await firebaseService.fetchAllUsers();
+      expect(users.length, 3);
+      expect(users[0].firstName, 'John');
+      expect(users[0].lastName, 'Doe');
+      expect(users[1].firstName, 'Ben');
+      expect(users[1].lastName, 'Clark');
+      expect(users[2].firstName, 'Marc');
+      expect(users[2].lastName, 'Malone');
+
+      expect(users.any((user) => user.userUID == 'user1'), isTrue);
+      expect(users.any((user) => user.userUID == 'user2'), isTrue);
+      expect(users.any((user) => user.userUID == 'user3'), isTrue);
+      expect(users.any((user) => user.userUID == 'nonexistent'), isFalse);
+    });
   });
 
   // Tests for filterEvents group -- have 4 test cases
