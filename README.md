@@ -53,9 +53,13 @@ selected before running this command.
   - There is a leaderboard page to showcase the highest raffle ticket earners
 
 ### Testing
-To run the automated tests for this project, execute the following command:
+To run all the automated tests under the '/test' directory for this project, execute the following command:
 ```bash
 flutter test
+```
+To run a specific test file, execute the following command:
+```bash
+flutter test test/file_name_here.dart
 ```
 
 ### Project Architecture
