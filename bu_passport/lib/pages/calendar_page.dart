@@ -33,6 +33,8 @@ class _CalendarPageState extends State<CalendarPage> {
     _allEventsFuture = firebaseService.fetchEvents();
   }
 
+  // Function to fetch events
+
   Future<void> _fetchEvents() async {
     List<Event> allEvents = await firebaseService.fetchEvents();
     setState(() {
@@ -75,6 +77,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 child: Text('No events found.'),
               );
             }
+            // Filter events for the selected day
             List<Event> selectedEvents =
                 firebaseService.fetchEventsForDay(_selectedDay, events);
             print('Selected events: $selectedEvents');

@@ -1,1 +1,1 @@
-${PODS_XCFRAMEWORKS_BUILD_DIR}/FirebaseFirestoreAbseilBinary/abseil.framework
+${PODS_XCFRAMEWORKS_BUILD_DIR}/FirebaseFirestoreAbseilBinary/absl.framework

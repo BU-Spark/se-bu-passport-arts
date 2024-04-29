@@ -33,6 +33,8 @@ class _EventWidgetState extends State<EventWidget> {
     super.initState();
   }
 
+  // Function to check if user has saved the event
+
   void checkIfUserSaved() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
@@ -47,6 +49,7 @@ class _EventWidgetState extends State<EventWidget> {
     });
   }
 
+  // Function to check if user has checked in to the event
   void checkIfUserCheckedIn() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
@@ -61,6 +64,7 @@ class _EventWidgetState extends State<EventWidget> {
     });
   }
 
+  // Function to update the event page
   void updateEventPage() {
     checkIfUserSaved();
     checkIfUserCheckedIn();

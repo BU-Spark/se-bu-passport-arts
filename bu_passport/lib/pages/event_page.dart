@@ -38,6 +38,8 @@ class _EventPageState extends State<EventPage> {
     checkIfUserIsCheckedIn();
   }
 
+  // Function to check if user has saved the event
+
   void checkIfUserSaved() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
     // Ensure there's a user logged in
@@ -53,6 +55,8 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
+  // Function to check if user has checked in to the event
+
   void checkIfUserIsCheckedIn() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
     // Ensure there's a user logged in
@@ -67,6 +71,7 @@ class _EventPageState extends State<EventPage> {
     });
   }
 
+  // Function to check if the event is happening today
   bool isEventToday(DateTime eventDateTimestamp) {
     final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
     final nowLocal = tz.TZDateTime.now(tz.local);
@@ -75,6 +80,7 @@ class _EventPageState extends State<EventPage> {
         nowLocal.day == eventDateTimeLocal.day;
   }
 
+  // Function to check in
   Future<bool> checkIn() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();

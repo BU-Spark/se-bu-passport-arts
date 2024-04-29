@@ -17,22 +17,22 @@ RSYNC_PROTECT_TMP_FILES=(--filter "P .*.??????")
 variant_for_slice()
 {
   case "$1" in
-  "gRPC-Core.xcframework/ios-arm64")
+  "grpc.xcframework/ios-arm64")
     echo ""
     ;;
-  "gRPC-Core.xcframework/ios-arm64_x86_64-maccatalyst")
+  "grpc.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "maccatalyst"
     ;;
-  "gRPC-Core.xcframework/ios-arm64_x86_64-simulator")
+  "grpc.xcframework/ios-arm64_x86_64-simulator")
     echo "simulator"
     ;;
-  "gRPC-Core.xcframework/macos-arm64_x86_64")
+  "grpc.xcframework/macos-arm64_x86_64")
     echo ""
     ;;
-  "gRPC-Core.xcframework/tvos-arm64")
+  "grpc.xcframework/tvos-arm64")
     echo ""
     ;;
-  "gRPC-Core.xcframework/tvos-arm64_x86_64-simulator")
+  "grpc.xcframework/tvos-arm64_x86_64-simulator")
     echo "simulator"
     ;;
   esac
@@ -41,22 +41,22 @@ variant_for_slice()
 archs_for_slice()
 {
   case "$1" in
-  "gRPC-Core.xcframework/ios-arm64")
+  "grpc.xcframework/ios-arm64")
     echo "arm64"
     ;;
-  "gRPC-Core.xcframework/ios-arm64_x86_64-maccatalyst")
+  "grpc.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "arm64 x86_64"
     ;;
-  "gRPC-Core.xcframework/ios-arm64_x86_64-simulator")
+  "grpc.xcframework/ios-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
-  "gRPC-Core.xcframework/macos-arm64_x86_64")
+  "grpc.xcframework/macos-arm64_x86_64")
     echo "arm64 x86_64"
     ;;
-  "gRPC-Core.xcframework/tvos-arm64")
+  "grpc.xcframework/tvos-arm64")
     echo "arm64"
     ;;
-  "gRPC-Core.xcframework/tvos-arm64_x86_64-simulator")
+  "grpc.xcframework/tvos-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
   esac
@@ -141,5 +141,5 @@ install_xcframework() {
   echo "Copied $source to $destination"
 }
 
-install_xcframework "${PODS_ROOT}/FirebaseFirestoreGRPCCoreBinary/gRPC-Core.xcframework" "FirebaseFirestoreGRPCCoreBinary" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/FirebaseFirestoreGRPCCoreBinary/grpc.xcframework" "FirebaseFirestoreGRPCCoreBinary" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
 

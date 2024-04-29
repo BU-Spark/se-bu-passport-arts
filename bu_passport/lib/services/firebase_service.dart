@@ -9,6 +9,8 @@ class FirebaseService {
 
   const FirebaseService({required this.db});
 
+  // Function to fetch events from Firestore
+
   Future<List<Event>> fetchEvents() async {
     List<Event> eventList = [];
 
@@ -38,6 +40,8 @@ class FirebaseService {
     }
   }
 
+  // Function to fetch events for a specific date from a list of events
+
   List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
     return events.where((event) {
       return event.eventStartTime.day == date.day &&
@@ -45,6 +49,8 @@ class FirebaseService {
           event.eventStartTime.year == date.year;
     }).toList();
   }
+
+  // Function to filter events based on a search query
 
   List<Event> filterEvents(List<Event> events, String query) {
     if (query.isEmpty) {
@@ -54,6 +60,8 @@ class FirebaseService {
       return event.eventTitle.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
+
+  // Function to fetch user details from Firestore
 
   Future<Users?> fetchUser(String userUID) async {
     try {
@@ -89,6 +97,8 @@ class FirebaseService {
     return null;
   }
 
+  // Function to save an event to userSavedEvents
+
   Future<void> saveEvent(String eventId) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = this.db.collection('users').doc(userUID);
@@ -108,6 +118,8 @@ class FirebaseService {
     }
   }
 
+  // Function to unsave an event from userSavedEvents
+
   Future<void> unsaveEvent(String eventId) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = this.db.collection('users').doc(userUID);
@@ -126,6 +138,7 @@ class FirebaseService {
     }
   }
 
+  // Function to check if a user has saved an event
   Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
     DocumentSnapshot userDocSnapshot =
         await this.db.collection('users').doc(userUID).get();
@@ -144,6 +157,8 @@ class FirebaseService {
     }
     return false;
   }
+
+  // Function to categorize events into attended and saved events
 
   Future<CategorizedEvents> fetchAndCategorizeEvents() async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
@@ -194,6 +209,8 @@ class FirebaseService {
         attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
   }
 
+  // Function to fetch an event by its ID
+
   Future<Event?> fetchEventById(String eventId) async {
     DocumentSnapshot<Map<String, dynamic>> snapshot =
         await this.db.collection('events').doc(eventId).get();
@@ -216,6 +233,7 @@ class FirebaseService {
     throw Exception("Event not found");
   }
 
+  // Function to check in a user for an event
   void checkInUserForEvent(String eventID, int eventPoints) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
@@ -238,6 +256,8 @@ class FirebaseService {
     }
   }
 
+  // Function to check if a user has checked in for an event
+
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
     DocumentSnapshot userDocSnapshot =
         await this.db.collection('users').doc(userUID).get();
@@ -251,6 +271,8 @@ class FirebaseService {
     }
     return false;
   }
+
+  // Function to update the user's profile URL
 
   Future<void> updateUserProfileURL(String profileURL) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
@@ -269,6 +291,8 @@ class FirebaseService {
       print("Failed to update profile URL: $error");
     }
   }
+
+  // Function to fetch events after current time for explore page
 
   Future<List<Event>> fetchEventsFromNow() async {
     final now = DateTime.now();
@@ -301,6 +325,8 @@ class FirebaseService {
       return [];
     }
   }
+
+  // Function to fetch all users
 
   Future<List<Users>> fetchAllUsers() async {
     List<Users> users = [];
