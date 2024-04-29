@@ -236,7 +236,6 @@ void main() {
     test(
         'hasUserSavedEvent returns false if the event is not saved for a given user',
         () async {
-
       print("Checking if user has not saved event...");
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
@@ -264,6 +263,68 @@ void main() {
       expect(hasSaved, isFalse);
     });
 
+    test('fetchEventById successfully fetches an event from a valid event ID',
+        () async {
+      print("Fetching event from valid ID...");
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String collectionPath = 'events';
+      const String documentId1 = 'event1';
+
+      Map<String, dynamic> data1 = {
+        "eventID": documentId1,
+        "eventTitle": "Test Event",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": DateTime(2024, 4, 29, 10, 0),
+        "eventEndTime": DateTime(2024, 4, 29, 12, 0),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": ['user1']
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(documentId1)
+          .set(data1);
+
+      Event? event = await firebaseService.fetchEventById(documentId1);
+
+      expect(event, isNotNull);
+      expect(event!.eventID, equals(documentId1));
+      expect(event.eventTitle, equals('Test Event'));
+      expect(event.savedUsers, contains('user1'));
+    });
+
+    test('fetchEventById catches error if event does not exist', () async {
+      print("Fetching event from an invalid ID...");
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String collectionPath = 'events';
+      const String documentId1 = 'event1';
+
+      Map<String, dynamic> data1 = {
+        "eventID": documentId1,
+        "eventTitle": "Test Event",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": DateTime(2024, 4, 29, 10, 0),
+        "eventEndTime": DateTime(2024, 4, 29, 12, 0),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": ['user1']
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(documentId1)
+          .set(data1);
+
+      expect(firebaseService.fetchEventById('nonexistent id'),
+          throwsA(isA<Exception>()));
+    });
   });
 
   // Tests for filterEvents group -- have 4 test cases
