@@ -37,7 +37,6 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
     ProfilePage(), // User profile page.
   ];
 
-  // Handler for changing the selected page index.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index; // Update the index of the selected page.
@@ -52,22 +51,28 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
         child: _pages[_selectedIndex], // Displays the selected page.
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Fixed type for consistent display.
-        currentIndex: _selectedIndex, // Set the current index.
-        onTap: _onItemTapped, // Change page on item tap.
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Events', // Label for the explore/events page.
           ),
+
+          // Calendar icon
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Calendar', // Label for the calendar page.
           ),
+
+          // Leaderboard icon
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events),
             label: 'Leaderboard', // Label for the leaderboard page.
           ),
+
+          // Profile icon
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile', // Label for the profile page.

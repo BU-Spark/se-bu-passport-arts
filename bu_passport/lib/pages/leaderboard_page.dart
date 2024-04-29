@@ -27,6 +27,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
     fetchUserPointsAndTickets();
   }
 
+  // Fetch all existing users to display on the leaderboard
   Future<void> fetchAllUsers() async {
     try {
       List<Users> users = await firebaseService.fetchAllUsers();
@@ -63,6 +64,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Fetching logo for rank/league
   String _getImageAssetPath(String league) {
     switch (league) {
       case 'Diamond League':
@@ -78,6 +80,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Fetching a user's number of points and raffle tickets
   Future<void> fetchUserPointsAndTickets() async {
     try {
       String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
@@ -85,7 +88,8 @@ class LeaderboardPageState extends State<LeaderboardPage> {
       if (user != null) {
         setState(() {
           userPoints = user.userPoints;
-          userTickets = userPoints ~/ 100; // Calculate tickets
+          userTickets =
+              userPoints ~/ 100; // Calculate tickets - 1 ticket per 100 points
         });
       }
     } catch (error) {
@@ -93,14 +97,17 @@ class LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Progress to earning next raffle (progress bar)
   double calculateProgressPercentage(int points) {
     return (points % 100) / 100.0;
   }
 
+  // Function to calculate how many points left to earn next raffle ticket
   int calculatePointsForNextTicket(int points) {
     return (points % 100);
   }
 
+  // Function to categorize which league user belongs to based on points earned
   String calculateLeague(int points) {
     if (points >= 1000) {
       return "Diamond League";
