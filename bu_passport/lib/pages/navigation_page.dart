@@ -32,6 +32,7 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
     ProfilePage(),
   ];
 
+  // Selects the page associated to the navigation item
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -48,19 +49,26 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        // Event icon
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Events',
           ),
+
+          // Calendar icon
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Calendar',
           ),
+
+          // Leaderboard icon
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events),
             label: 'Leaderboard',
           ),
+
+          // Profile icon
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',

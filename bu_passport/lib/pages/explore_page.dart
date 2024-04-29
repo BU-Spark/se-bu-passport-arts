@@ -28,6 +28,7 @@ class _HomePageState extends State<ExplorePage> {
 
   // not the most effiicent solution need to improve **
 
+  // Update event list in explore page with events from now to future
   void updateEventPage() {
     setState(() {
       fetchEventsFuture = firebaseService.fetchEventsFromNow();
@@ -48,7 +49,6 @@ class _HomePageState extends State<ExplorePage> {
       ),
       body: Center(
         child: ListView(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Search bar
             TextField(
@@ -95,6 +95,7 @@ class _HomePageState extends State<ExplorePage> {
                       ),
                     );
                   } else {
+                    // When there are no events to show
                     return Text('No events found');
                   }
                 }
