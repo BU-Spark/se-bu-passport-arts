@@ -80,6 +80,7 @@ void main() {
     });
 
     test('fetchEventsForDay gets data from a given collection', () async {
+      print('Fetching events only happening on target date...');
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
 
@@ -129,13 +130,111 @@ void main() {
       final filteredEvents =
           firebaseService.fetchEventsForDay(targetDate, allEvents);
 
-      print(allEvents[0].eventID);
-      print(allEvents[1].eventID);
-
       expect(filteredEvents.length, 1); // Should only contain one event
       expect(filteredEvents[0].eventID, "event1");
       expect(filteredEvents[0].eventTitle, "Event on Target Date");
       expect(filteredEvents[0].eventStartTime, DateTime(2024, 4, 29, 10, 0));
+    });
+  });
+
+  group('Event Filtering Tests', () {
+    late FakeFirebaseFirestore fakeFirebaseFirestore;
+    setupFirebaseAuthMocks();
+    late FirebaseService firebaseService;
+
+    setUpAll(() async {
+      fakeFirebaseFirestore = FakeFirebaseFirestore();
+      firebaseService = FirebaseService(db: fakeFirebaseFirestore);
+
+      const String collectionPath = 'events';
+      const String documentId1 = 'event1';
+      const String documentId2 = 'event2';
+      const String documentId3 = 'event3';
+
+      Map<String, dynamic> data1 = {
+        "eventID": "1",
+        "eventTitle": "Annual Art Conference",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": DateTime(2024, 4, 29, 10, 0),
+        "eventEndTime": DateTime(2024, 4, 29, 12, 0),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": []
+      };
+
+      Map<String, dynamic> data2 = {
+        "eventID": "2",
+        "eventTitle": "Theatre Show",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": DateTime(2024, 4, 28, 10, 0),
+        "eventEndTime": DateTime(2024, 4, 28, 12, 0),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": []
+      };
+
+      Map<String, dynamic> data3 = {
+        "eventID": "3",
+        "eventTitle": "Art Exhibit",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": DateTime(2024, 4, 28, 10, 0),
+        "eventEndTime": DateTime(2024, 4, 28, 12, 0),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": []
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(documentId1)
+          .set(data1);
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(documentId2)
+          .set(data2);
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(documentId3)
+          .set(data3);
+    });
+
+    test('filterEvents returns all events when query is empty', () async {
+      print("Filtering events with an empty query...");
+      final List<Event> eventList = (await firebaseService.fetchEvents());
+      final filteredEvents = firebaseService.filterEvents(eventList, "");
+      expect(filteredEvents.length, 3);
+    });
+
+    test('filterEvents returns correct events for specific query', () async {
+      print("Filtering events with an exact event title query...");
+      final List<Event> eventList = (await firebaseService.fetchEvents());
+      final filteredEvents =
+          firebaseService.filterEvents(eventList, "Annual Art Conference");
+      expect(filteredEvents.length, 1);
+      expect(filteredEvents.first.eventTitle, "Annual Art Conference");
+    });
+
+    test('filterEvents is case insensitive', () async {
+      print("Filtering events when query is case insensitive...");
+      final List<Event> eventList = (await firebaseService.fetchEvents());
+      final filteredEvents =
+          firebaseService.filterEvents(eventList, "theatre show");
+      expect(filteredEvents.length, 1);
+      expect(filteredEvents.first.eventTitle, "Theatre Show");
+    });
+
+    test('filterEvents returns no events when query does not match', () async {
+      print("Filtering events when query doesn't match any events...");
+      final List<Event> eventList = (await firebaseService.fetchEvents());
+      final filteredEvents =
+          firebaseService.filterEvents(eventList, "nonexistent event");
+      expect(filteredEvents.isEmpty, true);
     });
   });
 }
