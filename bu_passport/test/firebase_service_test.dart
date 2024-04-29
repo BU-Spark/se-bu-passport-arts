@@ -325,6 +325,77 @@ void main() {
       expect(firebaseService.fetchEventById('nonexistent id'),
           throwsA(isA<Exception>()));
     });
+
+    test(
+        'isUserCheckedInForEvent returns true if the user is checked in to a given event',
+        () async {
+      print(
+          'Checking if user is checked in for an event they are checked in to...');
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String collectionPath = 'users';
+      const String userId = 'user1';
+      const String documentId1 = 'event1';
+
+      final Map<String, dynamic> userData = {
+        'firstName': 'John',
+        'lastName': 'Doe',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU123456',
+        'userEmail': 'john@example.com',
+        'userSchool': 'School of Engineering',
+        'userUID': 'user1',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': true, 'event2': false},
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(userId)
+          .set(userData);
+
+      bool isCheckedIn =
+          await firebaseService.isUserCheckedInForEvent(userId, documentId1);
+
+      expect(isCheckedIn, isTrue);
+    });
+
+    test(
+        'isUserCheckedInForEvent returns false if the user is not checked in to a given event',
+        () async {
+      print(
+          'Checking if user is checked in for an event they are not checked in to...');
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String collectionPath = 'users';
+      const String userId = 'user1';
+      const String documentId1 = 'event1';
+
+      final Map<String, dynamic> userData = {
+        'firstName': 'John',
+        'lastName': 'Doe',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU123456',
+        'userEmail': 'john@example.com',
+        'userSchool': 'School of Engineering',
+        'userUID': 'user1',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': false, 'event2': false},
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(userId)
+          .set(userData);
+
+      bool isCheckedIn =
+          await firebaseService.isUserCheckedInForEvent(userId, documentId1);
+
+      expect(isCheckedIn, isFalse);
+    });
+
   });
 
   // Tests for filterEvents group -- have 4 test cases
