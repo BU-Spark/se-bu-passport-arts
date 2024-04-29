@@ -7,6 +7,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'mock.dart';
+import 'package:mockito/mockito.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
 void main() {
   group('FirestoreService', () {
@@ -135,8 +139,134 @@ void main() {
       expect(filteredEvents[0].eventTitle, "Event on Target Date");
       expect(filteredEvents[0].eventStartTime, DateTime(2024, 4, 29, 10, 0));
     });
+
+    // test('saveEvent saves an event to user and updates event document',
+    //     () async {
+    //   print("Saving events at request...");
+
+    //   final FirebaseService firebaseService =
+    //       FirebaseService(db: fakeFirebaseFirestore!);
+
+    //   const String userCollectionPath = 'users';
+    //   const String userDocumentPath = 'user1';
+    //   const String eventCollectionPath = 'events';
+    //   const String eventDocumentPath = 'event1';
+
+    //   final Map<String, dynamic> userData = {
+    //     'firstName': 'John',
+    //     'lastName': 'Doe',
+    //     'userProfileURL': 'https://example.com/profile.jpg',
+    //     'userBUID': 'BU123456',
+    //     'userEmail': 'john@example.com',
+    //     'userSchool': 'School of Engineering',
+    //     'userUID': 'user1',
+    //     'userYear': 2024,
+    //     'userPoints': 100,
+    //     'userSavedEvents': {},
+    //   };
+
+    //   await fakeFirebaseFirestore!
+    //       .collection(userCollectionPath)
+    //       .doc(userDocumentPath)
+    //       .set(userData);
+
+    //   Map<String, dynamic> eventData = {
+    //     "eventID": "1",
+    //     "eventTitle": "Event Save",
+    //     "eventPhoto": "assets/images/arts/image9.jpeg",
+    //     "eventLocation": "Test Location",
+    //     "eventStartTime": DateTime(2024, 4, 29, 10, 0),
+    //     "eventEndTime": DateTime(2024, 4, 29, 12, 0),
+    //     "eventDescription": "Test Description",
+    //     "eventPoints": 30,
+    //     "eventURL": "http://example.com",
+    //     "savedUsers": []
+    //   };
+
+    //   await fakeFirebaseFirestore!
+    //       .collection(eventCollectionPath)
+    //       .doc(eventDocumentPath)
+    //       .set(eventData);
+
+    //   await firebaseService.saveEvent(eventDocumentPath);
+
+    //   final userDoc = await fakeFirebaseFirestore!
+    //       .collection(userCollectionPath)
+    //       .doc(userDocumentPath)
+    //       .get();
+    //   final eventDoc = await fakeFirebaseFirestore!
+    //       .collection(eventCollectionPath)
+    //       .doc(eventDocumentPath)
+    //       .get();
+    //   // Verify that the event ID is added to the user's saved events
+    //   expect(userDoc.data()?['userSavedEvents'][eventDocumentPath], false);
+    //   // Verify that the user ID is added to the event's saved users
+    //   expect(eventDoc.data()?['savedUsers'], contains('user1'));
+    // });
+
+    test(
+        'hasUserSavedEvent returns true if the event is saved for a given user',
+        () async {
+      print("Checking if user has saved event...");
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String userId = 'user1';
+      const String eventId1 = 'event1';
+
+      final Map<String, dynamic> userData = {
+        'firstName': 'John',
+        'lastName': 'Doe',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU123456',
+        'userEmail': 'john@example.com',
+        'userSchool': 'School of Engineering',
+        'userUID': 'user1',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {'event1': true, 'event2': false},
+      };
+      await fakeFirebaseFirestore!
+          .collection('users')
+          .doc(userId)
+          .set(userData);
+
+      bool hasSaved = await firebaseService.hasUserSavedEvent(userId, eventId1);
+      expect(hasSaved, isTrue);
+    });
+    test(
+        'hasUserSavedEvent returns false if the event is not saved for a given user',
+        () async {
+
+      print("Checking if user has not saved event...");
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      const String userId = 'user1';
+      const String eventId1 = 'event1';
+
+      final Map<String, dynamic> userData = {
+        'firstName': 'John',
+        'lastName': 'Doe',
+        'userProfileURL': 'https://example.com/profile.jpg',
+        'userBUID': 'BU123456',
+        'userEmail': 'john@example.com',
+        'userSchool': 'School of Engineering',
+        'userUID': 'user1',
+        'userYear': 2024,
+        'userPoints': 100,
+        'userSavedEvents': {},
+      };
+      await fakeFirebaseFirestore!
+          .collection('users')
+          .doc(userId)
+          .set(userData);
+
+      bool hasSaved = await firebaseService.hasUserSavedEvent(userId, eventId1);
+      expect(hasSaved, isFalse);
+    });
+
   });
 
+  // Tests for filterEvents group -- have 4 test cases
   group('Event Filtering Tests', () {
     late FakeFirebaseFirestore fakeFirebaseFirestore;
     setupFirebaseAuthMocks();

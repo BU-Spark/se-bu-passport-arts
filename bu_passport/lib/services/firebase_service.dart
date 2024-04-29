@@ -133,10 +133,14 @@ class FirebaseService {
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
       print(userData['userSavedEvents']);
-      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? {};
+      if (userData['userSavedEvents'] is Map) {
+        Map<String, dynamic> savedEvents = userData['userSavedEvents'] != null
+            ? Map<String, dynamic>.from(userData['userSavedEvents'])
+            : {};
 
-      // Check if the eventId exists in the list
-      return savedEvents.containsKey(eventId);
+        // Check if the eventId exists in the list
+        return savedEvents.containsKey(eventId);
+      }
     }
     return false;
   }
