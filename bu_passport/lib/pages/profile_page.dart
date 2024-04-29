@@ -14,6 +14,7 @@ import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 
+// The ProfilePage is a StatefulWidget that allows users to view and edit their profile.
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -21,21 +22,23 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
+// The _ProfilePageState handles the state of the ProfilePage, including user data and events.
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   List<Event> attendedEvents = [];
   List<Event> userSavedEvents = [];
-  bool isLoading = true;
+  bool isLoading = true; // Indicates if the page is currently loading data.
   FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+      FirebaseService(db: FirebaseFirestore.instance); // Firebase service instance for database operations.
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  File? selectedImageFile;
-  bool _isEditing = false;
+  File? selectedImageFile; // The file for a selected profile image.
+  bool _isEditing = false; // Flag to check if the user is editing their profile.
   final ImageService _imageService = ImageService();
-  String? userProfileImageUrl;
+  String? userProfileImageUrl; // URL for the user's profile image.
 
+  // Method to save profile changes to Firestore and Firebase Auth.
   void _saveProfileChanges(String firstName, String lastName) async {
     final userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
@@ -54,8 +57,8 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   User? finalUser = FirebaseAuth.instance.currentUser;
-  late TabController _tabController;
-  late Future<DocumentSnapshot> _userProfileFuture;
+  late TabController _tabController; // Controller for managing tabs.
+  late Future<DocumentSnapshot> _userProfileFuture; // Future for retrieving user data from Firestore.
 
   @override
   void initState() {
@@ -71,6 +74,7 @@ class _ProfilePageState extends State<ProfilePage>
     fetchAndDisplayEvents();
   }
 
+  // Fetches and displays events categorized into attended and saved.
   void fetchAndDisplayEvents() async {
     try {
       CategorizedEvents categorizedEvents =
@@ -84,8 +88,9 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  // Refresh the events when returning from EventPage
   void updateEventPage() {
-    fetchAndDisplayEvents(); // Refresh the events when returning from EventPage
+    fetchAndDisplayEvents();
     setState(() {
       _userProfileFuture = FirebaseFirestore.instance
           .collection('users')
@@ -104,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   Uint8List? _image;
 
+  // Uploads an image to Firebase Storage and returns the URL.
   Future<String?> uploadImageToFirebase(Uint8List imageBytes) async {
     // Unique file name for the image
     String fileName = "profile_${DateTime.now().millisecondsSinceEpoch}.jpg";
@@ -127,6 +133,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  // Updates the Firebase user profile with a new image URL.
   void updateFirebaseUserProfile(String imageUrl) async {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -137,6 +144,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  // Selects an image using the Image Picker and uploads it to Firebase.
   void selectImage() async {
     Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
@@ -151,6 +159,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  // Builds a list of event widgets based on the passed events list.
   Widget _buildEventsList(List<Event> events, String message) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;

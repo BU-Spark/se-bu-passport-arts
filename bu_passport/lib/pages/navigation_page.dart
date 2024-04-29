@@ -5,15 +5,18 @@ import 'package:bu_passport/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// NavigationPage is a StatelessWidget that constructs the main navigation structure.
 class NavigationPage extends StatelessWidget {
   const NavigationPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // It simply returns an instance of NavigationPageContent.
     return NavigationPageContent();
   }
 }
 
+// NavigationPageContent is a StatefulWidget that handles changing between pages.
 class NavigationPageContent extends StatefulWidget {
   const NavigationPageContent({Key? key}) : super(key: key);
 
@@ -21,49 +24,53 @@ class NavigationPageContent extends StatefulWidget {
   _NavigationPageContentState createState() => _NavigationPageContentState();
 }
 
+// The state for NavigationPageContent handles the current user session and navigation logic.
 class _NavigationPageContentState extends State<NavigationPageContent> {
-  final user = FirebaseAuth.instance.currentUser!;
-  int _selectedIndex = 0;
+  final user = FirebaseAuth.instance.currentUser!; // Current logged-in user instance.
+  int _selectedIndex = 0; // Index of the currently selected page in the bottom navigation.
 
+  // Static list of all pages in the bottom navigation bar.
   static List<Widget> _pages = <Widget>[
-    ExplorePage(),
-    CalendarPage(),
-    LeaderboardPage(), // Add LeaderboardPage here
-    ProfilePage(),
+    ExplorePage(), // Page for exploring events.
+    CalendarPage(), // Calendar page.
+    LeaderboardPage(), // Leaderboard page.
+    ProfilePage(), // User profile page.
   ];
 
+  // Handler for changing the selected page index.
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex = index; // Update the index of the selected page.
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Builds the scaffold of the app with navigation.
     return Scaffold(
       body: Center(
-        child: _pages[_selectedIndex],
+        child: _pages[_selectedIndex], // Displays the selected page.
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Fixed type for consistent display.
+        currentIndex: _selectedIndex, // Set the current index.
+        onTap: _onItemTapped, // Change page on item tap.
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Events',
+            label: 'Events', // Label for the explore/events page.
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
+            label: 'Calendar', // Label for the calendar page.
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events),
-            label: 'Leaderboard',
+            label: 'Leaderboard', // Label for the leaderboard page.
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Profile', // Label for the profile page.
           ),
         ],
       ),
