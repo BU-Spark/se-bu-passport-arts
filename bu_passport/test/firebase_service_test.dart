@@ -3,6 +3,7 @@ import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/pages/login_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -396,6 +397,57 @@ void main() {
       expect(isCheckedIn, isFalse);
     });
 
+    test(
+        'fetchEventsFromNow only returns events that end after the current time',
+        () async {
+      print('Checking if events from now to the future are fetched...');
+      final FirebaseService firebaseService =
+          FirebaseService(db: fakeFirebaseFirestore!);
+      final DateTime now = DateTime.now();
+
+      const String collectionPath = 'events';
+      const String eventId1 = 'event1';
+      const String eventId2 = 'event2';
+
+      Map<String, dynamic> data1 = {
+        "eventID": eventId1,
+        "eventTitle": "Past Event",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": Timestamp.fromDate(now.subtract(Duration(days: 2))),
+        "eventEndTime": Timestamp.fromDate(now.subtract(Duration(days: 1))),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": ['user1']
+      };
+
+      Map<String, dynamic> data2 = {
+        "eventID": eventId2,
+        "eventTitle": "Now/Future Event",
+        "eventPhoto": "assets/images/arts/image9.jpeg",
+        "eventLocation": "Test Location",
+        "eventStartTime": Timestamp.fromDate(now.add(Duration(hours: 1))),
+        "eventEndTime": Timestamp.fromDate(now.add(Duration(days: 1))),
+        "eventDescription": "Test Description",
+        "eventPoints": 30,
+        "eventURL": "http://example.com",
+        "savedUsers": ['user1']
+      };
+
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(eventId1)
+          .set(data1);
+      await fakeFirebaseFirestore!
+          .collection(collectionPath)
+          .doc(eventId2)
+          .set(data2);
+
+      List<Event> events = await firebaseService.fetchEventsFromNow();
+      expect(events.length, 1);
+      expect(events.first.eventTitle, 'Now/Future Event');
+    });
   });
 
   // Tests for filterEvents group -- have 4 test cases
