@@ -88,6 +88,12 @@ Web scraper of BU events calendar here
 test/ \
 All automated testing files are in this directory
 
+### Current Known Issues, Bugs or Errors
+1. [Check-in and Saved Event](https://github.com/BU-Spark/se-bu-passport-arts/issues/13)
+2. [Web Scraper](https://github.com/BU-Spark/se-bu-passport-arts/issues/14)
+3. [Passport](https://github.com/BU-Spark/se-bu-passport-arts/issues/15)
+4. [JSON vs. ICS vs. Web Scraper](https://github.com/BU-Spark/se-bu-passport-arts/issues/16)
+
 ## Future Scope
 
 ### Features to be Implemented
