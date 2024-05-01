@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:flutter/widgets.dart';
@@ -22,6 +23,8 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event
@@ -35,6 +38,8 @@ class _EventPageState extends State<EventPage> {
     checkIfUserIsCheckedIn();
   }
 
+  // Function to check if user has saved the event
+
   void checkIfUserSaved() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
     // Ensure there's a user logged in
@@ -43,12 +48,14 @@ class _EventPageState extends State<EventPage> {
       return;
     }
     bool isSaved =
-        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+        await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
     });
   }
+
+  // Function to check if user has checked in to the event
 
   void checkIfUserIsCheckedIn() async {
     String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
@@ -57,13 +64,14 @@ class _EventPageState extends State<EventPage> {
       print("User is not logged in.");
       return;
     }
-    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
+    bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
         userUID, widget.event.eventID);
     setState(() {
       _isCheckedIn = isCheckedIn;
     });
   }
 
+  // Function to check if the event is happening today
   bool isEventToday(DateTime eventDateTimestamp) {
     final eventDateTimeLocal = tz.TZDateTime.from(eventDateTimestamp, tz.local);
     final nowLocal = tz.TZDateTime.now(tz.local);
@@ -72,6 +80,7 @@ class _EventPageState extends State<EventPage> {
         nowLocal.day == eventDateTimeLocal.day;
   }
 
+  // Function to check in
   Future<bool> checkIn() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();
@@ -257,9 +266,9 @@ class _EventPageState extends State<EventPage> {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
-                            FirebaseService.checkInUserForEvent(
-                                widget.event.eventID,widget.event.eventPoints);
-                              
+                            firebaseService.checkInUserForEvent(
+                                widget.event.eventID, widget.event.eventPoints);
+
                             widget.onUpdateEventPage();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -280,12 +289,12 @@ class _EventPageState extends State<EventPage> {
                     String userUID =
                         FirebaseAuth.instance.currentUser?.uid ?? "";
                     String eventId = widget.event.eventID;
-                    bool isSaved = await FirebaseService.hasUserSavedEvent(
+                    bool isSaved = await firebaseService.hasUserSavedEvent(
                         userUID, eventId);
                     if (isSaved) {
-                      FirebaseService.unsaveEvent(eventId);
+                      firebaseService.unsaveEvent(eventId);
                     } else {
-                      FirebaseService.saveEvent(eventId);
+                      firebaseService.saveEvent(eventId);
                     }
                     setState(() {
                       _isSaved = !_isSaved; // Toggle saved status

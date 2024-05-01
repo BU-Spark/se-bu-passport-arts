@@ -1,2 +1,2 @@
 ${PODS_ROOT}/Target Support Files/FirebaseFirestoreAbseilBinary/FirebaseFirestoreAbseilBinary-xcframeworks.sh
-${PODS_ROOT}/FirebaseFirestoreAbseilBinary/abseil.xcframework
+${PODS_ROOT}/FirebaseFirestoreAbseilBinary/absl.xcframework

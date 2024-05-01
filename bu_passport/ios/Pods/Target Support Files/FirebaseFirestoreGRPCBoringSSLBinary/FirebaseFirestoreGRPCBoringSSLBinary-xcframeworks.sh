@@ -17,22 +17,22 @@ RSYNC_PROTECT_TMP_FILES=(--filter "P .*.??????")
 variant_for_slice()
 {
   case "$1" in
-  "BoringSSL-GRPC.xcframework/ios-arm64")
+  "openssl_grpc.xcframework/ios-arm64")
     echo ""
     ;;
-  "BoringSSL-GRPC.xcframework/ios-arm64_x86_64-maccatalyst")
+  "openssl_grpc.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "maccatalyst"
     ;;
-  "BoringSSL-GRPC.xcframework/ios-arm64_x86_64-simulator")
+  "openssl_grpc.xcframework/ios-arm64_x86_64-simulator")
     echo "simulator"
     ;;
-  "BoringSSL-GRPC.xcframework/macos-arm64_x86_64")
+  "openssl_grpc.xcframework/macos-arm64_x86_64")
     echo ""
     ;;
-  "BoringSSL-GRPC.xcframework/tvos-arm64")
+  "openssl_grpc.xcframework/tvos-arm64")
     echo ""
     ;;
-  "BoringSSL-GRPC.xcframework/tvos-arm64_x86_64-simulator")
+  "openssl_grpc.xcframework/tvos-arm64_x86_64-simulator")
     echo "simulator"
     ;;
   esac
@@ -41,22 +41,22 @@ variant_for_slice()
 archs_for_slice()
 {
   case "$1" in
-  "BoringSSL-GRPC.xcframework/ios-arm64")
+  "openssl_grpc.xcframework/ios-arm64")
     echo "arm64"
     ;;
-  "BoringSSL-GRPC.xcframework/ios-arm64_x86_64-maccatalyst")
+  "openssl_grpc.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "arm64 x86_64"
     ;;
-  "BoringSSL-GRPC.xcframework/ios-arm64_x86_64-simulator")
+  "openssl_grpc.xcframework/ios-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
-  "BoringSSL-GRPC.xcframework/macos-arm64_x86_64")
+  "openssl_grpc.xcframework/macos-arm64_x86_64")
     echo "arm64 x86_64"
     ;;
-  "BoringSSL-GRPC.xcframework/tvos-arm64")
+  "openssl_grpc.xcframework/tvos-arm64")
     echo "arm64"
     ;;
-  "BoringSSL-GRPC.xcframework/tvos-arm64_x86_64-simulator")
+  "openssl_grpc.xcframework/tvos-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
   esac
@@ -141,5 +141,5 @@ install_xcframework() {
   echo "Copied $source to $destination"
 }
 
-install_xcframework "${PODS_ROOT}/FirebaseFirestoreGRPCBoringSSLBinary/BoringSSL-GRPC.xcframework" "FirebaseFirestoreGRPCBoringSSLBinary" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/FirebaseFirestoreGRPCBoringSSLBinary/openssl_grpc.xcframework" "FirebaseFirestoreGRPCBoringSSLBinary" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
 

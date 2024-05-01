@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -20,7 +21,10 @@ class EventWidget extends StatefulWidget {
 class _EventWidgetState extends State<EventWidget> {
   bool _isSaved = false;
   bool _isCheckedIn = false;
-  String userUID = FirebaseAuth.instance.currentUser!.uid;
+  String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
+  // Ensure there's a user logged in
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
 
   @override
   void initState() {
@@ -29,6 +33,8 @@ class _EventWidgetState extends State<EventWidget> {
     super.initState();
   }
 
+  // Function to check if user has saved the event
+
   void checkIfUserSaved() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
@@ -36,20 +42,21 @@ class _EventWidgetState extends State<EventWidget> {
       return;
     }
     bool isSaved =
-        await FirebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+        await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
     });
   }
 
+  // Function to check if user has checked in to the event
   void checkIfUserCheckedIn() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
       print("User is not logged in.");
       return;
     }
-    bool isCheckedIn = await FirebaseService.isUserCheckedInForEvent(
+    bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
         userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
@@ -57,6 +64,7 @@ class _EventWidgetState extends State<EventWidget> {
     });
   }
 
+  // Function to update the event page
   void updateEventPage() {
     checkIfUserSaved();
     checkIfUserCheckedIn();
@@ -175,12 +183,12 @@ class _EventWidgetState extends State<EventWidget> {
               right: sizedBoxHeight,
               child: GestureDetector(
                 onTap: () async {
-                  _isSaved = await FirebaseService.hasUserSavedEvent(
+                  _isSaved = await firebaseService.hasUserSavedEvent(
                       userUID, widget.event.eventID);
                   if (_isSaved) {
-                    FirebaseService.unsaveEvent(widget.event.eventID);
+                    firebaseService.unsaveEvent(widget.event.eventID);
                   } else {
-                    FirebaseService.saveEvent(widget.event.eventID);
+                    firebaseService.saveEvent(widget.event.eventID);
                   }
                   setState(() {
                     _isSaved = !_isSaved; // Toggle saved status

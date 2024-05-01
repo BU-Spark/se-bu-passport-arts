@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/components/user_widget.dart';
 import 'package:bu_passport/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -8,16 +9,17 @@ class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({Key? key}) : super(key: key);
 
   @override
-  _LeaderboardPageState createState() => _LeaderboardPageState();
+  LeaderboardPageState createState() => LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage> {
+class LeaderboardPageState extends State<LeaderboardPage> {
   List<Users> allUsers = []; // List to store all users
   List<Users> topUsers = []; // List to store top 5 users
   int userPoints = 0;
   int userTickets = 0;
   int? userRank; // Variable to store user rank
-
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();
@@ -25,9 +27,10 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     fetchUserPointsAndTickets();
   }
 
+  // Fetch all existing users to display on the leaderboard
   Future<void> fetchAllUsers() async {
     try {
-      List<Users> users = await FirebaseService.fetchAllUsers();
+      List<Users> users = await firebaseService.fetchAllUsers();
       setState(() {
         allUsers = users;
       });
@@ -61,6 +64,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Fetching logo for rank/league
   String _getImageAssetPath(String league) {
     switch (league) {
       case 'Diamond League':
@@ -76,14 +80,16 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Fetching a user's number of points and raffle tickets
   Future<void> fetchUserPointsAndTickets() async {
     try {
       String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
-      Users? user = await FirebaseService.fetchUser(userUID);
+      Users? user = await firebaseService.fetchUser(userUID);
       if (user != null) {
         setState(() {
           userPoints = user.userPoints;
-          userTickets = userPoints ~/ 100; // Calculate tickets
+          userTickets =
+              userPoints ~/ 100; // Calculate tickets - 1 ticket per 100 points
         });
       }
     } catch (error) {
@@ -91,14 +97,17 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     }
   }
 
+  // Progress to earning next raffle (progress bar)
   double calculateProgressPercentage(int points) {
     return (points % 100) / 100.0;
   }
 
+  // Function to calculate how many points left to earn next raffle ticket
   int calculatePointsForNextTicket(int points) {
     return (points % 100);
   }
 
+  // Function to categorize which league user belongs to based on points earned
   String calculateLeague(int points) {
     if (points >= 1000) {
       return "Diamond League";

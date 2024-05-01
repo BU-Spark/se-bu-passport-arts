@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 import 'package:bu_passport/config/secrets.dart';
 import 'dart:convert';
 
+// Service to fetch coordinates of an address for geolocation based checkin
+
 class GeocodingService {
   Future<Map<String, dynamic>?> getAddressCoordinates(String address) async {
     try {

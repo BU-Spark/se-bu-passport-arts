@@ -1,1 +1,1 @@
-${PODS_XCFRAMEWORKS_BUILD_DIR}/FirebaseFirestoreGRPCBoringSSLBinary/BoringSSL-GRPC.framework
+${PODS_XCFRAMEWORKS_BUILD_DIR}/FirebaseFirestoreGRPCBoringSSLBinary/openssl_grpc.framework

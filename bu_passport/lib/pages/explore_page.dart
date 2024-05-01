@@ -12,24 +12,26 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<ExplorePage> {
-  final user = FirebaseAuth.instance.currentUser!;
+  final user = FirebaseAuth.instance.currentUser?.uid ?? "";
   final db = FirebaseFirestore.instance;
   List<Event> eventList = []; // List to store events data
   String _searchQuery = '';
   late Future<List<Event>> fetchEventsFuture;
   int _selectedIndex = 0;
-
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();
-    fetchEventsFuture = FirebaseService.fetchEventsFromNow();
+    fetchEventsFuture = firebaseService.fetchEventsFromNow();
   }
 
   // not the most effiicent solution need to improve **
 
+  // Update event list in explore page with events from now to future
   void updateEventPage() {
     setState(() {
-      fetchEventsFuture = FirebaseService.fetchEventsFromNow();
+      fetchEventsFuture = firebaseService.fetchEventsFromNow();
     });
   }
 
@@ -47,7 +49,6 @@ class _HomePageState extends State<ExplorePage> {
       ),
       body: Center(
         child: ListView(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Search bar
             TextField(
@@ -73,7 +74,7 @@ class _HomePageState extends State<ExplorePage> {
                   List<Event>? events = snapshot.data;
                   if (events != null && events.isNotEmpty) {
                     List<Event> filteredEvents =
-                        FirebaseService.filterEvents(events, _searchQuery);
+                        firebaseService.filterEvents(events, _searchQuery);
                     return Padding(
                       padding: EdgeInsets.all(edgeInsets * 1.5),
                       child: ListView.separated(
@@ -94,6 +95,7 @@ class _HomePageState extends State<ExplorePage> {
                       ),
                     );
                   } else {
+                    // When there are no events to show
                     return Text('No events found');
                   }
                 }

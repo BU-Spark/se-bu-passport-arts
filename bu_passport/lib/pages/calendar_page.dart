@@ -1,4 +1,5 @@
 import 'package:bu_passport/components/event_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,7 +18,9 @@ class _CalendarPageState extends State<CalendarPage> {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
   List<Event> _allEvents = []; // List to store events
-// List to store events for the selected day
+  FirebaseService firebaseService = FirebaseService(
+      db: FirebaseFirestore
+          .instance); // List to store events for the selected day
   late Future<List<Event>> _allEventsFuture;
 
   @override
@@ -27,11 +30,13 @@ class _CalendarPageState extends State<CalendarPage> {
     _focusedDay = DateTime.now();
     _selectedDay = DateTime.now();
     _fetchEvents(); // Initialize the future to fetch events
-    _allEventsFuture = FirebaseService.fetchEvents();
+    _allEventsFuture = firebaseService.fetchEvents();
   }
 
+  // Function to fetch events
+
   Future<void> _fetchEvents() async {
-    List<Event> allEvents = await FirebaseService.fetchEvents();
+    List<Event> allEvents = await firebaseService.fetchEvents();
     setState(() {
       _allEvents = allEvents;
     });
@@ -72,8 +77,9 @@ class _CalendarPageState extends State<CalendarPage> {
                 child: Text('No events found.'),
               );
             }
+            // Filter events for the selected day
             List<Event> selectedEvents =
-                FirebaseService.fetchEventsForDay(_selectedDay, events);
+                firebaseService.fetchEventsForDay(_selectedDay, events);
             print('Selected events: $selectedEvents');
             return Column(
               children: [

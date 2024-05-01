@@ -33,7 +33,14 @@ flutter pub get
 ```
 Since our application is built using Flutter, the command above will download all the necessary dependencies to run the project.
 
-3. Run the application locally
+3. Install pod Files
+Before running this app for the first time, you have to install pod files. To do this, ensure that you are in the '/ios' directory and execute the following command:
+```bash
+pod install
+```
+If there are any issues with version mismatches, delete the 'podfile.lock' file and re-run the same commmand.
+
+4. Run the application locally
 ```bash
 flutter run
 ```
@@ -117,5 +124,3 @@ All automated testing files are in this directory
 - Do additional research if an admin side of the app is needed/necessary
 - Work on a new method of pulling events. Currently, events are pulled using a web scraper to fetch calendar data from the BU Arts calendar website. However, this likely wouldn't be the long-term solution. JSON or ICS files are avaliable, but additional research shows that these files may not be appropriate for the use case of this project (see JSON vs. ICS document on Google Drive). 
 - Find a way to generate tags for events. At the moment, BU has not generated any tags for their events. This may change in the future, but for now, a work around would be to discover a reliable method to generate tags for events. These tags are essential for implementing the interest page, event filtering page, and the passport page. Some additional insights are added to the 'JSON vs. ICS' document, but not comprehensive enough to implement a solution yet.
-
-

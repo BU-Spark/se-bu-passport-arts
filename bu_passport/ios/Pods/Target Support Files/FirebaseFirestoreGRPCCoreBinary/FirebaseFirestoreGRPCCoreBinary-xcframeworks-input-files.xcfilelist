@@ -1,2 +1,2 @@
 ${PODS_ROOT}/Target Support Files/FirebaseFirestoreGRPCCoreBinary/FirebaseFirestoreGRPCCoreBinary-xcframeworks.sh
-${PODS_ROOT}/FirebaseFirestoreGRPCCoreBinary/gRPC-Core.xcframework
+${PODS_ROOT}/FirebaseFirestoreGRPCCoreBinary/grpc.xcframework
