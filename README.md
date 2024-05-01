@@ -60,7 +60,7 @@ selected before running this command.
   - There is a leaderboard page to showcase the highest raffle ticket earners
 
 ### Testing
-To run all the automated tests under the '/test' directory for this project, execute the following command:
+To run all the automated tests under the '/test' directory for this project, ensure that you are in the '/bu_passport' directory and execute the following command:
 ```bash
 flutter test
 ```
