@@ -1,7 +1,6 @@
 ### Running 'pod install'
 Before running this app for the first time, you have to install pod files. To do this, ensure that you are in the '/ios' directory and execute the following command:
 ```bash
-cd 
 pod install
 ```
 If there are any issues with version mismatches, delete the 'podfile.lock' file and re-run the same commmand.
