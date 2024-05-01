@@ -14,13 +14,12 @@ void main() {
   setUpAll(() async {
     await Firebase.initializeApp();
   });
-  testWidgets('CalenderPage test', (WidgetTester tester) async {
+  testWidgets('Calendar UI Test', (WidgetTester tester) async {
     // Build our widget and trigger a frame.
     await tester.pumpWidget(MaterialApp(
       home: CalendarPage(),
     ));
-  });
 
-  // check if Calendar text is in app bar
-  expect(find.text('Calendar'), findsOneWidget);
+    expect(find.text('Calendar'), findsOneWidget);
+  });
 }
