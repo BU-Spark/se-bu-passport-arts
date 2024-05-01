@@ -70,7 +70,6 @@ flutter test test/file_name_here.dart
 ```
 
 ### Project Architecture
->>>>>>> main
 
 ![alt text](./passportArchitecture.png)
 
