@@ -69,9 +69,7 @@ class FirebaseService {
           await this.db.collection('users').doc(userUID).get();
 
       if (snapshot.exists) {
-        print('Snapshot exists');
         final userData = snapshot.data() as Map<String, dynamic>;
-        print('User Data: $userData'); // Print userData to see its contents
 
         Users user = Users(
           firstName: userData['firstName'],
@@ -86,7 +84,6 @@ class FirebaseService {
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
         );
-        print(user);
         return user;
       } else {
         print('Snapshot does not exist');
@@ -112,7 +109,6 @@ class FirebaseService {
       await this.db.collection('events').doc(eventId).update({
         'savedUsers': FieldValue.arrayUnion([userUID]),
       });
-      print("Event saved successfully");
     } catch (error) {
       print("Failed to save event: $error");
     }
@@ -132,7 +128,6 @@ class FirebaseService {
       await this.db.collection('events').doc(eventId).update({
         'savedUsers': FieldValue.arrayRemove([userUID]),
       });
-      print("Event unsaving successful");
     } catch (error) {
       print("Failed to unsave event: $error");
     }
@@ -145,7 +140,6 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      print(userData['userSavedEvents']);
       if (userData['userSavedEvents'] is Map) {
         Map<String, dynamic> savedEvents = userData['userSavedEvents'] != null
             ? Map<String, dynamic>.from(userData['userSavedEvents'])
@@ -189,7 +183,6 @@ class FirebaseService {
       bool isCheckedIn = entry.value;
 
       Event? event = await fetchEventById(eventId);
-      print(event?.eventTitle);
       if (event != null) {
         DateTime startOfDayEvent = DateTime(event.eventStartTime.year,
             event.eventStartTime.month, event.eventStartTime.day);
@@ -286,7 +279,6 @@ class FirebaseService {
       await userDoc.update({
         'userProfileURL': profileURL,
       });
-      print("Profile URL updated successfully");
     } catch (error) {
       print("Failed to update profile URL: $error");
     }
@@ -336,7 +328,6 @@ class FirebaseService {
           await this.db.collection('users').get();
       snapshot.docs.forEach((doc) {
         final userData = doc.data();
-        print(userData);
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],

@@ -80,7 +80,6 @@ class _CalendarPageState extends State<CalendarPage> {
             // Filter events for the selected day
             List<Event> selectedEvents =
                 firebaseService.fetchEventsForDay(_selectedDay, events);
-            print('Selected events: $selectedEvents');
             return Column(
               children: [
                 TableCalendar(
