@@ -28,13 +28,15 @@ class _ProfilePageState extends State<ProfilePage>
   List<Event> attendedEvents = [];
   List<Event> userSavedEvents = [];
   bool isLoading = true; // Indicates if the page is currently loading data.
-  FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance); // Firebase service instance for database operations.
+  FirebaseService firebaseService = FirebaseService(
+      db: FirebaseFirestore
+          .instance); // Firebase service instance for database operations.
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   File? selectedImageFile; // The file for a selected profile image.
-  bool _isEditing = false; // Flag to check if the user is editing their profile.
+  bool _isEditing =
+      false; // Flag to check if the user is editing their profile.
   final ImageService _imageService = ImageService();
   String? userProfileImageUrl; // URL for the user's profile image.
 
@@ -58,7 +60,8 @@ class _ProfilePageState extends State<ProfilePage>
 
   User? finalUser = FirebaseAuth.instance.currentUser;
   late TabController _tabController; // Controller for managing tabs.
-  late Future<DocumentSnapshot> _userProfileFuture; // Future for retrieving user data from Firestore.
+  late Future<DocumentSnapshot>
+      _userProfileFuture; // Future for retrieving user data from Firestore.
 
   @override
   void initState() {
@@ -165,8 +168,6 @@ class _ProfilePageState extends State<ProfilePage>
     double screenWidth = MediaQuery.of(context).size.width;
     double verticalMargin = screenHeight * 0.01; // 1% of screen height
     double horizontalMargin = screenWidth * 0.035; // 2% of screen width
-
-    print(events);
 
     if (events.isEmpty) {
       return Center(child: Text(message, style: TextStyle(fontSize: 20)));

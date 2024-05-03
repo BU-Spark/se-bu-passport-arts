@@ -10,8 +10,6 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        print(FirebaseAuth.instance.authStateChanges());
-
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the authentication state
           return CircularProgressIndicator();

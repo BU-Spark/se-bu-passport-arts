@@ -99,8 +99,6 @@ class _EventPageState extends State<EventPage> {
       // User's current location
       final currentPosition = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      print("Event coords: $eventCoords");
-      print("Current position: $currentPosition");
 
       // Calculate the distance between event to user
       final double distance = Geolocator.distanceBetween(
@@ -109,7 +107,6 @@ class _EventPageState extends State<EventPage> {
         eventCoords['lat'],
         eventCoords['lng'],
       );
-      print("Distance: $distance meters");
 
       // Distance radius checking
       if (distance <= 400) {
