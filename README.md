@@ -24,7 +24,7 @@ Before you begin, ensure you have met the following requirements:
 # Use either HTTPS or SSH
 git clone https://github.com/BU-Spark/se-bu-passport-arts.git
 
-cd se-bu-passport-arts
+cd se-bu-passport-arts/bu_passport
 ```
 
 2. Install Dependencies
