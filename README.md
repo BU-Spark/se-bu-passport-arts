@@ -9,7 +9,7 @@ finding out the details of interested events, to finally checking in and trackin
 Before you begin, ensure you have met the following requirements:
 - **Flutter**: Your system must have Flutter installed. This project was built using Flutter 3.19.2. Ensure that you are using this version or later. For installation instructions, see [Flutter's official installation guide](https://flutter.dev/docs/get-started/install).
 - **Dart SDK**: Dart 3.3.0 or later is required. However, this typically comes with the Flutter installation.
-- **Android or iOS Setup**: For Android, you must have Android SDK setup. For iOS, you need to Xcode installed to run the simulator. Ensure that these emulators are configured for your IDE of choice.
+- **Android or iOS Setup**: For Android, you must have Android SDK setup. For iOS, you need to Xcode installed to run the simulator. Ensure that these emulators are configured for your IDE of choice. For the iOS simulator, we developed using either the iPhone 14 Pro Max or iPhone 15 Pro Max. For further develop, choose either one to be safe.
 - **Google Places API Key**: The Geolocation check in relies on the Google Places API, which requires an API key.
   - Create a directory under 'bu_passport/lib' named 'config'
   - Create a file named 'secrets.dart' and add your API key in this file as follows:
@@ -38,14 +38,15 @@ Before running this app for the first time, you have to install pod files. To do
 ```bash
 pod install
 ```
-If there are any issues with version mismatches, delete the 'podfile.lock' file and re-run the same commmand.
+Link to [Troubleshooting](#troubleshooting) for potential errors related to pod install.
 
 4. Run the application locally
 ```bash
 flutter run
 ```
 Running this command will run the app locally, either via an Android simulator or iOS simulator. Ensure that you have either simulators installed and 
-selected before running this command.
+selected before running this command. \
+Link to [Troubleshooting](#troubleshooting) for errors with running the app or missing dependencies.
 
 ### Features
 - **Centralized Section for Events**
@@ -104,6 +105,16 @@ All automated testing files are in this directory
 2. [Web Scraper](https://github.com/BU-Spark/se-bu-passport-arts/issues/14)
 3. [Passport](https://github.com/BU-Spark/se-bu-passport-arts/issues/15)
 4. [JSON vs. ICS vs. Web Scraper](https://github.com/BU-Spark/se-bu-passport-arts/issues/16)
+5. [Firebase Options API Key](https://github.com/BU-Spark/se-bu-passport-arts/issues/20)
+
+<a name="troubleshooting"></a>
+### Troubleshooting
+- Pod Install Version Mismatches
+  - If there are any issues with version mismatches, delete the 'podfile.lock' file and re-run the same commmand.
+- Flutter dependencies installing issues or 'flutter run' issues
+  - Run 'flutter clean' to clean out all dependencies for a fresh start, and re-install the dependencies and try running the app again
+- Error building application for simulator or launching application
+  - Re-run 'flutter run' or 'flutter clean' and restart the steps of installing and running to be extra safe
 
 ## Future Scope
 
@@ -124,3 +135,4 @@ All automated testing files are in this directory
 - Do additional research if an admin side of the app is needed/necessary
 - Work on a new method of pulling events. Currently, events are pulled using a web scraper to fetch calendar data from the BU Arts calendar website. However, this likely wouldn't be the long-term solution. JSON or ICS files are avaliable, but additional research shows that these files may not be appropriate for the use case of this project (see JSON vs. ICS document on Google Drive). 
 - Find a way to generate tags for events. At the moment, BU has not generated any tags for their events. This may change in the future, but for now, a work around would be to discover a reliable method to generate tags for events. These tags are essential for implementing the interest page, event filtering page, and the passport page. Some additional insights are added to the 'JSON vs. ICS' document, but not comprehensive enough to implement a solution yet.
+- Firebase Service testing is not full coverage. Methods that require to fetch a user instance are not implemented as we couldn't mock grading a new user from a mock authenticator/database. Figuring out a way to add these tests would be ideal.
