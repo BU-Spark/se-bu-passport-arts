@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event {
   final String eventID;
+  final String realEventID;
   final String eventTitle;
   final String eventPhoto;
   final String eventLocation;
@@ -14,6 +15,7 @@ class Event {
 
   Event({
     required this.eventID,
+    required this.realEventID,
     required this.eventTitle,
     required this.eventPhoto,
     required this.eventLocation,

@@ -27,7 +27,7 @@ void main() {
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
 
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String documentPath = 'event1';
 
       Map<String, dynamic> data = {
@@ -89,7 +89,7 @@ void main() {
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
 
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String documentId1 = 'event1';
       const String documentId2 = 'event2';
 
@@ -205,7 +205,7 @@ void main() {
       print("Fetching event from valid ID...");
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String documentId1 = 'event1';
 
       Map<String, dynamic> data1 = {
@@ -238,7 +238,7 @@ void main() {
       print("Fetching event from an invalid ID...");
       final FirebaseService firebaseService =
           FirebaseService(db: fakeFirebaseFirestore!);
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String documentId1 = 'event1';
 
       Map<String, dynamic> data1 = {
@@ -341,7 +341,7 @@ void main() {
           FirebaseService(db: fakeFirebaseFirestore!);
       final DateTime now = DateTime.now();
 
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String eventId1 = 'event1';
       const String eventId2 = 'event2';
 
@@ -474,7 +474,7 @@ void main() {
       fakeFirebaseFirestore = FakeFirebaseFirestore();
       firebaseService = FirebaseService(db: fakeFirebaseFirestore);
 
-      const String collectionPath = 'events';
+      const String collectionPath = 'test_events';
       const String documentId1 = 'event1';
       const String documentId2 = 'event2';
       const String documentId3 = 'event3';

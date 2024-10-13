@@ -12,6 +12,7 @@ import 'mock.dart';
 void main() {
   final testEvent2 = Event(
     eventID: '2',
+    realEventID: '2',
     eventTitle: 'Test Event 2',
     eventPhoto: "assets/images/arts/image9.jpeg",
     eventLocation: 'Test Location 2',
@@ -38,7 +39,7 @@ void main() {
     await Firebase.initializeApp();
     final FakeFirebaseFirestore fakeFirebaseFirestore = FakeFirebaseFirestore();
 
-    const String collectionPath = 'events';
+    const String collectionPath = 'test_events';
     const String documentPath = 'event1';
 
     Map<String, dynamic> data = {
@@ -66,7 +67,7 @@ void main() {
     ));
 
     // Verify that the app bar title is displayed correctly
-    expect(find.text('Events'), findsOneWidget);
+    expect(find.text('test_events'), findsOneWidget);
 
     // Verify that the search bar is displayed
     expect(find.byType(TextField), findsOneWidget);

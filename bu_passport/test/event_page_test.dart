@@ -26,6 +26,7 @@ void main() {
     // Create a test event
     final testEvent = Event(
       eventID: '1',
+      realEventID: '1',
       eventTitle: 'Test Event',
       eventPhoto: "assets/images/arts/image9.jpeg",
       eventLocation: 'Test Location',

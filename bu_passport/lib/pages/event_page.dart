@@ -1,3 +1,4 @@
+import 'package:bu_passport/services/web_image_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
@@ -140,11 +141,11 @@ class _EventPageState extends State<EventPage> {
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset(
-            widget.event.eventPhoto,
+          Image(
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
             fit: BoxFit.cover,
             width: double.infinity,
-            height: screenHeight * 0.4, // Adjust the height as needed
+            height: screenHeight * 0.4,
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets * 2.5),

@@ -13,6 +13,7 @@ import 'mock.dart';
 
 final event = Event(
   eventID: '1',
+  realEventID: '1',
   eventTitle: 'Test Event',
   eventPhoto: "assets/images/arts/image9.jpeg",
   eventLocation: 'Test Location',
