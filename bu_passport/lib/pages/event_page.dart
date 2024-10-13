@@ -252,6 +252,7 @@ class _EventPageState extends State<EventPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                //TODO: Update UI Logic
                 ElevatedButton(
                   onPressed: (!_isSaved ||
                           !isEventToday(widget.event.eventStartTime) ||

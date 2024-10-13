@@ -12,10 +12,11 @@ class FirebaseService {
   // Function to fetch events from Firestore
 
   Future<List<Event>> fetchEvents() async {
+    // TODO: Update this function to get new field from event doc
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await this.db.collection('events').get();
+      QuerySnapshot snapshot = await this.db.collection('test_events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
@@ -64,6 +65,7 @@ class FirebaseService {
   // Function to fetch user details from Firestore
 
   Future<Users?> fetchUser(String userUID) async {
+    // TODO: Update this function to get new field from user doc
     try {
       DocumentSnapshot snapshot =
           await this.db.collection('users').doc(userUID).get();
@@ -155,6 +157,7 @@ class FirebaseService {
   // Function to categorize events into attended and saved events
 
   Future<CategorizedEvents> fetchAndCategorizeEvents() async {
+    //TODO: Update Display Logic
     final userUID = FirebaseAuth.instance.currentUser?.uid;
 
     if (userUID == null) {
@@ -205,6 +208,7 @@ class FirebaseService {
   // Function to fetch an event by its ID
 
   Future<Event?> fetchEventById(String eventId) async {
+    // TODO: Update this function to get new field from event doc
     DocumentSnapshot<Map<String, dynamic>> snapshot =
         await this.db.collection('events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
@@ -228,6 +232,7 @@ class FirebaseService {
 
   // Function to check in a user for an event
   void checkInUserForEvent(String eventID, int eventPoints) {
+    // TODO: Update this function to separate check-ins from saved events
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
       throw Exception("User is not logged in");
@@ -252,6 +257,7 @@ class FirebaseService {
   // Function to check if a user has checked in for an event
 
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
+    // TODO: Update this function to check check-in status from the new separate field
     DocumentSnapshot userDocSnapshot =
         await this.db.collection('users').doc(userUID).get();
 
@@ -287,6 +293,7 @@ class FirebaseService {
   // Function to fetch events after current time for explore page
 
   Future<List<Event>> fetchEventsFromNow() async {
+    // TODO: Update this function to get new field from event doc
     final now = DateTime.now();
     List<Event> eventList = [];
 
@@ -321,6 +328,7 @@ class FirebaseService {
   // Function to fetch all users
 
   Future<List<Users>> fetchAllUsers() async {
+    // TODO: Update this function to get new field from user doc
     List<Users> users = [];
 
     try {

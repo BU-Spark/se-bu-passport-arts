@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// TODO: add new field
 class Event {
   final String eventID;
   final String eventTitle;
