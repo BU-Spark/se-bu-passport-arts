@@ -16,7 +16,7 @@ class FirebaseService {
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await this.db.collection('test_events').get();
+      QuerySnapshot snapshot = await this.db.collection('events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
