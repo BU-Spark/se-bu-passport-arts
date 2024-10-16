@@ -30,6 +30,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
         );
 
         eventList.add(event);
@@ -222,6 +223,7 @@ class FirebaseService {
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
         savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
       );
       return event;
     }
@@ -308,6 +310,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+            eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
         );
 
         eventList.add(event);
