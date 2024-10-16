@@ -43,6 +43,20 @@ class CFAEvent:
             "eventPoints": 30,
             "savedUsers": [],
         }
+        
+    def to_dict_exist(self) -> dict:
+        return {
+            "eventID": self.event_id,
+            "eventTitle": self.title,
+            "eventCategories": self.categories,
+            "eventLocation": self.location,
+            "eventStartTime": self.start_time,
+            "eventEndTime": self.end_time,
+            "eventURL": self.event_url,
+            "eventDescription": self.description,
+            "eventPhoto": self.photo,
+            "eventPoints": 30,
+        }
 
     def write_event_id_hex(self):
         hash_object = hashlib.sha256()
@@ -248,7 +262,7 @@ def scrape_event_event_link(raw_detail) -> str | None:
         return None
 
 
-def main():
+def main(table_name: str):
     cred = credentials.Certificate("../serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
     db = firestore.client()
@@ -280,7 +294,7 @@ def main():
         except Exception as e:
             print(f"Error extracting slide data: {e}")
 
-    for i, event in enumerate(cfa_events):
+    for _, event in enumerate(cfa_events):
         if not event.detail_url:
             continue
         response = requests.get(event.detail_url)
@@ -293,13 +307,13 @@ def main():
 
     for i, event in enumerate(cfa_events):
         
-        doc_ref = db.collection("test_events").document(event.event_id_hex)
+        doc_ref = db.collection(table_name).document(event.event_id_hex)
     
         if doc_ref.get().exists:
             print(f"Updating event with pk {event.event_id_hex} in db")
-            doc_ref.set(event.to_dict(), merge=True)
+            doc_ref.set(event.to_dict_exist(), merge=True)
         else:
             print(f"Adding event with pk {event.event_id_hex} in db")
             doc_ref.set(event.to_dict())
 
-main()
+main("test_events")
