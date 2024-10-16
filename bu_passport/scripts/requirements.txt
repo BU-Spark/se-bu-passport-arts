@@ -1,0 +1,4 @@
+requests
+firebase-admin
+beautifulsoup4
+pytz
