@@ -135,7 +135,7 @@ for eventLink in eventLinks:
             print("Event ID:", eventID)
 
             # Check if eventID already exists in Firebase
-            event_ref = db.collection('events').document(eventID)
+            event_ref = db.collection('test_events').document(eventID)
             event_doc = event_ref.get()
 
             # parse eventStartTime and eventEndTime to datetime objects
@@ -160,7 +160,7 @@ for eventLink in eventLinks:
                     'savedUsers': [],
                 }
 
-                db.collection('events').document(eventID).set(event_data)
+                db.collection('test_events').document(eventID).set(event_data)
                 
         except NoSuchElementException:
             print("Tabular section not found")

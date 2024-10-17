@@ -57,7 +57,7 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Events', // Label for the explore/events page.
+            label: 'test_events', // Label for the explore/events page.
           ),
 
           // Calendar icon

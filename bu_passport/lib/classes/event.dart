@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event {
   final String eventID;
+  final String realEventID;
   final String eventTitle;
   final String eventPhoto;
   final String eventLocation;
@@ -11,9 +12,11 @@ class Event {
   final DateTime eventEndTime;
   final int eventPoints;
   final List<String> savedUsers;
+  final List<String> eventCategories;
 
   Event({
     required this.eventID,
+    required this.realEventID,
     required this.eventTitle,
     required this.eventPhoto,
     required this.eventLocation,
@@ -23,5 +26,6 @@ class Event {
     required this.eventPoints,
     required this.eventURL,
     required this.savedUsers,
+    required this.eventCategories,
   });
 }

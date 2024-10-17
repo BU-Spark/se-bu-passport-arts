@@ -1,6 +1,7 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
+import 'package:bu_passport/services/web_image_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class _EventWidgetState extends State<EventWidget> {
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: Colors.grey),
           image: DecorationImage(
-            image: AssetImage(widget.event.eventPhoto),
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.black.withOpacity(0.3), BlendMode.multiply),

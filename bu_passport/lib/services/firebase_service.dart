@@ -15,11 +15,12 @@ class FirebaseService {
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await this.db.collection('events').get();
+      QuerySnapshot snapshot = await this.db.collection('test_events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
           eventID: doc.id,
+          realEventID: eventData['eventID'],
           eventTitle: eventData['eventTitle'] ?? '',
           eventURL: eventData['eventURL'] ?? '',
           eventPhoto: eventData['eventPhoto'] ?? '',
@@ -29,6 +30,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
         );
 
         eventList.add(event);
@@ -106,7 +108,7 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': false,
       });
-      await this.db.collection('events').doc(eventId).update({
+      await this.db.collection('test_events').doc(eventId).update({
         'savedUsers': FieldValue.arrayUnion([userUID]),
       });
     } catch (error) {
@@ -125,7 +127,7 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': FieldValue.delete(),
       });
-      await this.db.collection('events').doc(eventId).update({
+      await this.db.collection('test_events').doc(eventId).update({
         'savedUsers': FieldValue.arrayRemove([userUID]),
       });
     } catch (error) {
@@ -206,11 +208,12 @@ class FirebaseService {
 
   Future<Event?> fetchEventById(String eventId) async {
     DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await this.db.collection('events').doc(eventId).get();
+        await this.db.collection('test_events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
       Map<String, dynamic> eventData = snapshot.data()!;
       Event event = Event(
-        eventID: eventData['eventID'] ?? '',
+        eventID: eventId,
+        realEventID: eventData['eventID'] ?? '',
         eventTitle: eventData['eventTitle'] ?? '',
         eventPhoto: eventData['eventPhoto'] ?? '',
         eventLocation: eventData['eventLocation'] ?? '',
@@ -220,6 +223,7 @@ class FirebaseService {
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
         savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
       );
       return event;
     }
@@ -291,11 +295,12 @@ class FirebaseService {
     List<Event> eventList = [];
 
     try {
-      QuerySnapshot snapshot = await this.db.collection('events').get();
+      QuerySnapshot snapshot = await this.db.collection('test_events').get();
       snapshot.docs.forEach((doc) {
         final eventData = doc.data() as Map<String, dynamic>;
         Event event = Event(
           eventID: doc.id,
+          realEventID: eventData['eventID'] ?? '',
           eventTitle: eventData['eventTitle'] ?? '',
           eventURL: eventData['eventURL'] ?? '',
           eventPhoto: eventData['eventPhoto'] ?? '',
@@ -305,6 +310,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+            eventCategories: List<String>.from(eventData['eventCatogeries'] ?? []),
         );
 
         eventList.add(event);

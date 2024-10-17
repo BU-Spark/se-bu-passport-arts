@@ -13,6 +13,7 @@ import 'mock.dart';
 
 final event = Event(
   eventID: '1',
+  realEventID: '1',
   eventTitle: 'Test Event',
   eventPhoto: "assets/images/arts/image9.jpeg",
   eventLocation: 'Test Location',
@@ -22,6 +23,7 @@ final event = Event(
   eventPoints: 30,
   eventURL: 'http://example.com',
   savedUsers: ['user1', 'user2'],
+  eventCategories: [],
 );
 
 @GenerateMocks([FirebaseService])
