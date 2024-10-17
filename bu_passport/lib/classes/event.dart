@@ -11,6 +11,7 @@ class Event {
   final DateTime eventEndTime;
   final int eventPoints;
   final List<String> savedUsers;
+  final List<String> attendedUsers;
 
   Event({
     required this.eventID,
@@ -23,5 +24,6 @@ class Event {
     required this.eventPoints,
     required this.eventURL,
     required this.savedUsers,
+    required this.attendedUsers,
   });
 }

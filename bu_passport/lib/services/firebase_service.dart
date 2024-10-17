@@ -29,6 +29,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -83,6 +84,8 @@ class FirebaseService {
           userPoints: userData['userPoints'],
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userAttendedEvents:
+              Map<String, dynamic>.from(userData['userAttendedEvents'] ?? {}),
         );
         return user;
       } else {
@@ -170,36 +173,38 @@ class FirebaseService {
     final userData = userDoc.data();
 
     Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? {};
+    Map<String, dynamic> attendedEvents = userData!['userAttendedEvents'] ?? {};
 
     final now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
 
-    final List<Event> attendedEvents = [];
+    final List<Event> userAttendedEvents = [];
     final List<Event> userSavedEvents = [];
 
     await Future.forEach(savedEvents.entries,
         (MapEntry<String, dynamic> entry) async {
       String eventId = entry.key;
-      bool isCheckedIn = entry.value;
+      //bool isCheckedIn = entry.value;
 
       Event? event = await fetchEventById(eventId);
       if (event != null) {
-        DateTime startOfDayEvent = DateTime(event.eventStartTime.year,
-            event.eventStartTime.month, event.eventStartTime.day);
-        if ((startOfDayEvent.isBefore(now) ||
-                startOfDayEvent.isAtSameMomentAs(today)) &&
-            isCheckedIn) {
-          // Event has already occurred (attended)
-          attendedEvents.add(event);
-        } else {
-          // Event is upcoming
-          userSavedEvents.add(event);
+        userSavedEvents.add(event);
         }
-      }
+
     });
 
+    await Future.forEach(attendedEvents.entries,
+            (MapEntry<String, dynamic> entry) async {
+          String eventId = entry.key;
+
+          Event? event = await fetchEventById(eventId);
+          if (event != null) {
+          userAttendedEvents.add(event);
+          }
+        });
+
     return CategorizedEvents(
-        attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
+        attendedEvents: userAttendedEvents, userSavedEvents: userSavedEvents);
   }
 
   // Function to fetch an event by its ID
@@ -220,6 +225,7 @@ class FirebaseService {
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
         savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+        attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
       );
       return event;
     }
@@ -234,11 +240,15 @@ class FirebaseService {
     }
 
     final userDoc = this.db.collection('users').doc(userUID);
+    final eventDoc = this.db.collection('events').doc(eventID);
 
     try {
       // Atomically add the new event ID to the user's saved events list
       userDoc.update({
-        'userSavedEvents.$eventID': true,
+        'userAttendedEvents.$eventID': false,
+      });
+      eventDoc.update({
+        'attendedUsers': FieldValue.arrayUnion([userUID]),
       });
       userDoc.update({
         'userPoints': FieldValue.increment(eventPoints),
@@ -257,10 +267,10 @@ class FirebaseService {
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? {};
+      Map<String, dynamic> attendedEvents = userData['userAttendedEvents'] ?? {};
 
       // Check if the eventId exists in the list
-      return savedEvents.containsKey(eventId) && savedEvents[eventId];
+      return attendedEvents.containsKey(eventId);
     }
     return false;
   }
@@ -305,6 +315,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -340,6 +351,8 @@ class FirebaseService {
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
           userPoints: userData['userPoints'],
           userProfileURL: userData['userProfileURL'],
+          userAttendedEvents:
+              Map<String, dynamic>.from(userData['userAttendedEvents'] ?? {}),
         );
         users.add(user);
       });

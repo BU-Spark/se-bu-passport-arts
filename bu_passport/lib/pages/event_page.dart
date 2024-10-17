@@ -253,8 +253,7 @@ class _EventPageState extends State<EventPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: (!_isSaved ||
-                          !isEventToday(widget.event.eventStartTime) ||
+                  onPressed: (!isEventToday(widget.event.eventStartTime) ||
                           _isCheckedIn)
                       ? null
                       : () async {
@@ -277,7 +276,7 @@ class _EventPageState extends State<EventPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isSaved ? Colors.red : Colors.grey),
+                        : (Colors.red),
                   ),
                 ),
                 SizedBox(width: sizedBoxHeight * 3), // Optional spacing
