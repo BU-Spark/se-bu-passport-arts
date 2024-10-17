@@ -35,6 +35,7 @@ void main() {
       eventPoints: 30,
       eventURL: 'http://example.com',
       savedUsers: ['user1', 'user2'],
+      attendedUsers: [],
     );
 
     // Build our widget and trigger a frame.

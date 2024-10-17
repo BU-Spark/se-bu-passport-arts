@@ -1,5 +1,4 @@
 
-// TODO: add new field
 class Users {
   final String firstName;
   final String lastName;
@@ -11,6 +10,7 @@ class Users {
   final int userPoints;
   final String userProfileURL;
   final Map<String, dynamic> userSavedEvents;
+  final Map<String, dynamic> userAttendedEvents;
 
   Users({
     required this.firstName,
@@ -23,5 +23,6 @@ class Users {
     required this.userSavedEvents,
     required this.userPoints,
     required this.userProfileURL,
+    required this.userAttendedEvents,
   });
 }

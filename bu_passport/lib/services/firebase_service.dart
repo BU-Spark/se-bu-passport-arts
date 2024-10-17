@@ -12,7 +12,6 @@ class FirebaseService {
   // Function to fetch events from Firestore
 
   Future<List<Event>> fetchEvents() async {
-    // TODO: Update this function to get new field from event doc
     List<Event> eventList = [];
 
     try {
@@ -30,6 +29,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -65,7 +65,6 @@ class FirebaseService {
   // Function to fetch user details from Firestore
 
   Future<Users?> fetchUser(String userUID) async {
-    // TODO: Update this function to get new field from user doc
     try {
       DocumentSnapshot snapshot =
           await this.db.collection('users').doc(userUID).get();
@@ -85,6 +84,8 @@ class FirebaseService {
           userPoints: userData['userPoints'],
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userAttendedEvents:
+              Map<String, dynamic>.from(userData['userAttendedEvents'] ?? {}),
         );
         return user;
       } else {
@@ -157,7 +158,6 @@ class FirebaseService {
   // Function to categorize events into attended and saved events
 
   Future<CategorizedEvents> fetchAndCategorizeEvents() async {
-    //TODO: Update Display Logic
     final userUID = FirebaseAuth.instance.currentUser?.uid;
 
     if (userUID == null) {
@@ -173,42 +173,43 @@ class FirebaseService {
     final userData = userDoc.data();
 
     Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? {};
+    Map<String, dynamic> attendedEvents = userData!['userAttendedEvents'] ?? {};
 
     final now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
 
-    final List<Event> attendedEvents = [];
+    final List<Event> userAttendedEvents = [];
     final List<Event> userSavedEvents = [];
 
     await Future.forEach(savedEvents.entries,
         (MapEntry<String, dynamic> entry) async {
       String eventId = entry.key;
-      bool isCheckedIn = entry.value;
+      //bool isCheckedIn = entry.value;
 
       Event? event = await fetchEventById(eventId);
       if (event != null) {
-        DateTime startOfDayEvent = DateTime(event.eventStartTime.year,
-            event.eventStartTime.month, event.eventStartTime.day);
-        if ((startOfDayEvent.isBefore(now) ||
-                startOfDayEvent.isAtSameMomentAs(today)) &&
-            isCheckedIn) {
-          // Event has already occurred (attended)
-          attendedEvents.add(event);
-        } else {
-          // Event is upcoming
-          userSavedEvents.add(event);
+        userSavedEvents.add(event);
         }
-      }
+
     });
 
+    await Future.forEach(attendedEvents.entries,
+            (MapEntry<String, dynamic> entry) async {
+          String eventId = entry.key;
+
+          Event? event = await fetchEventById(eventId);
+          if (event != null) {
+          userAttendedEvents.add(event);
+          }
+        });
+
     return CategorizedEvents(
-        attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
+        attendedEvents: userAttendedEvents, userSavedEvents: userSavedEvents);
   }
 
   // Function to fetch an event by its ID
 
   Future<Event?> fetchEventById(String eventId) async {
-    // TODO: Update this function to get new field from event doc
     DocumentSnapshot<Map<String, dynamic>> snapshot =
         await this.db.collection('events').doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
@@ -224,6 +225,7 @@ class FirebaseService {
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
         savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+        attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
       );
       return event;
     }
@@ -232,18 +234,21 @@ class FirebaseService {
 
   // Function to check in a user for an event
   void checkInUserForEvent(String eventID, int eventPoints) {
-    // TODO: Update this function to separate check-ins from saved events
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
       throw Exception("User is not logged in");
     }
 
     final userDoc = this.db.collection('users').doc(userUID);
+    final eventDoc = this.db.collection('events').doc(eventID);
 
     try {
       // Atomically add the new event ID to the user's saved events list
       userDoc.update({
-        'userSavedEvents.$eventID': true,
+        'userAttendedEvents.$eventID': false,
+      });
+      eventDoc.update({
+        'attendedUsers': FieldValue.arrayUnion([userUID]),
       });
       userDoc.update({
         'userPoints': FieldValue.increment(eventPoints),
@@ -257,16 +262,15 @@ class FirebaseService {
   // Function to check if a user has checked in for an event
 
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
-    // TODO: Update this function to check check-in status from the new separate field
     DocumentSnapshot userDocSnapshot =
         await this.db.collection('users').doc(userUID).get();
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      Map<String, dynamic> savedEvents = userData['userSavedEvents'] ?? {};
+      Map<String, dynamic> attendedEvents = userData['userAttendedEvents'] ?? {};
 
       // Check if the eventId exists in the list
-      return savedEvents.containsKey(eventId) && savedEvents[eventId];
+      return attendedEvents.containsKey(eventId);
     }
     return false;
   }
@@ -293,7 +297,6 @@ class FirebaseService {
   // Function to fetch events after current time for explore page
 
   Future<List<Event>> fetchEventsFromNow() async {
-    // TODO: Update this function to get new field from event doc
     final now = DateTime.now();
     List<Event> eventList = [];
 
@@ -312,6 +315,7 @@ class FirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
+          attendedUsers: List<String>.from(eventData['attendedUsers'] ?? []),
         );
 
         eventList.add(event);
@@ -328,7 +332,6 @@ class FirebaseService {
   // Function to fetch all users
 
   Future<List<Users>> fetchAllUsers() async {
-    // TODO: Update this function to get new field from user doc
     List<Users> users = [];
 
     try {
@@ -348,6 +351,8 @@ class FirebaseService {
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
           userPoints: userData['userPoints'],
           userProfileURL: userData['userProfileURL'],
+          userAttendedEvents:
+              Map<String, dynamic>.from(userData['userAttendedEvents'] ?? {}),
         );
         users.add(user);
       });

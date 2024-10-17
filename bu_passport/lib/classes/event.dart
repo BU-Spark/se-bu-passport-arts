@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// TODO: add new field
 class Event {
   final String eventID;
   final String eventTitle;
@@ -12,6 +11,7 @@ class Event {
   final DateTime eventEndTime;
   final int eventPoints;
   final List<String> savedUsers;
+  final List<String> attendedUsers;
 
   Event({
     required this.eventID,
@@ -24,5 +24,6 @@ class Event {
     required this.eventPoints,
     required this.eventURL,
     required this.savedUsers,
+    required this.attendedUsers,
   });
 }
