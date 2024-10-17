@@ -1,17 +1,40 @@
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+
+  Future<User?> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        return null; // The user canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      return userCredential.user;
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Google Sign-In failed. Please try again.';
+      });
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +55,6 @@ class _LoginPageState extends State<LoginPage> {
                 "assets/images/onboarding/BU art logo.png",
                 fit: BoxFit.contain,
               ),
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                ),
-              ),
-              SizedBox(height: sizedBoxHeight),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                ),
-                obscureText: true,
-              ),
               if (_errorMessage != null)
                 Text(
                   _errorMessage!,
@@ -54,60 +63,18 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: sizedBoxHeight),
               ElevatedButton(
                 onPressed: () async {
-                  // Reset error message
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                  String email = _emailController.text;
-                  String password = _passwordController.text;
-                  try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    // Navigate to home page
+                  User? user = await _signInWithGoogle();
+                  if (user != null) {
                     Navigator.pushNamed(context, '/home');
-                  } catch (e) {
-                    // Handle login errors
-                    print('Login error: $e');
-                    setState(() {
-                      _errorMessage =
-                          'Login failed. Please check your email and password.';
-                    });
                   }
                 },
-                child: const Text('Sign In'),
+                child: const Text('Sign In with Google'),
               ),
               SizedBox(height: sizedBoxHeight),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Don\'t have an account?'),
-                  TextButton(
-                    onPressed: () {
-                      // Navigate to sign up page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignUpPage(),
-                        ),
-                      );
-                    },
-                    child: const Text('Sign Up'),
-                  ),
-                ],
-              )
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "429645705382",
+    "firebase_url": "https://se-bu-passport-default-rtdb.firebaseio.com",
+    "project_id": "se-bu-passport",
+    "storage_bucket": "se-bu-passport.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429645705382:android:9f0f8af5edb9341147c467",
+        "android_client_info": {
+          "package_name": "com.example.bu_passport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "429645705382-eaea9sqfmj8st3mn8o2t9jgnbacih67m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bu_passport",
+            "certificate_hash": "d20f358562edf29f6d34f9d5ab57697734bc4157"
+          }
+        },
+        {
+          "client_id": "429645705382-qdv5dcrft8ifi50gs2d1e7psu7e22nfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoIG5QDtwfePSWyYQWOBZQgMLy3RPetc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "429645705382-qdv5dcrft8ifi50gs2d1e7psu7e22nfq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "429645705382-1j4106od8lrq0ceoetqln2c928v18850.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.buPassport.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

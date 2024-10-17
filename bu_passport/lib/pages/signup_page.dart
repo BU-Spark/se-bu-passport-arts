@@ -108,7 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     String lastName = _lastNameController.text;
                     String buID = _buIDController.text;
                     String school = _userSchool.text;
-                    String year_text = _userYear.toString().trim();
+                    String year_text = _userYear.text.trim();
 
                     // Check if any of the fields are empty.
                     if (email.isEmpty ||
