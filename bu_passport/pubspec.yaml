@@ -30,8 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    assets:
-      - bu_passport\assets\images\onboarding\BU art logo.png
 
 
   # The following adds the Cupertino Icons font to your application.

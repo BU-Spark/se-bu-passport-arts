@@ -2,6 +2,7 @@ import 'package:bu_passport/pages/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -27,11 +28,70 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      return userCredential.user;
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        // Check if the user document exists in Firestore
+        final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        final docSnapshot = await userDoc.get();
+        if (docSnapshot.exists) {
+          print("Firestore doc data: ${docSnapshot.data()}");
+        }
+        if (!docSnapshot.exists) {
+          // Create a new user document
+          final name = user.displayName?.split(' ') ?? [];
+          await userDoc.set({
+            'userUID': user.uid,
+            'userEmail': user.email,
+            'firstName': name.isNotEmpty ? name[0] : '',
+            'lastName': name.length > 1 ? name[1] : '',
+            'userProfileURL': user.photoURL,
+            'userPoints': 0,
+            'userSavedEvents': {},
+            // Additional fields to be filled by the user
+            'userBUID': '',
+            'userSchool': '',
+            'userYear': 0,
+          });
+          // Navigate to SignUpPage to collect additional information
+          if (mounted) {
+            print("Navigating to SignUpPage");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SignUpPage(),
+              ),
+            );
+          }
+        } else {
+          // Check if additional fields are set
+          final data = docSnapshot.data();
+          if (data != null && (data['userBUID'] == '' || data['userSchool'] == '' || data['userYear'] == 0)) {
+            if (mounted) {
+              print("Navigating to SignUpPage");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SignUpPage(),
+                ),
+              );
+            }
+          } else {
+            // Navigate to home page if user document is complete
+            if (mounted) {
+              Navigator.pushNamed(context, '/home');
+            }
+          }
+        }
+      }
+
+      return user;
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Google Sign-In failed. Please try again.';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Google Sign-In failed. Please try again. Error: $e';
+        });
+      }
       return null;
     }
   }
@@ -77,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                       'Sign In with Google',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16, // Adjust the font size if needed
+                        fontSize: 16,
                       ),
                     ),
                   ),
@@ -89,6 +149,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-
   }
 }
