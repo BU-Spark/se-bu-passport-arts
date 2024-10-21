@@ -38,9 +38,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
@@ -58,17 +55,33 @@ class _LoginPageState extends State<LoginPage> {
               if (_errorMessage != null)
                 Text(
                   _errorMessage!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Color(0xFFCC0000)),
                 ),
               SizedBox(height: sizedBoxHeight),
-              ElevatedButton(
-                onPressed: () async {
+              GestureDetector(
+                onTap: () async {
                   User? user = await _signInWithGoogle();
                   if (user != null) {
                     Navigator.pushNamed(context, '/home');
                   }
                 },
-                child: const Text('Sign In with Google'),
+                child: Container(
+                  width: 244.14,
+                  height: 43.89,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCC0000),
+                    borderRadius: BorderRadius.circular(66.75),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Sign In with Google',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16, // Adjust the font size if needed
+                      ),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: sizedBoxHeight),
             ],
@@ -76,5 +89,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+
   }
 }
