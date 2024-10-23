@@ -13,6 +13,26 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
+  static bool newUser = false;
+
+  // Navigate to the signup page
+  void _navigateToSignUp() {
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SignUpPage(),
+        ),
+      );
+    }
+  }
+
+  // Navigate to the home page
+  void _navigateToHome() {
+    if (mounted) {
+      Navigator.pushNamed(context, '/home');
+    }
+  }
 
   Future<User?> _signInWithGoogle() async {
     try {
@@ -34,9 +54,7 @@ class _LoginPageState extends State<LoginPage> {
         // Check if the user document exists in Firestore
         final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
         final docSnapshot = await userDoc.get();
-        if (docSnapshot.exists) {
-          print("Firestore doc data: ${docSnapshot.data()}");
-        }
+        
         if (!docSnapshot.exists) {
           // Create a new user document
           final name = user.displayName?.split(' ') ?? [];
@@ -52,35 +70,15 @@ class _LoginPageState extends State<LoginPage> {
             'userBUID': '',
             'userSchool': '',
             'userYear': 0,
+            'admin': false,
           });
-          // Navigate to SignUpPage to collect additional information
-          if (mounted) {
-            print("Navigating to SignUpPage");
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SignUpPage(),
-              ),
-            );
-          }
+          // Set newUser flag
+          newUser = true;
         } else {
           // Check if additional fields are set
           final data = docSnapshot.data();
           if (data != null && (data['userBUID'] == '' || data['userSchool'] == '' || data['userYear'] == 0)) {
-            if (mounted) {
-              print("Navigating to SignUpPage");
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SignUpPage(),
-                ),
-              );
-            }
-          } else {
-            // Navigate to home page if user document is complete
-            if (mounted) {
-              Navigator.pushNamed(context, '/home');
-            }
+            newUser = true;
           }
         }
       }
@@ -121,9 +119,13 @@ class _LoginPageState extends State<LoginPage> {
               GestureDetector(
                 onTap: () async {
                   User? user = await _signInWithGoogle();
-                  if (user != null) {
-                    Navigator.pushNamed(context, '/home');
-                  }
+                  if(user != null) {
+                    if (newUser) {
+                      _navigateToSignUp();
+                    } else {
+                      _navigateToHome();
+                    }
+                  };
                 },
                 child: Container(
                   width: 244.14,
