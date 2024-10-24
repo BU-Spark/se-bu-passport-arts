@@ -48,6 +48,7 @@ dependencies:
   timezone: ^0.8.0
   permission_handler: ^11.3.1
   url_launcher: ^6.2.5
+  google_sign_in: ^5.2.1
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>429645705382-1j4106od8lrq0ceoetqln2c928v18850.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.429645705382-1j4106od8lrq0ceoetqln2c928v18850</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>429645705382-eaea9sqfmj8st3mn8o2t9jgnbacih67m.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDB-0rxfn8BysrqjdSsWddOiJseJlvvIyo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>429645705382</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.buPassport.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>se-bu-passport</string>
+	<key>STORAGE_BUCKET</key>
+	<string>se-bu-passport.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:429645705382:ios:cd4b6c01aab761b947c467</string>
+	<key>DATABASE_URL</key>
+	<string>https://se-bu-passport-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
