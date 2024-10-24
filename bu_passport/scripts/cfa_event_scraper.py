@@ -29,7 +29,7 @@ class CFAEvent:
     event_url: Optional[str] = ""
     detail_url: Optional[str] = ""
 
-    def to_dict(self) -> dict:
+    def to_dict_with_empty_users(self) -> dict:
         return {
             "eventID": self.event_id,
             "eventTitle": self.title,
@@ -44,7 +44,7 @@ class CFAEvent:
             "savedUsers": [],
         }
         
-    def to_dict_exist(self) -> dict:
+    def to_dict(self) -> dict:
         return {
             "eventID": self.event_id,
             "eventTitle": self.title,
@@ -215,7 +215,7 @@ def scrape_event_detail_link(raw_event: str) -> Tuple[str, str] | Tuple[None, No
         return None, None
 
 
-def scrape_event_detail_page(soup: BeautifulSoup):
+def scrape_detail_page(soup: BeautifulSoup):
     return (
         soup.find("div", class_="wrapper")
         .find("main", class_="content")
@@ -266,6 +266,8 @@ def main(table_name: str):
     cred = credentials.Certificate("../serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
     db = firestore.client()
+    
+    print("Starting scraper")
 
     url = "https://www.bu.edu/cfa/news/bu-arts-initiative/"
     response = requests.get(url)
@@ -299,21 +301,23 @@ def main(table_name: str):
             continue
         response = requests.get(event.detail_url)
         soup = BeautifulSoup(response.content, "html.parser")
-        raw_detail = scrape_event_detail_page(soup)
+        raw_detail = scrape_detail_page(soup)
 
         event.photo = scrape_event_image(raw_detail)
         event.description = scrape_event_description(raw_detail)
         event.event_url = scrape_event_event_link(raw_detail)
 
+    # update firebase db
     for i, event in enumerate(cfa_events):
         
         doc_ref = db.collection(table_name).document(event.event_id_hex)
     
         if doc_ref.get().exists:
             print(f"Updating event with pk {event.event_id_hex} in db")
-            doc_ref.set(event.to_dict_exist(), merge=True)
+            doc_ref.set(event.to_dict(), merge=True)
         else:
             print(f"Adding event with pk {event.event_id_hex} in db")
-            doc_ref.set(event.to_dict())
+            doc_ref.set(event.to_dict_with_empty_users())
+    print("Event Scraping has completed")
 
 main("test_events")
