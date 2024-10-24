@@ -45,7 +45,7 @@ class _HomePageState extends State<ExplorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Events'),
+        title: Text('test_events'),
       ),
       body: Center(
         child: ListView(
