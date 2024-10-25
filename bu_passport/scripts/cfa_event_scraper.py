@@ -64,6 +64,18 @@ class CFAEvent:
             },
         }
 
+    def to_dict_no_sessions(self):
+        return {
+            "eventID": self.event_id,
+            "eventTitle": self.title,
+            "eventCategories": self.categories,
+            "eventLocation": self.location,
+            "eventURL": self.event_url,
+            "eventDescription": self.description,
+            "eventPhoto": self.photo,
+            "eventPoints": 0,
+        }
+
 
 def fetch_and_parse_url(url: str) -> BeautifulSoup:
     """Fetch content from a URL and parse it with BeautifulSoup."""
@@ -273,21 +285,16 @@ def update_database(db, cfa_events, table_name):
             print(f"Updating event with pk {event.event_id} in db")
             existing_data = doc.to_dict()
 
-            # Extract existing sessions from Firestore
+            # Update only the new sessions in eventSessions
             existing_sessions = existing_data.get("eventSessions", {})
-
-            # New sessions to be appended
-            updated_sessions = (
-                event.sessions.copy()
-            )  # Start with a copy of the new event sessions
+            updated_sessions = event.sessions.copy()
 
             # Skip existing sessions
-            for session_id, session in existing_sessions.items():
-                if session_id in event.sessions:
-                    # If session exists, remove from the update list
-                    updated_sessions.pop(session_id, None)
+            for session_id in existing_sessions:
+                updated_sessions.pop(session_id, None)
 
-            # If there are new sessions, append them to existing sessions
+            # Merge event data without eventSessions
+            event_dict = event.to_dict()
             if updated_sessions:
                 existing_sessions.update(
                     {
@@ -295,16 +302,13 @@ def update_database(db, cfa_events, table_name):
                         for session_id, session in updated_sessions.items()
                     }
                 )
-                # Update the event data with the new sessions
-                event_dict = event.to_dict()
-                event_dict["eventSessions"] = (
-                    existing_sessions  # Update with merged sessions
-                )
-
-                # Merge updated data into Firestore
-                doc_ref.set(event_dict, merge=True)
+                event_dict["eventSessions"] = existing_sessions
             else:
-                print(f"No new sessions to add for event {event.event_id}")
+                event_dict.pop("eventSessions", None)  # Exclude if no new sessions
+
+            # Merge attributes without overwriting eventSessions
+            doc_ref.set(event.to_dict_no_sessions(), merge=True)
+
         else:
             print(f"Adding event with pk {event.event_id} in db")
             doc_ref.set(event.to_dict())
@@ -350,4 +354,4 @@ def main(table_name):
     print("Event Scraping has completed")
 
 
-main("new_events")
+main("new_events1")
