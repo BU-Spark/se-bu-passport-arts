@@ -9,6 +9,7 @@ class Users {
   final int userPoints;
   final String userProfileURL;
   final Map<String, dynamic> userSavedEvents;
+  final bool admin;
 
   Users({
     required this.firstName,
@@ -21,5 +22,6 @@ class Users {
     required this.userSavedEvents,
     required this.userPoints,
     required this.userProfileURL,
+    required this.admin,
   });
 }

@@ -83,6 +83,7 @@ class FirebaseService {
           userPoints: userData['userPoints'],
           userSavedEvents:
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          admin: userData['admin'],  
         );
         return user;
       } else {
@@ -340,6 +341,7 @@ class FirebaseService {
               Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
           userPoints: userData['userPoints'],
           userProfileURL: userData['userProfileURL'],
+          admin: userData['admin'],
         );
         users.add(user);
       });

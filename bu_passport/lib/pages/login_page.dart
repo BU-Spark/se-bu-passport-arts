@@ -14,6 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
   static bool newUser = false;
+  static bool BUemail = false;
 
   // Navigate to the signup page
   void _navigateToSignUp() {
@@ -36,7 +37,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<User?> _signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        hostedDomain: 'bu.edu',
+      );
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         return null; // The user canceled the sign-in
       }
@@ -51,18 +55,27 @@ class _LoginPageState extends State<LoginPage> {
       final User? user = userCredential.user;
 
       if (user != null) {
+        if (user.email != null && !user.email!.contains("bu.edu")) {
+          BUemail = false;
+          await user.delete();
+          setState(() {
+            _errorMessage = 'Please sign in with a BU email address.';
+          });
+          return null;
+        } else {
+          BUemail = true;
+        }
         // Check if the user document exists in Firestore
         final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
         final docSnapshot = await userDoc.get();
         
         if (!docSnapshot.exists) {
           // Create a new user document
-          final name = user.displayName?.split(' ') ?? [];
           await userDoc.set({
             'userUID': user.uid,
             'userEmail': user.email,
-            'firstName': name.isNotEmpty ? name[0] : '',
-            'lastName': name.length > 1 ? name[1] : '',
+            'firstName': userCredential.additionalUserInfo?.profile?['given_name'],
+            'lastName': userCredential.additionalUserInfo?.profile?['family_name'],
             'userProfileURL': user.photoURL,
             'userPoints': 0,
             'userSavedEvents': {},
@@ -77,15 +90,25 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           // Check if additional fields are set
           final data = docSnapshot.data();
+          
           if (data != null && (data['userBUID'] == '' || data['userSchool'] == '' || data['userYear'] == 0)) {
             newUser = true;
           }
         }
+      } else {
+        setState(() {
+          _errorMessage = 'Sign in failed. Please sign in with a BU email address.';
+        });
+        return null;
       }
 
       return user;
     } catch (e) {
-      if (mounted) {
+      if (_errorMessage != null) {
+        setState(() {
+          _errorMessage = 'Please sign in with a BU email address. Error: $e';
+        });
+      } else if (mounted) {
         setState(() {
           _errorMessage = 'Google Sign-In failed. Please try again. Error: $e';
         });
@@ -110,22 +133,19 @@ class _LoginPageState extends State<LoginPage> {
                 "assets/images/onboarding/BU art logo.png",
                 fit: BoxFit.contain,
               ),
-              if (_errorMessage != null)
-                Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Color(0xFFCC0000)),
-                ),
               SizedBox(height: sizedBoxHeight),
               GestureDetector(
                 onTap: () async {
                   User? user = await _signInWithGoogle();
-                  if(user != null) {
+                  if (user != null) {
                     if (newUser) {
+                      debugPrint("navigate to signup");
                       _navigateToSignUp();
                     } else {
+                      debugPrint("navigate to home");
                       _navigateToHome();
                     }
-                  };
+                  }
                 },
                 child: Container(
                   width: 244.14,
@@ -136,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: const Center(
                     child: Text(
-                      'Sign In with Google',
+                      'Sign In with BU Gmail',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -145,6 +165,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
+              SizedBox(height: sizedBoxHeight),
+              if (_errorMessage != null || !BUemail)
+                Text(
+                  'Please sign in with a BU email address.',
+                  style: const TextStyle(color: Color(0xFFCC0000)),
+                ),
               SizedBox(height: sizedBoxHeight),
             ],
           ),
