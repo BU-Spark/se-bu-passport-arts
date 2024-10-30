@@ -14,7 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
   static bool newUser = false;
-  static bool BUemail = false;
+  static bool BUemail = true;
 
   // Navigate to the signup page
   void _navigateToSignUp() {
