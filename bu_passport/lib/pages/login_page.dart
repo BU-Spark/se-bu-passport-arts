@@ -1,23 +1,124 @@
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+  static bool newUser = false;
+  static bool BUemail = true;
+
+  // Navigate to the signup page
+  void _navigateToSignUp() {
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SignUpPage(),
+        ),
+      );
+    }
+  }
+
+  // Navigate to the home page
+  void _navigateToHome() {
+    if (mounted) {
+      Navigator.pushNamed(context, '/home');
+    }
+  }
+
+  Future<User?> _signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        hostedDomain: 'bu.edu',
+      );
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        return null; // The user canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        if (user.email != null && !user.email!.contains("bu.edu")) {
+          BUemail = false;
+          await user.delete();
+          setState(() {
+            _errorMessage = 'Please sign in with a BU email address.';
+          });
+          return null;
+        } else {
+          BUemail = true;
+        }
+        // Check if the user document exists in Firestore
+        final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        final docSnapshot = await userDoc.get();
+        
+        if (!docSnapshot.exists) {
+          // Create a new user document
+          await userDoc.set({
+            'userUID': user.uid,
+            'userEmail': user.email,
+            'firstName': userCredential.additionalUserInfo?.profile?['given_name'],
+            'lastName': userCredential.additionalUserInfo?.profile?['family_name'],
+            'userProfileURL': user.photoURL,
+            'userPoints': 0,
+            'userSavedEvents': {},
+            // Additional fields to be filled by the user
+            'userBUID': '',
+            'userSchool': '',
+            'userYear': 0,
+            'admin': false,
+          });
+          // Set newUser flag
+          newUser = true;
+        } else {
+          // Check if additional fields are set
+          final data = docSnapshot.data();
+          
+          if (data != null && (data['userBUID'] == '' || data['userSchool'] == '' || data['userYear'] == 0)) {
+            newUser = true;
+          }
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Sign in failed. Please sign in with a BU email address.';
+        });
+        return null;
+      }
+
+      return user;
+    } catch (e) {
+      if (_errorMessage != null) {
+        setState(() {
+          _errorMessage = 'Please sign in with a BU email address. Error: $e';
+        });
+      } else if (mounted) {
+        setState(() {
+          _errorMessage = 'Google Sign-In failed. Please try again. Error: $e';
+        });
+      }
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
 
@@ -32,82 +133,49 @@ class _LoginPageState extends State<LoginPage> {
                 "assets/images/onboarding/BU art logo.png",
                 fit: BoxFit.contain,
               ),
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                ),
-              ),
               SizedBox(height: sizedBoxHeight),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                ),
-                obscureText: true,
-              ),
-              if (_errorMessage != null)
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: Colors.red),
-                ),
-              SizedBox(height: sizedBoxHeight),
-              ElevatedButton(
-                onPressed: () async {
-                  // Reset error message
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                  String email = _emailController.text;
-                  String password = _passwordController.text;
-                  try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    // Navigate to home page
-                    Navigator.pushNamed(context, '/home');
-                  } catch (e) {
-                    // Handle login errors
-                    print('Login error: $e');
-                    setState(() {
-                      _errorMessage =
-                          'Login failed. Please check your email and password.';
-                    });
+              GestureDetector(
+                onTap: () async {
+                  User? user = await _signInWithGoogle();
+                  if (user != null) {
+                    if (newUser) {
+                      debugPrint("navigate to signup");
+                      _navigateToSignUp();
+                    } else {
+                      debugPrint("navigate to home");
+                      _navigateToHome();
+                    }
                   }
                 },
-                child: const Text('Sign In'),
+                child: Container(
+                  width: 244.14,
+                  height: 43.89,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCC0000),
+                    borderRadius: BorderRadius.circular(66.75),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Sign In with BU Gmail',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: sizedBoxHeight),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Don\'t have an account?'),
-                  TextButton(
-                    onPressed: () {
-                      // Navigate to sign up page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignUpPage(),
-                        ),
-                      );
-                    },
-                    child: const Text('Sign Up'),
-                  ),
-                ],
-              )
+              if (_errorMessage != null || !BUemail)
+                Text(
+                  'Please sign in with a BU email address.',
+                  style: const TextStyle(color: Color(0xFFCC0000)),
+                ),
+              SizedBox(height: sizedBoxHeight),
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

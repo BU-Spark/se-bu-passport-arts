@@ -54,5 +54,18 @@
 	<string>We need your location to check you into events near you.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to provide notifications and information about events near you.</string>
+	<key>GIDClientID</key>
+    <string>429645705382-neovegus18m295gn11dpo2g6mi85tv3j.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.429645705382-neovegus18m295gn11dpo2g6mi85tv3j</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
