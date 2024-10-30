@@ -21,6 +21,7 @@ void main() {
       userSavedEvents: {},
       userPoints: 100,
       userProfileURL: '',
+      admin: false,
     ),
     Users(
       firstName: 'Jane',
@@ -33,6 +34,7 @@ void main() {
       userSavedEvents: {},
       userPoints: 200,
       userProfileURL: '',
+      admin: false,
     ),
   ];
   MockFirebaseService mockFirebaseService = MockFirebaseService();
