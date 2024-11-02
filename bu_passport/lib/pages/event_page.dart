@@ -1,3 +1,4 @@
+import 'package:bu_passport/classes/new_event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
@@ -10,8 +11,10 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/new_firebase_service.dart';
+
 class EventPage extends StatefulWidget {
-  final Event event;
+  final NewEvent event;
 
   const EventPage(
       {Key? key, required this.event, required this.onUpdateEventPage})
@@ -23,8 +26,8 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+  NewFirebaseService firebaseService =
+      NewFirebaseService(db: FirebaseFirestore.instance);
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event
@@ -182,8 +185,11 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
-                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                            .format(widget.event.eventStartTime),
+                        //TODO: display time here
+                        // text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                        //     .format(widget.event.eventStartTime),
+                        text: "place holder"
+
                       ),
                     ],
                   ),
@@ -198,8 +204,10 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
-                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                            .format(widget.event.eventEndTime),
+                        //TODO: display time here
+                        // text: DateFormat('h:mm a, EEEE, MMMM d, y')
+                        //     .format(widget.event.eventEndTime),
+                          text: "place holder"
                       ),
                     ],
                   ),
@@ -253,8 +261,8 @@ class _EventPageState extends State<EventPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: (!_isSaved ||
-                          !isEventToday(widget.event.eventStartTime) ||
+                  onPressed: (
+                          !widget.event.isEventHappening() ||
                           _isCheckedIn)
                       ? null
                       : () async {

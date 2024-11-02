@@ -57,4 +57,13 @@ class NewEvent {
     }
     return false; // No active sessions
   }
+  bool isEventHappening() {
+    DateTime now = DateTime.now();
+    for (var session in eventSessions) {
+      if (session.sessionStartTime.isBefore(now) && session.sessionEndTime.isAfter(now)) {
+        return true; // Event is happening
+      }
+    }
+    return false; // Event is not happening
+  }
 }

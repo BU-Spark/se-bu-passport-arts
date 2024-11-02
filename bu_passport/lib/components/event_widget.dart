@@ -1,4 +1,5 @@
 import 'package:bu_passport/classes/event.dart';
+import 'package:bu_passport/classes/new_event.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import '../services/new_firebase_service.dart';
+
 class EventWidget extends StatefulWidget {
-  final Event event;
+  final NewEvent event;
   final Function onUpdateEventPage;
   const EventWidget(
       {Key? key, required this.event, required this.onUpdateEventPage})
@@ -23,8 +26,8 @@ class _EventWidgetState extends State<EventWidget> {
   bool _isCheckedIn = false;
   String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
   // Ensure there's a user logged in
-  FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+  NewFirebaseService firebaseService =
+      NewFirebaseService(db: FirebaseFirestore.instance);
 
   @override
   void initState() {
@@ -140,8 +143,9 @@ class _EventWidgetState extends State<EventWidget> {
                             ),
                             SizedBox(height: sizedBoxHeight * 0.5),
                             Text(
-                              DateFormat.yMMMd()
-                                  .format(widget.event.eventStartTime),
+                              //DateFormat.yMMMd()
+                                  //.format(widget.event.eventStartTime),
+                              "space holder",
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w500,

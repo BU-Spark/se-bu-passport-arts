@@ -1,3 +1,4 @@
+import 'package:bu_passport/classes/new_event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:bu_passport/classes/event.dart';
+
+import '../services/new_firebase_service.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -17,11 +20,11 @@ class _CalendarPageState extends State<CalendarPage> {
   late CalendarFormat _calendarFormat;
   late DateTime _focusedDay;
   late DateTime _selectedDay;
-  List<Event> _allEvents = []; // List to store events
-  FirebaseService firebaseService = FirebaseService(
+  List<NewEvent> _allEvents = []; // List to store events
+  NewFirebaseService firebaseService = NewFirebaseService(
       db: FirebaseFirestore
           .instance); // List to store events for the selected day
-  late Future<List<Event>> _allEventsFuture;
+  late Future<List<NewEvent>> _allEventsFuture;
 
   @override
   void initState() {
@@ -36,7 +39,7 @@ class _CalendarPageState extends State<CalendarPage> {
   // Function to fetch events
 
   Future<void> _fetchEvents() async {
-    List<Event> allEvents = await firebaseService.fetchEvents();
+    List<NewEvent> allEvents = await firebaseService.fetchEvents();
     setState(() {
       _allEvents = allEvents;
     });
@@ -59,7 +62,7 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: Text('Calendar'),
       ),
-      body: FutureBuilder<List<Event>>(
+      body: FutureBuilder<List<NewEvent>>(
         future: _allEventsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,14 +74,14 @@ class _CalendarPageState extends State<CalendarPage> {
               child: Text('Error: ${snapshot.error}'),
             );
           } else {
-            List<Event>? events = snapshot.data;
+            List<NewEvent>? events = snapshot.data;
             if (events == null || events.isEmpty) {
               return Center(
                 child: Text('No events found.'),
               );
             }
             // Filter events for the selected day
-            List<Event> selectedEvents =
+            List<NewEvent> selectedEvents =
                 firebaseService.fetchEventsForDay(_selectedDay, events);
             return Column(
               children: [
@@ -105,10 +108,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   // Provide events to the calendar
                   eventLoader: (day) {
                     return _allEvents
-                        .where((event) =>
-                            event.eventStartTime.year == day.year &&
-                            event.eventStartTime.month == day.month &&
-                            event.eventStartTime.day == day.day)
+                        .where((event) =>event.hasSessionOnDay(day))
                         .toList();
                   },
                 ),

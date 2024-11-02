@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 
+import '../classes/new_event.dart';
+import '../services/new_firebase_service.dart';
+
 class ExplorePage extends StatefulWidget {
   const ExplorePage({Key? key}) : super(key: key);
   @override
@@ -16,10 +19,10 @@ class _HomePageState extends State<ExplorePage> {
   final db = FirebaseFirestore.instance;
   List<Event> eventList = []; // List to store events data
   String _searchQuery = '';
-  late Future<List<Event>> fetchEventsFuture;
+  late Future<List<NewEvent>> fetchEventsFuture;
   int _selectedIndex = 0;
-  FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+  NewFirebaseService firebaseService =
+      NewFirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();
@@ -62,7 +65,7 @@ class _HomePageState extends State<ExplorePage> {
                 prefixIcon: Icon(Icons.search),
               ),
             ),
-            FutureBuilder<List<Event>>(
+            FutureBuilder<List<NewEvent>>(
               future: fetchEventsFuture, // Call fetchEvents() to get events
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,9 +74,9 @@ class _HomePageState extends State<ExplorePage> {
                   return Text('Error: ${snapshot.error}');
                 } else {
                   // If events are fetched successfully, display them
-                  List<Event>? events = snapshot.data;
+                  List<NewEvent>? events = snapshot.data;
                   if (events != null && events.isNotEmpty) {
-                    List<Event> filteredEvents =
+                    List<NewEvent> filteredEvents =
                         firebaseService.filterEvents(events, _searchQuery);
                     return Padding(
                       padding: EdgeInsets.all(edgeInsets * 1.5),

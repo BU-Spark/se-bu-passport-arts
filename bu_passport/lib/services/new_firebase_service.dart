@@ -154,7 +154,7 @@ class NewFirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': FieldValue.delete(),
       });
-      await this.db.collection('events').doc(eventId).update({
+      await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
         'savedUsers': FieldValue.arrayRemove([userUID]),
       });
     } catch (error) {
