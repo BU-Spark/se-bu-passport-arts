@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../services/new_firebase_service.dart';
+import '../services/web_image_service.dart';
 
 class EventWidget extends StatefulWidget {
   final NewEvent event;
@@ -101,7 +102,7 @@ class _EventWidgetState extends State<EventWidget> {
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: Colors.grey),
           image: DecorationImage(
-            image: AssetImage(widget.event.eventPhoto),
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.black.withOpacity(0.3), BlendMode.multiply),

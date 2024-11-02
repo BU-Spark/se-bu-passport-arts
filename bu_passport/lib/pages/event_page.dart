@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../components/time_span.dart';
 import '../services/new_firebase_service.dart';
+import '../services/web_image_service.dart';
 
 class EventPage extends StatefulWidget {
   final NewEvent event;
@@ -144,11 +145,11 @@ class _EventPageState extends State<EventPage> {
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset(
-            widget.event.eventPhoto,
+          Image(
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
             fit: BoxFit.cover,
             width: double.infinity,
-            height: screenHeight * 0.4, // Adjust the height as needed
+            height: screenHeight * 0.4,
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets * 2.5),
