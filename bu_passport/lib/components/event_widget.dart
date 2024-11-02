@@ -1,5 +1,6 @@
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/classes/new_event.dart';
+import 'package:bu_passport/components/time_span.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:bu_passport/services/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -142,15 +143,8 @@ class _EventWidgetState extends State<EventWidget> {
                               ),
                             ),
                             SizedBox(height: sizedBoxHeight * 0.5),
-                            Text(
-                              //DateFormat.yMMMd()
-                                  //.format(widget.event.eventStartTime),
-                              "space holder",
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
+                            EventDateRangeDisplay(
+                              sessions: widget.event.eventSessions,
                             ),
                           ],
                         ),

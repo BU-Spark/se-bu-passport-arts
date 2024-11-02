@@ -11,6 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../components/time_span.dart';
 import '../services/new_firebase_service.dart';
 
 class EventPage extends StatefulWidget {
@@ -176,41 +177,8 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'Start: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        //TODO: display time here
-                        // text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                        //     .format(widget.event.eventStartTime),
-                        text: "place holder"
-
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'End: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        //TODO: display time here
-                        // text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                        //     .format(widget.event.eventEndTime),
-                          text: "place holder"
-                      ),
-                    ],
-                  ),
+                AllSessionsDisplay(
+                  sessions: widget.event.eventSessions,
                 ),
                 SizedBox(height: sizedBoxHeight),
                 GestureDetector(
