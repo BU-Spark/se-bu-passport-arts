@@ -108,7 +108,7 @@ class NewFirebaseService {
       if (snapshot.exists) {
         final userData = snapshot.data() as Map<String, dynamic>;
 
-        Map<String, bool> stickerData = Map<String, bool>.from(userData['userStickerCollection'] ?? {});
+        Map<String, bool> stickerData = Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
 
         // Convert Map<String, bool> to Map<Sticker, bool>
         Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
@@ -301,8 +301,8 @@ class NewFirebaseService {
 
 
   // Function to check in a user for an event
-  //DONE: check in with time only
-  void checkInUserForEvent(String eventID, int eventPoints) {
+  //DONE: check in with time only, add stickers to user's collection
+  void checkInUserForEvent(String eventID, int eventPoints, List<Sticker> stickers) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final attendanceDocID = '${eventID}_$userUID';
     final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
@@ -321,6 +321,9 @@ class NewFirebaseService {
         'eventID': eventID,
         'userID': userUID,
       });
+      for(Sticker s in stickers){
+        addStickerToUserCollection(userUID, s);
+      }
       //
     } catch (error) {
       print("Failed to check-in for event: $error");
@@ -429,7 +432,7 @@ class NewFirebaseService {
       await this.db.collection('users').get();
       snapshot.docs.forEach((doc) {
         final userData = doc.data();
-        Map<String, bool> stickerData = Map<String, bool>.from(userData['userStickerCollection'] ?? {});
+        Map<String, bool> stickerData = Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
 
         // Convert Map<String, bool> to Map<Sticker, bool>
         Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
@@ -486,4 +489,39 @@ class NewFirebaseService {
       print("Error uploading image: $e");
     }
   }
+
+  Future<void> addStickerToUserCollection(String userID, Sticker sticker) async {
+    try {
+      final userDocRef = db.collection(USER_COLLECTION).doc(userID);
+
+      await db.runTransaction((transaction) async {
+        final userDoc = await transaction.get(userDocRef);
+
+        // Check if the document exists
+        if (userDoc.exists) {
+          // Retrieve existing stickers or create a new map if it doesn't exist
+          Map<String, bool> stickers =
+              (userDoc.data()?['userCollectedStickers'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as bool)) ?? {};
+
+          // Add the sticker if it’s not already present
+          if (!stickers.containsKey(sticker.name)) {
+            stickers[sticker.name] = true;
+
+            // Update or set the 'userCollectedStickers' field
+            transaction.set(userDocRef, {'userCollectedStickers': stickers}, SetOptions(merge: true));
+          }
+        } else {
+          // If the user document does not exist, handle accordingly
+          throw Exception("User document does not exist.");
+        }
+      });
+
+      print("Sticker '${sticker.name}' added to user $userID's collection.");
+    } catch (e) {
+      print("Failed to add sticker: $e");
+      throw Exception("Failed to add sticker to user's collection.");
+    }
+  }
+
+
 }

@@ -240,7 +240,7 @@ class _EventPageState extends State<EventPage> {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Checked in successfully!")));
                             firebaseService.checkInUserForEvent(
-                                widget.event.eventID, widget.event.eventPoints);
+                                widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
 
                             widget.onUpdateEventPage();
                           } else {
