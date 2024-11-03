@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:bu_passport/classes/user.dart';
 import 'package:bu_passport/classes/categorized_events.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../classes/new_categorized_events.dart';
 import '../classes/new_event.dart';
@@ -12,7 +15,9 @@ class NewFirebaseService {
   final FirebaseFirestore db;
   static const EVENT_COLLECTION = "new_events";
   static const USER_COLLECTION = "users";
-  static const ATTENDANCE_COLLECTION = "attendance";
+  static const ATTENDANCE_COLLECTION = "attendances";
+
+  static const CHECKIN_PHOTO_PATH = "checkinPhotos";
 
   const NewFirebaseService({required this.db});
 
@@ -218,7 +223,7 @@ class NewFirebaseService {
           }
         });
 
-    final attendanceQuerySnapshot = await this.db.collection('attendance')
+    final attendanceQuerySnapshot = await this.db.collection(ATTENDANCE_COLLECTION)
         .where('userID', isEqualTo: userUID)
         .get();
 
@@ -287,8 +292,8 @@ class NewFirebaseService {
   //DONE: check in with time only
   void checkInUserForEvent(String eventID, int eventPoints) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
-    final attendanceDocID = '$eventID$userUID';
-    final attendanceDoc = this.db.collection('attendance').doc(attendanceDocID);
+    final attendanceDocID = '${eventID}_$userUID';
+    final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
     if (userUID == null) {
       throw Exception("User is not logged in");
     }
@@ -313,8 +318,8 @@ class NewFirebaseService {
   // Function to check if a user has checked in for an event
   //DONE: check check-in status by 'attendance'
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
-    final attendanceDocID = '$eventId$userUID';
-    final attendanceDoc = this.db.collection('attendance').doc(attendanceDocID);
+    final attendanceDocID = '${eventId}_$userUID';
+    final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
 
     try {
       final docSnapshot = await attendanceDoc.get();
@@ -429,6 +434,36 @@ class NewFirebaseService {
     } catch (error) {
       print("Failed to fetch all users: $error");
       return [];
+    }
+  }
+
+
+  Future<void> uploadCheckinImage(String userID, String eventID, Uint8List imageBytes) async {
+    // Unique file name for the image
+    String fileName = "checkin_${userID}_${eventID}.jpg";
+
+    // Attempt to upload image to Firebase Storage
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child(CHECKIN_PHOTO_PATH)
+          .child(fileName);
+      UploadTask uploadTask = ref.putData(imageBytes);
+
+      // Await completion of the upload task
+      TaskSnapshot snapshot = await uploadTask;
+      // Get the download URL of the uploaded file
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      final attendanceDoc = FirebaseFirestore.instance
+          .collection('attendances')
+          .doc('${eventID}_$userID'); // Using eventID_userID as document ID
+
+      await attendanceDoc.update({
+        'checkInPhoto': downloadUrl,
+      });
+
+    } catch (e) {
+      print("Error uploading image: $e");
     }
   }
 }

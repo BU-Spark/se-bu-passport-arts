@@ -254,7 +254,7 @@ class _EventPageState extends State<EventPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isSaved ? Colors.red : Colors.grey),
+                        : (Colors.red),
                   ),
                 ),
                 SizedBox(width: sizedBoxHeight * 3), // Optional spacing

@@ -45,7 +45,9 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  void updateEventPage() {}
+  void updateEventPage() {
+    _fetchEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +129,15 @@ class _CalendarPageState extends State<CalendarPage> {
                           child: ListView.builder(
                             itemCount: selectedEvents.length,
                             itemBuilder: (context, index) {
+                              final uniqueKey =
+                                  '${selectedEvents[index].eventID}-${DateTime.now().millisecondsSinceEpoch.hashCode}';
                               return Container(
                                 margin: EdgeInsets.symmetric(
                                   vertical: itemVerticalMargin,
                                   horizontal: itemHorizontalMargin,
                                 ),
                                 child: EventWidget(
+                                    key: ValueKey(uniqueKey),
                                     event: selectedEvents[index],
                                     onUpdateEventPage: updateEventPage),
                               );
