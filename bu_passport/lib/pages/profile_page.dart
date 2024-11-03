@@ -12,7 +12,6 @@ import 'package:bu_passport/components/event_widget.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 
 import '../classes/new_categorized_events.dart';
 import '../classes/new_event.dart';

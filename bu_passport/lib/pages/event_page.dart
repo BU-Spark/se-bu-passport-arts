@@ -5,7 +5,6 @@ import 'package:bu_passport/services/geocoding_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';

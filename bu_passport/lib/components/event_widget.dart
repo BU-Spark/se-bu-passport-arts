@@ -2,7 +2,6 @@ import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/classes/new_event.dart';
 import 'package:bu_passport/components/time_span.dart';
 import 'package:bu_passport/pages/event_page.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

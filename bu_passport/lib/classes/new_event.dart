@@ -1,4 +1,5 @@
 import 'package:bu_passport/classes/session.dart';
+import 'package:bu_passport/classes/sticker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewEvent {
@@ -10,6 +11,7 @@ class NewEvent {
   final String eventURL;
   final int eventPoints;
   final List<Session> eventSessions;
+  final List<Sticker> eventStickers;
 
   NewEvent({
     required this.eventID,
@@ -20,6 +22,7 @@ class NewEvent {
     required this.eventPoints,
     required this.eventURL,
     required this.eventSessions,
+    required this.eventStickers,
   });
 
   @override

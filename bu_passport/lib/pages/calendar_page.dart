@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 import 'package:bu_passport/classes/event.dart';
 
 import '../services/new_firebase_service.dart';

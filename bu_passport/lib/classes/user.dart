@@ -1,3 +1,5 @@
+import 'package:bu_passport/classes/sticker.dart';
+
 class Users {
   final String firstName;
   final String lastName;
@@ -10,6 +12,7 @@ class Users {
   final String userProfileURL;
   final Map<String, dynamic> userSavedEvents;
   final bool admin;
+  final Map<Sticker, bool> userStickerCollection;
 
   Users({
     required this.firstName,
@@ -23,5 +26,6 @@ class Users {
     required this.userPoints,
     required this.userProfileURL,
     required this.admin,
+    required this.userStickerCollection,
   });
 }

@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../classes/new_categorized_events.dart';
 import '../classes/new_event.dart';
 import '../classes/session.dart';
+import '../classes/sticker.dart';
 
 class NewFirebaseService {
   final FirebaseFirestore db;
@@ -62,6 +63,9 @@ class NewFirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           eventSessions: sessions,
+          eventStickers: (eventData['eventStickers'] as List<dynamic>?)
+              ?.map((stickerName) => Sticker(name: stickerName as String))
+              .toList() ?? [],
         );
 
         eventList.add(event);
@@ -104,6 +108,10 @@ class NewFirebaseService {
       if (snapshot.exists) {
         final userData = snapshot.data() as Map<String, dynamic>;
 
+        Map<String, bool> stickerData = Map<String, bool>.from(userData['userStickerCollection'] ?? {});
+
+        // Convert Map<String, bool> to Map<Sticker, bool>
+        Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
@@ -117,6 +125,7 @@ class NewFirebaseService {
           userSavedEvents:
           Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
           admin: userData['admin'],
+          userStickerCollection: stickerCollection,
         );
         return user;
       } else {
@@ -280,6 +289,9 @@ class NewFirebaseService {
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
         eventSessions: sessions,
+        eventStickers: (eventData['eventStickers'] as List<dynamic>?)
+            ?.map((stickerName) => Sticker(name: stickerName as String))
+            .toList() ?? [],
       );
       return event;
     }
@@ -391,6 +403,9 @@ class NewFirebaseService {
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
           eventSessions: sessions,
+          eventStickers: (eventData['eventStickers'] as List<dynamic>?)
+              ?.map((stickerName) => Sticker(name: stickerName as String))
+              .toList() ?? [],
         );
 
         eventList.add(event);
@@ -414,6 +429,10 @@ class NewFirebaseService {
       await this.db.collection('users').get();
       snapshot.docs.forEach((doc) {
         final userData = doc.data();
+        Map<String, bool> stickerData = Map<String, bool>.from(userData['userStickerCollection'] ?? {});
+
+        // Convert Map<String, bool> to Map<Sticker, bool>
+        Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
@@ -427,6 +446,7 @@ class NewFirebaseService {
           userPoints: userData['userPoints'],
           userProfileURL: userData['userProfileURL'],
           admin: userData['admin'],
+          userStickerCollection: stickerCollection,
         );
         users.add(user);
       });
