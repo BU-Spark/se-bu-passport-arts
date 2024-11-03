@@ -461,9 +461,10 @@ class NewFirebaseService {
   }
 
 
-  Future<void> uploadCheckinImage(String userID, String eventID, Uint8List imageBytes) async {
+  Future<void> uploadCheckinImage(String eventID, Uint8List imageBytes) async {
     // Unique file name for the image
-    String fileName = "checkin_${userID}_${eventID}.jpg";
+    final userUID = FirebaseAuth.instance.currentUser?.uid;
+    String fileName = "checkin_${userUID}_${eventID}.jpg";
 
     // Attempt to upload image to Firebase Storage
     try {
@@ -479,7 +480,7 @@ class NewFirebaseService {
       String downloadUrl = await snapshot.ref.getDownloadURL();
       final attendanceDoc = FirebaseFirestore.instance
           .collection('attendances')
-          .doc('${eventID}_$userID'); // Using eventID_userID as document ID
+          .doc('${eventID}_$userUID'); // Using eventID_userID as document ID
 
       await attendanceDoc.update({
         'checkInPhoto': downloadUrl,

@@ -1,3 +1,6 @@
+//import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
+import 'dart:typed_data';
+
 import 'package:bu_passport/classes/new_event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -6,13 +9,17 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bu_passport/classes/event.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+//import 'dart:typed_data' as typed_data;
 
+import '../components/checkin_options_dialog.dart';
 import '../components/time_span.dart';
 import '../services/new_firebase_service.dart';
 import '../services/web_image_service.dart';
+//import '../util/image_select.dart';
 
 class EventPage extends StatefulWidget {
   final NewEvent event;
@@ -131,6 +138,31 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
+  Future<void> checkInWithPhoto() async {
+    firebaseService.checkInUserForEvent(
+        widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      // Convert picked file to Uint8List
+      final Uint8List imageBytes = await pickedFile.readAsBytes();
+
+      // Call your upload function
+      await firebaseService.uploadCheckinImage(widget.event.eventID,imageBytes);
+
+    } else {
+      print('No image selected.');
+    }
+    widget.onUpdateEventPage();
+  }
+
+  void checkInWithoutPhoto(){
+    firebaseService.checkInUserForEvent(
+        widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
+
+    widget.onUpdateEventPage();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -234,17 +266,24 @@ class _EventPageState extends State<EventPage> {
                           _isCheckedIn)
                       ? null
                       : () async {
+
                           // Your check-in logic here. On successful check-in, update the _isCheckedIn state.
                           bool success = await checkIn();
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Checked in successfully!")));
-                            firebaseService.checkInUserForEvent(
-                                widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
+                            bool withPhoto = await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CheckInOptionsDialog();
+                              },
+                            );
+                            if(withPhoto){
+                              checkInWithPhoto();
+                            } else {
+                              checkInWithoutPhoto();
+                            }
 
-                            widget.onUpdateEventPage();
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text(
                                     "Unable to check in: location too far or permission denied.")));
                           }
