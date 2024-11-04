@@ -209,7 +209,7 @@ class _EventPageState extends State<EventPage> {
   Future<void> checkInWithoutPhoto()async {
     try{
       firebaseService.checkInUserForEvent(
-          widget.event.eventID, widget.event.eventPoints+5, widget.event.eventStickers);
+          widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
       ui.Image? sticker1;
       ui.Image? sticker2;
       if (widget.event.eventStickers.isNotEmpty) sticker1 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[0].name+".png");
@@ -219,7 +219,7 @@ class _EventPageState extends State<EventPage> {
         context: context,
         builder: (BuildContext context) {
           return SuccessDialog(
-            points: widget.event.eventPoints+5,
+            points: widget.event.eventPoints,
             eventTitle: widget.event.eventTitle,
             icon: icon,
             sticker1: sticker1,
