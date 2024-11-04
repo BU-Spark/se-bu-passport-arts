@@ -71,7 +71,7 @@ class ImagePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class IconPainter extends CustomPainter {
+class LogoPainter extends CustomPainter {
   final ui.Image? image;
   final Color _frameColor = Color(0xFFCC0000);
   final ui.Image? sticker1;
@@ -79,7 +79,7 @@ class IconPainter extends CustomPainter {
 
 
 
-  IconPainter(this.image, this.sticker1, this.sticker2);
+  LogoPainter(this.image, this.sticker1, this.sticker2);
 
 
   @override

@@ -11,9 +11,9 @@ import 'package:bu_passport/components/event_widget.dart';
 import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
 
-import '../classes/new_categorized_events.dart';
-import '../classes/new_event.dart';
-import '../services/new_firebase_service.dart';
+import '../classes/categorized_events.dart';
+import '../classes/event.dart';
+import '../services/firebase_service.dart';
 
 // The ProfilePage is a StatefulWidget that allows users to view and edit their profile.
 class ProfilePage extends StatefulWidget {
@@ -26,10 +26,10 @@ class ProfilePage extends StatefulWidget {
 // The _ProfilePageState handles the state of the ProfilePage, including user data and events.
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  List<NewEvent> attendedEvents = [];
-  List<NewEvent> userSavedEvents = [];
+  List<Event> attendedEvents = [];
+  List<Event> userSavedEvents = [];
   bool isLoading = true; // Indicates if the page is currently loading data.
-  NewFirebaseService firebaseService = NewFirebaseService(
+  FirebaseService firebaseService = FirebaseService(
       db: FirebaseFirestore
           .instance); // Firebase service instance for database operations.
 
@@ -81,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage>
   // Fetches and displays events categorized into attended and saved.
   void fetchAndDisplayEvents() async {
     try {
-      NewCategorizedEvents categorizedEvents =
+      CategorizedEvents categorizedEvents =
           await firebaseService.fetchAndCategorizeEvents();
       setState(() {
         attendedEvents = categorizedEvents.attendedEvents;
@@ -164,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   // Builds a list of event widgets based on the passed events list.
-  Widget _buildEventsList(List<NewEvent> events, String message) {
+  Widget _buildEventsList(List<Event> events, String message) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     double verticalMargin = screenHeight * 0.01; // 1% of screen height

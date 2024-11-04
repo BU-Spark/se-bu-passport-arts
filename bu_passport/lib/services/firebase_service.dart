@@ -5,12 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../classes/new_categorized_events.dart';
-import '../classes/new_event.dart';
+import '../classes/categorized_events.dart';
+import '../classes/event.dart';
 import '../classes/session.dart';
 import '../classes/sticker.dart';
 
-class NewFirebaseService {
+class FirebaseService {
   final FirebaseFirestore db;
   static const EVENT_COLLECTION = "new_events";
   static const USER_COLLECTION = "users";
@@ -18,11 +18,11 @@ class NewFirebaseService {
 
   static const CHECKIN_PHOTO_PATH = "checkinPhotos";
 
-  const NewFirebaseService({required this.db});
+  const FirebaseService({required this.db});
 
   // Function to fetch events from Firestore
-  Future<List<NewEvent>> fetchEvents() async {
-    List<NewEvent> eventList = [];
+  Future<List<Event>> fetchEvents() async {
+    List<Event> eventList = [];
 
     try {
       QuerySnapshot snapshot = await this.db.collection(EVENT_COLLECTION).get();
@@ -51,7 +51,7 @@ class NewFirebaseService {
           }).toList();
         }
 
-        NewEvent event = NewEvent(
+        Event event = Event(
           eventID: doc.id,
           eventTitle: eventData['eventTitle'] ?? '',
           eventURL: eventData['eventURL'] ?? '',
@@ -77,14 +77,14 @@ class NewFirebaseService {
 
 
   // Function to fetch events which have sessions happening on a particular day
-  List<NewEvent> fetchEventsForDay(DateTime date, List<NewEvent> events) {
+  List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
     return events.where((event) => event.hasSessionOnDay(date)).toList();
   }
 
 
 
   // Function to filter events based on a search query
-  List<NewEvent> filterEvents(List<NewEvent> events, String query) {
+  List<Event> filterEvents(List<Event> events, String query) {
     if (query.isEmpty) {
       return events;
     }
@@ -189,7 +189,7 @@ class NewFirebaseService {
   }
 
   // Function to categorize events into attended and saved events
-  Future<NewCategorizedEvents> fetchAndCategorizeEvents() async {
+  Future<CategorizedEvents> fetchAndCategorizeEvents() async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
 
     if (userUID == null) {
@@ -206,13 +206,13 @@ class NewFirebaseService {
 
     Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? {};
 
-    final List<NewEvent> attendedEvents = [];
-    final List<NewEvent> userSavedEvents = [];
+    final List<Event> attendedEvents = [];
+    final List<Event> userSavedEvents = [];
 
     await Future.forEach(savedEvents.entries,
             (MapEntry<String, dynamic> entry) async {
           String eventId = entry.key;
-          NewEvent? event = await fetchEventById(eventId);
+          Event? event = await fetchEventById(eventId);
           if (event != null) {
             userSavedEvents.add(event);
           }
@@ -226,18 +226,18 @@ class NewFirebaseService {
       final eventId = attendanceDoc['eventID'];
 
       // Fetch the event details using the event ID
-      NewEvent? event = await fetchEventById(eventId);
+      Event? event = await fetchEventById(eventId);
       if (event != null) {
         attendedEvents.add(event);
       }
     }
 
-    return NewCategorizedEvents(
+    return CategorizedEvents(
         attendedEvents: attendedEvents, userSavedEvents: userSavedEvents);
   }
 
   // Function to fetch an event by its ID
-  Future<NewEvent?> fetchEventById(String eventId) async {
+  Future<Event?> fetchEventById(String eventId) async {
     DocumentSnapshot<Map<String, dynamic>> snapshot =
     await this.db.collection(EVENT_COLLECTION).doc(eventId).get();
     if (snapshot.exists && snapshot.data() != null) {
@@ -265,7 +265,7 @@ class NewFirebaseService {
         }).toList();
       }
 
-      NewEvent event = NewEvent(
+      Event event = Event(
         eventID: eventId,
         eventTitle: eventData['eventTitle'] ?? '',
         eventURL: eventData['eventURL'] ?? '',
@@ -347,9 +347,9 @@ class NewFirebaseService {
   }
 
   // Function to fetch events after current time for explore page
-  Future<List<NewEvent>> fetchEventsFromNow() async {
+  Future<List<Event>> fetchEventsFromNow() async {
     final now = DateTime.now();
-    List<NewEvent> eventList = [];
+    List<Event> eventList = [];
 
     try {
       QuerySnapshot snapshot = await this.db.collection(EVENT_COLLECTION).get();
@@ -378,7 +378,7 @@ class NewFirebaseService {
           }).toList();
         }
 
-        NewEvent event = NewEvent(
+        Event event = Event(
           eventID: doc.id,
           eventTitle: eventData['eventTitle'] ?? '',
           eventURL: eventData['eventURL'] ?? '',

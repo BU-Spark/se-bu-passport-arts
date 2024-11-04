@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:bu_passport/classes/new_event.dart';
+import 'package:bu_passport/classes/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
@@ -19,13 +19,13 @@ import 'dart:ui' as ui;
 import '../components/checkin_options_dialog.dart';
 import '../components/checkin_success_dialog.dart';
 import '../components/time_span.dart';
-import '../services/new_firebase_service.dart';
+import '../services/firebase_service.dart';
 import '../services/web_image_service.dart';
 
 import 'package:http/http.dart' as http;
 
 class EventPage extends StatefulWidget {
-  final NewEvent event;
+  final Event event;
 
   const EventPage(
       {Key? key, required this.event, required this.onUpdateEventPage})
@@ -37,8 +37,8 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  NewFirebaseService firebaseService =
-      NewFirebaseService(db: FirebaseFirestore.instance);
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event
@@ -219,7 +219,7 @@ class _EventPageState extends State<EventPage> {
           return SuccessDialog(
             points: widget.event.eventPoints,
             eventTitle: widget.event.eventTitle,
-            icon: icon,
+            logo: icon,
             sticker1: sticker1,
             sticker2: sticker2,
           );

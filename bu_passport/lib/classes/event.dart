@@ -2,7 +2,7 @@ import 'package:bu_passport/classes/session.dart';
 import 'package:bu_passport/classes/sticker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class NewEvent {
+class Event {
   final String eventID;
   final String eventTitle;
   final String eventPhoto;
@@ -13,7 +13,7 @@ class NewEvent {
   final List<Session> eventSessions;
   final List<Sticker> eventStickers;
 
-  NewEvent({
+  Event({
     required this.eventID,
     required this.eventTitle,
     required this.eventPhoto,

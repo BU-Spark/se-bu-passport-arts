@@ -1,4 +1,4 @@
-import 'package:bu_passport/classes/new_event.dart';
+import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/time_span.dart';
 import 'package:bu_passport/pages/event_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
-import '../services/new_firebase_service.dart';
+import '../services/firebase_service.dart';
 import '../services/web_image_service.dart';
 
 class EventWidget extends StatefulWidget {
-  final NewEvent event;
+  final Event event;
   final Function onUpdateEventPage;
   const EventWidget(
       {Key? key, required this.event, required this.onUpdateEventPage})
@@ -26,8 +26,8 @@ class _EventWidgetState extends State<EventWidget> {
   bool _isCheckedIn = false;
   String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
   // Ensure there's a user logged in
-  NewFirebaseService firebaseService =
-      NewFirebaseService(db: FirebaseFirestore.instance);
+  FirebaseService firebaseService =
+      FirebaseService(db: FirebaseFirestore.instance);
 
   @override
   void initState() {

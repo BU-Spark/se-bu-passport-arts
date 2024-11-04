@@ -11,7 +11,7 @@ class SuccessDialog extends StatelessWidget {
   final String eventTitle;
   final int points;
   final ui.Image? image;
-  final ui.Image? icon;
+  final ui.Image? logo;
   final ui.Image? frame;
   final ui.Image? sticker1;
   final ui.Image? sticker2;
@@ -22,7 +22,7 @@ class SuccessDialog extends StatelessWidget {
     Key? key,
     required this.eventTitle,
     required this.points,
-    this.image, this.frame, this.sticker1, this.sticker2, this.icon,
+    this.image, this.frame, this.sticker1, this.sticker2, this.logo,
   }) : super(key: key);
 
 
@@ -57,7 +57,7 @@ class SuccessDialog extends StatelessWidget {
             if(image==null)
               CustomPaint(
                 size: const Size(STAMP_SIZE, STAMP_SIZE),
-                painter: IconPainter(icon,sticker1,sticker2),
+                painter: LogoPainter(logo,sticker1,sticker2),
               ),
             const SizedBox(height: 16),
             Text(
