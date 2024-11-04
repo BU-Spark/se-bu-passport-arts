@@ -461,7 +461,7 @@ class NewFirebaseService {
   }
 
 
-  Future<void> uploadCheckinImage(String eventID, Uint8List imageBytes) async {
+  Future<String> uploadCheckinImage(String eventID, Uint8List imageBytes) async {
     // Unique file name for the image
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     String fileName = "checkin_${userUID}_${eventID}.jpg";
@@ -485,9 +485,11 @@ class NewFirebaseService {
       await attendanceDoc.update({
         'checkInPhoto': downloadUrl,
       });
+      return downloadUrl;
 
     } catch (e) {
       print("Error uploading image: $e");
+      return "null";
     }
   }
 
