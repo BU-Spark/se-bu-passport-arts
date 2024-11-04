@@ -178,11 +178,14 @@ class _ProfilePageState extends State<ProfilePage>
       return ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
+          final uniqueKey =
+              '${events[index].eventID}-${DateTime.now().millisecondsSinceEpoch.hashCode}';
           final event = events[index];
           return Card(
               margin: EdgeInsets.symmetric(
                   vertical: verticalMargin, horizontal: horizontalMargin),
               child: EventWidget(
+                  key: ValueKey(uniqueKey),
                   event: event, onUpdateEventPage: updateEventPage));
           // Use your EventWidget to display each event
         },

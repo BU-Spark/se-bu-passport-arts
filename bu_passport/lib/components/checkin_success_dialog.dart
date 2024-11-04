@@ -1,172 +1,28 @@
 import 'dart:io';
+import 'package:bu_passport/components/sticker_painters.dart';
 import 'package:flutter/material.dart';
 import 'postmark_widget.dart';
 import 'dart:ui' as ui;
 
-class ImagePainter extends CustomPainter {
-  final ui.Image? image;
-  final Color _frameColor = Color(0xFFCC0000);
-  final double _frameThickness = 8.0;
-  final ui.Image? frame;
-  final ui.Image? sticker1;
-  final ui.Image? sticker2;
-
-
-
-  ImagePainter(this.image, this.frame, this.sticker1, this.sticker2);
-
-
-  @override
-  void paint(Canvas canvas, Size size) {
-
-    final double image_padding = size.height*0.167;
-    final double frame_padding = size.height*0.167;
-
-    if(image!=null&&frame!=null){
-      canvas.drawImageRect(
-        image!,
-        Rect.fromLTWH(0, 0, image!.width.toDouble(), image!.height.toDouble()),
-        Rect.fromLTWH(image_padding/2+frame_padding/2, image_padding/2+frame_padding/2, size.width-image_padding-frame_padding, size.height-image_padding-frame_padding), // Center the image by adding padding
-        Paint(),
-      );
-      canvas.drawImageRect(
-        frame!,
-        Rect.fromLTWH(0, 0, frame!.width.toDouble(), frame!.height.toDouble()),
-        Rect.fromLTWH(frame_padding/2, frame_padding/2, size.width-frame_padding, size.height-frame_padding), // Increase size for the frame
-        Paint(),
-      );
-
-      if (sticker1 != null) {
-        canvas.drawImageRect(
-          sticker1!,
-          Rect.fromLTWH(0, 0, sticker1!.width.toDouble(), sticker1!.height.toDouble()),
-          Rect.fromLTWH(0, size.height*0.58, size.height*0.42, size.height*0.42), // Bottom left
-          Paint(),
-        );
-      }
-
-      if (sticker2 != null) {
-        canvas.drawImageRect(
-          sticker2!,
-          Rect.fromLTWH(0, 0, sticker2!.width.toDouble(), sticker2!.height.toDouble()),
-          Rect.fromLTWH(size.width*0.58, 0, size.width*0.42, size.width*0.42),
-          Paint(),
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class IconPainter extends CustomPainter {
-  final ui.Image? image;
-  final Color _frameColor = Color(0xFFCC0000); // Frame color
-  final ui.Image? sticker1;
-  final ui.Image? sticker2;
-
-
-
-  IconPainter(this.image, this.sticker1, this.sticker2);
-
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (image != null) {
-      final double centerX = size.width / 2;
-      final double centerY = size.height / 2;
-      final double radius = size.width / 2;
-      final double _outerFrameThickness = size.height*0.0292;
-      final double _innerFrameThickness = size.height*0.01;
-      final _middleFrameThickness = size.height*0.01667;
-
-      // Draw the outer frame (bold)
-// Draw the outer frame (thick red)
-      final Paint outerFramePaint = Paint()
-        ..color = _frameColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = _outerFrameThickness;
-      canvas.drawCircle(Offset(centerX, centerY), radius, outerFramePaint);
-
-      // Draw the middle frame (thin white)
-      final Paint middleFramePaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = _middleFrameThickness;
-      canvas.drawCircle(Offset(centerX, centerY), radius - (_outerFrameThickness / 2), middleFramePaint);
-
-      // Draw the inner frame (thinner red)
-      final Paint innerFramePaint = Paint()
-        ..color = _frameColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = _innerFrameThickness;
-      canvas.drawCircle(Offset(centerX, centerY), radius - (_outerFrameThickness + _middleFrameThickness), innerFramePaint);
-
-      // Clip the canvas to a circle to create rounded image
-      canvas.save();
-      canvas.clipPath(Path()..addOval(Rect.fromCircle(center: Offset(centerX, centerY), radius: radius - _outerFrameThickness-_middleFrameThickness-_innerFrameThickness-3.0)));
-
-      // Draw the image, clipped to the circle
-      canvas.drawImageRect(
-        image!,
-        Rect.fromLTWH(0, 0, image!.width.toDouble(), image!.height.toDouble()),
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint(),
-      );
-      canvas.restore();
-
-      // Draw stickers overlapping the frame
-      if (sticker1 != null) {
-        final double stickerSize = size.height*0.4167; // Size for the stickers
-        // Move sticker1 closer to the middle
-        canvas.drawImageRect(
-          sticker1!,
-          Rect.fromLTWH(0, 0, sticker1!.width.toDouble(), sticker1!.height.toDouble()),
-          Rect.fromLTWH(-stickerSize * 0.1, size.height - stickerSize, stickerSize, stickerSize), // Adjusted position
-          Paint(),
-        );
-      }
-
-      if (sticker2 != null) {
-        final double stickerSize = size.height*0.4167; // Size for the stickers
-        // Move sticker2 closer to the middle
-        canvas.drawImageRect(
-          sticker2!,
-          Rect.fromLTWH(0, 0, sticker2!.width.toDouble(), sticker2!.height.toDouble()),
-          Rect.fromLTWH(size.width - stickerSize, -stickerSize * 0.1, stickerSize, stickerSize), // Adjusted position
-          Paint(),
-        );
-      }
-
-      // Restore the canvas to allow for future drawings
-      canvas.restore();
-    }
-  }
-
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
 
 
 class SuccessDialog extends StatelessWidget {
   final String eventTitle;
   final int points;
-  final ui.Image? image; // Add this to receive the image
-  final ui.Image? icon; // Add this to receive the image
-  final ui.Image? frame; // Add this to receive the image
-  final ui.Image? sticker1; // Add this to receive the image
-  final ui.Image? sticker2; // Add this to receive the image
-  static const double STAMP_SIZE=120;
-  static const double POSTMARK_SIZE=95;
+  final ui.Image? image;
+  final ui.Image? icon;
+  final ui.Image? frame;
+  final ui.Image? sticker1;
+  final ui.Image? sticker2;
+  static const double STAMP_SIZE=100;
+  static const double POSTMARK_SIZE=100;
 
   const SuccessDialog({
     Key? key,
     required this.eventTitle,
     required this.points,
-    this.image, this.frame, this.sticker1, this.sticker2, this.icon, // Optional image parameter
+    this.image, this.frame, this.sticker1, this.sticker2, this.icon,
   }) : super(key: key);
 
 
@@ -200,10 +56,10 @@ class SuccessDialog extends StatelessWidget {
               ),
             if(image==null)
               CustomPaint(
-                size: const Size(STAMP_SIZE, STAMP_SIZE), // Size for the image
+                size: const Size(STAMP_SIZE, STAMP_SIZE),
                 painter: IconPainter(icon,sticker1,sticker2),
               ),
-            const SizedBox(height: 16), // Spacing between image and postmark
+            const SizedBox(height: 16),
             Text(
               eventTitle,
               style: const TextStyle(

@@ -18,18 +18,18 @@ class PostmarkPainter extends CustomPainter {
     final Paint outerPaint = Paint()
       ..color = _color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..strokeWidth = 0.03*size.height;
 
     // Dashed circle logic
-    const double dashWidth = 8;
-    const double dashSpace = 7;
+    double dashWidth = 0.08*size.height;
+    double dashSpace = 0.07*size.height;
     double angle = 0;
 
     while (angle < 360) {
-      final startX = radius + (radius - 5) * cos(_degreeToRadian(angle));
-      final startY = radius + (radius - 5) * sin(_degreeToRadian(angle));
-      final endX = radius + (radius - 5) * cos(_degreeToRadian(angle + dashWidth));
-      final endY = radius + (radius - 5) * sin(_degreeToRadian(angle + dashWidth));
+      final startX = radius + (radius - 0.05*size.height) * cos(_degreeToRadian(angle));
+      final startY = radius + (radius - 0.05*size.height) * sin(_degreeToRadian(angle));
+      final endX = radius + (radius - 0.05*size.height) * cos(_degreeToRadian(angle + dashWidth));
+      final endY = radius + (radius - 0.05*size.height) * sin(_degreeToRadian(angle + dashWidth));
 
       canvas.drawLine(
         Offset(startX, startY),
@@ -45,21 +45,21 @@ class PostmarkPainter extends CustomPainter {
       ..color = Colors.white
       ..style = PaintingStyle.fill;
 
-    canvas.drawCircle(Offset(radius, radius), radius - 10, innerPaint);
+    canvas.drawCircle(Offset(radius, radius), radius - 0.1*size.height, innerPaint);
 
     // Paint inner circle border
     final Paint innerBorderPaint = Paint()
       ..color = _color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = 0.02*size.height;
 
-    canvas.drawCircle(Offset(radius, radius), radius - 12, innerBorderPaint);
+    canvas.drawCircle(Offset(radius, radius), radius - 0.12*size.height, innerBorderPaint);
 
     // Draw points text
     final TextStyle textStyle = TextStyle(
-      fontFamily: 'Inter', // Set the font family to Inter
+      fontFamily: 'Inter',
       color: _color,
-      fontSize: 38,
+      fontSize: 0.38*size.height,
       fontWeight: FontWeight.bold,
     );
 
@@ -76,14 +76,14 @@ class PostmarkPainter extends CustomPainter {
       canvas,
       Offset(
         (size.width - textPainter.width) / 2,
-        (size.height - textPainter.height) / 2 - 8,
+        (size.height - textPainter.height) / 2 - 0.08*size.height,
       ),
     );
 
     // Draw "pts" label
     final TextStyle ptsStyle = TextStyle(
       color: _color,
-      fontSize: 18,
+      fontSize: 0.18*size.height,
       fontWeight: FontWeight.bold,
     );
 
@@ -100,7 +100,7 @@ class PostmarkPainter extends CustomPainter {
       canvas,
       Offset(
         (size.width - ptsPainter.width) / 2,
-        (size.height - ptsPainter.height) / 2 + 18,
+        (size.height - ptsPainter.height) / 2 + 0.18*size.height,
       ),
     );
   }

@@ -23,7 +23,6 @@ class NewFirebaseService {
   const NewFirebaseService({required this.db});
 
   // Function to fetch events from Firestore
-  // DONE: tested
   Future<List<NewEvent>> fetchEvents() async {
     List<NewEvent> eventList = [];
 
@@ -80,7 +79,6 @@ class NewFirebaseService {
 
 
   // Function to fetch events which have sessions happening on a particular day
-  //DONE: tested
   List<NewEvent> fetchEventsForDay(DateTime date, List<NewEvent> events) {
     return events.where((event) => event.hasSessionOnDay(date)).toList();
   }
@@ -88,7 +86,6 @@ class NewFirebaseService {
 
 
   // Function to filter events based on a search query
-  //DONE:
   List<NewEvent> filterEvents(List<NewEvent> events, String query) {
     if (query.isEmpty) {
       return events;
@@ -99,7 +96,6 @@ class NewFirebaseService {
   }
 
   // Function to fetch user details from Firestore
-  //DONE: no change
   Future<Users?> fetchUser(String userUID) async {
     try {
       DocumentSnapshot snapshot =
@@ -138,7 +134,6 @@ class NewFirebaseService {
   }
 
   // Function to save an event to userSavedEvents
-  // TODO: The logic of user saving events remain unchanged. New implementation should go with new UI design.
   Future<void> saveEvent(String eventId) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = this.db.collection('users').doc(userUID);
@@ -158,7 +153,6 @@ class NewFirebaseService {
   }
 
   // Function to unsave an event from userSavedEvents
-  //TODO: The logic of user un-saving events remain unchanged. New implementation should go with new UI design.
   Future<void> unsaveEvent(String eventId) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = this.db.collection('users').doc(userUID);
@@ -178,7 +172,6 @@ class NewFirebaseService {
 
 
   // Function to check if a user has saved an event
-  //TODO: Same as above.
   Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
     DocumentSnapshot userDocSnapshot =
     await this.db.collection('users').doc(userUID).get();
@@ -198,8 +191,6 @@ class NewFirebaseService {
   }
 
   // Function to categorize events into attended and saved events
-  //DONE: fetch all saved events
-  //DONE: get all attended events, tested
   Future<NewCategorizedEvents> fetchAndCategorizeEvents() async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
 
@@ -216,9 +207,6 @@ class NewFirebaseService {
     final userData = userDoc.data();
 
     Map<String, dynamic> savedEvents = userData!['userSavedEvents'] ?? {};
-
-    //final now = DateTime.now();
-    //final DateTime today = DateTime(now.year, now.month, now.day);
 
     final List<NewEvent> attendedEvents = [];
     final List<NewEvent> userSavedEvents = [];
@@ -237,7 +225,7 @@ class NewFirebaseService {
         .get();
 
     for (var attendanceDoc in attendanceQuerySnapshot.docs) {
-      final eventId = attendanceDoc['eventID']; // Assuming the field name is 'eventID'
+      final eventId = attendanceDoc['eventID'];
 
       // Fetch the event details using the event ID
       NewEvent? event = await fetchEventById(eventId);
@@ -251,7 +239,6 @@ class NewFirebaseService {
   }
 
   // Function to fetch an event by its ID
-  //DONE: tested
   Future<NewEvent?> fetchEventById(String eventId) async {
     DocumentSnapshot<Map<String, dynamic>> snapshot =
     await this.db.collection(EVENT_COLLECTION).doc(eventId).get();
@@ -301,7 +288,6 @@ class NewFirebaseService {
 
 
   // Function to check in a user for an event
-  //DONE: check in with time only, add stickers to user's collection
   void checkInUserForEvent(String eventID, int eventPoints, List<Sticker> stickers) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final attendanceDocID = '${eventID}_$userUID';
@@ -331,7 +317,6 @@ class NewFirebaseService {
   }
 
   // Function to check if a user has checked in for an event
-  //DONE: check check-in status by 'attendance'
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
     final attendanceDocID = '${eventId}_$userUID';
     final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
@@ -346,7 +331,6 @@ class NewFirebaseService {
   }
 
   // Function to update the user's profile URL
-  //DONE: no change
   Future<void> updateUserProfileURL(String profileURL) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     if (userUID == null) {
@@ -365,7 +349,6 @@ class NewFirebaseService {
   }
 
   // Function to fetch events after current time for explore page
-  //DONE: tested
   Future<List<NewEvent>> fetchEventsFromNow() async {
     final now = DateTime.now();
     List<NewEvent> eventList = [];
@@ -423,7 +406,6 @@ class NewFirebaseService {
   }
 
   // Function to fetch all users
-  //DONE: no  change
   Future<List<Users>> fetchAllUsers() async {
     List<Users> users = [];
 
@@ -462,11 +444,9 @@ class NewFirebaseService {
 
 
   Future<String> uploadCheckinImage(String eventID, Uint8List imageBytes) async {
-    // Unique file name for the image
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     String fileName = "checkin_${userUID}_${eventID}.jpg";
 
-    // Attempt to upload image to Firebase Storage
     try {
       final ref = FirebaseStorage.instance
           .ref()
@@ -474,13 +454,11 @@ class NewFirebaseService {
           .child(fileName);
       UploadTask uploadTask = ref.putData(imageBytes);
 
-      // Await completion of the upload task
       TaskSnapshot snapshot = await uploadTask;
-      // Get the download URL of the uploaded file
       String downloadUrl = await snapshot.ref.getDownloadURL();
       final attendanceDoc = FirebaseFirestore.instance
           .collection('attendances')
-          .doc('${eventID}_$userUID'); // Using eventID_userID as document ID
+          .doc('${eventID}_$userUID');
 
       await attendanceDoc.update({
         'checkInPhoto': downloadUrl,
@@ -500,21 +478,16 @@ class NewFirebaseService {
       await db.runTransaction((transaction) async {
         final userDoc = await transaction.get(userDocRef);
 
-        // Check if the document exists
         if (userDoc.exists) {
-          // Retrieve existing stickers or create a new map if it doesn't exist
-          Map<String, bool> stickers =
+           Map<String, bool> stickers =
               (userDoc.data()?['userCollectedStickers'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as bool)) ?? {};
 
-          // Add the sticker if it’s not already present
           if (!stickers.containsKey(sticker.name)) {
             stickers[sticker.name] = true;
 
-            // Update or set the 'userCollectedStickers' field
             transaction.set(userDocRef, {'userCollectedStickers': stickers}, SetOptions(merge: true));
           }
         } else {
-          // If the user document does not exist, handle accordingly
           throw Exception("User document does not exist.");
         }
       });
