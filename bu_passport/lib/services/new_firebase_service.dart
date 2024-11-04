@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:bu_passport/classes/user.dart';
-import 'package:bu_passport/classes/categorized_events.dart';
-import 'package:bu_passport/classes/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';

@@ -1,4 +1,3 @@
-import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/classes/new_event.dart';
 import 'package:bu_passport/components/time_span.dart';
 import 'package:bu_passport/pages/event_page.dart';

@@ -1,4 +1,3 @@
-import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,7 +15,7 @@ class ExplorePage extends StatefulWidget {
 class _HomePageState extends State<ExplorePage> {
   final user = FirebaseAuth.instance.currentUser?.uid ?? "";
   final db = FirebaseFirestore.instance;
-  List<Event> eventList = []; // List to store events data
+  List<NewEvent> eventList = []; // List to store events data
   String _searchQuery = '';
   late Future<List<NewEvent>> fetchEventsFuture;
   int _selectedIndex = 0;
