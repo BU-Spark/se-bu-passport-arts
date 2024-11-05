@@ -59,6 +59,7 @@ class FirebaseService {
           eventLocation: eventData['eventLocation'] ?? '',
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
+          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
           eventSessions: sessions,
           eventStickers: (eventData['eventStickers'] as List<dynamic>?)
               ?.map((stickerName) => Sticker(name: stickerName as String))
@@ -273,6 +274,7 @@ class FirebaseService {
         eventLocation: eventData['eventLocation'] ?? '',
         eventDescription: eventData['eventDescription'] ?? '',
         eventPoints: eventData['eventPoints'] ?? 0,
+        savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
         eventSessions: sessions,
         eventStickers: (eventData['eventStickers'] as List<dynamic>?)
             ?.map((stickerName) => Sticker(name: stickerName as String))
@@ -386,6 +388,7 @@ class FirebaseService {
           eventLocation: eventData['eventLocation'] ?? '',
           eventDescription: eventData['eventDescription'] ?? '',
           eventPoints: eventData['eventPoints'] ?? 0,
+          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
           eventSessions: sessions,
           eventStickers: (eventData['eventStickers'] as List<dynamic>?)
               ?.map((stickerName) => Sticker(name: stickerName as String))

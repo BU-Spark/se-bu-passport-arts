@@ -10,6 +10,7 @@ class Event {
   final String eventDescription;
   final String eventURL;
   final int eventPoints;
+  final List<String> savedUsers;
   final List<Session> eventSessions;
   final List<Sticker> eventStickers;
 
@@ -21,6 +22,7 @@ class Event {
     required this.eventDescription,
     required this.eventPoints,
     required this.eventURL,
+    required this.savedUsers,
     required this.eventSessions,
     required this.eventStickers,
   });
