@@ -1,9 +1,10 @@
-import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bu_passport/services/firebase_service.dart';
+
+import '../classes/event.dart';
+import '../services/firebase_service.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({Key? key}) : super(key: key);
