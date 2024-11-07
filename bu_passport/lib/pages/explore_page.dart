@@ -1,3 +1,6 @@
+import 'dart:collection';
+
+import 'package:bu_passport/components/event_filter.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,31 +12,54 @@ import '../services/firebase_service.dart';
 class ExplorePage extends StatefulWidget {
   const ExplorePage({Key? key}) : super(key: key);
   @override
-  State<ExplorePage> createState() => _HomePageState();
+  State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _HomePageState extends State<ExplorePage> {
+class _ExplorePageState extends State<ExplorePage> {
   final user = FirebaseAuth.instance.currentUser?.uid ?? "";
   final db = FirebaseFirestore.instance;
-  List<Event> eventList = []; // List to store events data
-  String _searchQuery = '';
+  List<Event> eventList = [];
   late Future<List<Event>> fetchEventsFuture;
-  int _selectedIndex = 0;
+  HashSet<String> categories = HashSet<String>();
+  bool showFilters = false; // Toggle state for filter view
   FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+  FirebaseService(db: FirebaseFirestore.instance);
+  Map<String, dynamic> _filters = {
+    'range': RangeValues(0, 100), // Range filter
+    'search': '', // Search query filter
+    'categoryIndex': [],
+    'categoryList': [],
+  };
+
+
   @override
   void initState() {
     super.initState();
     fetchEventsFuture = firebaseService.fetchEventsFromNow();
+
   }
 
-  // not the most effiicent solution need to improve **
-
-  // Update event list in explore page with events from now to future
   void updateEventPage() {
     setState(() {
       fetchEventsFuture = firebaseService.fetchEventsFromNow();
     });
+  }
+
+  void onApplyFilters(RangeValues ptsRange, List<int> selectedChips, List<String> categoryList){
+    //print("apply filter");
+    setState(() {
+
+      _filters['range'] = ptsRange;  // Update the range filter
+      _filters['categoryIndex'] = selectedChips;
+      _filters['categoryList'] = categoryList;
+    });
+  }
+  void onResetFilters(){
+
+  }
+
+  void goBackToEvents(){
+    showFilters=false;
   }
 
   @override
@@ -47,15 +73,38 @@ class _HomePageState extends State<ExplorePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Events'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              showFilters ? Icons.list : Icons.filter_alt, // Switch icons
+            ),
+            onPressed: () {
+              setState(() {
+                showFilters = !showFilters; // Toggle view
+              });
+            },
+          ),
+        ],
       ),
       body: Center(
-        child: ListView(
+        child: showFilters
+            ? // Display filter view
+        FilterWidget(
+          onApplyFilters: onApplyFilters,
+          onResetFilters: onResetFilters,
+          initRange: _filters['range'],
+          categories: categories,
+          goBackToEvents: goBackToEvents,
+          selectedChips: (_filters['categoryIndex'] as List<dynamic>).map((item) => item as int)
+              .toList(),
+        )
+            : // Display event list view
+        ListView(
           children: [
-            // Search bar
             TextField(
               onChanged: (value) {
                 setState(() {
-                  _searchQuery = value; // Update search query
+                  _filters["search"] = value;
                 });
               },
               decoration: InputDecoration(
@@ -64,18 +113,26 @@ class _HomePageState extends State<ExplorePage> {
               ),
             ),
             FutureBuilder<List<Event>>(
-              future: fetchEventsFuture, // Call fetchEvents() to get events
+              future: fetchEventsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // Show loading indicator while fetching events
+                  return CircularProgressIndicator();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  // If events are fetched successfully, display them
                   List<Event>? events = snapshot.data;
+
                   if (events != null && events.isNotEmpty) {
+                    // get all categories
+                    for(Event e in events){
+                      for(String s in e.eventCategories){
+                        categories.add(s);
+                        print(s);
+                      }
+                    }
+                    //
                     List<Event> filteredEvents =
-                        firebaseService.filterEvents(events, _searchQuery);
+                    firebaseService.filterEvents(events, _filters);
                     return Padding(
                       padding: EdgeInsets.all(edgeInsets * 1.5),
                       child: ListView.separated(
@@ -83,11 +140,9 @@ class _HomePageState extends State<ExplorePage> {
                         physics: ClampingScrollPhysics(),
                         itemCount: filteredEvents.length,
                         separatorBuilder: (BuildContext context, int index) {
-                          // Add vertical space between items
                           return SizedBox(height: sizedBoxHeight * 0.4);
                         },
                         itemBuilder: (BuildContext context, int index) {
-                          // Return your EventWidget
                           return EventWidget(
                             event: filteredEvents[index],
                             onUpdateEventPage: updateEventPage,
@@ -96,7 +151,6 @@ class _HomePageState extends State<ExplorePage> {
                       ),
                     );
                   } else {
-                    // When there are no events to show
                     return Text('No events found');
                   }
                 }

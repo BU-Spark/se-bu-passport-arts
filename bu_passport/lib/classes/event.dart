@@ -13,6 +13,7 @@ class Event {
   final List<String> savedUsers;
   final List<Session> eventSessions;
   final List<Sticker> eventStickers;
+  final List<String> eventCategories;
 
   Event({
     required this.eventID,
@@ -25,6 +26,7 @@ class Event {
     required this.savedUsers,
     required this.eventSessions,
     required this.eventStickers,
+    required this.eventCategories,
   });
 
   @override

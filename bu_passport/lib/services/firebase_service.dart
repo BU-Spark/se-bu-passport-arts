@@ -4,6 +4,7 @@ import 'package:bu_passport/classes/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 import '../classes/categorized_events.dart';
 import '../classes/event.dart';
@@ -64,6 +65,7 @@ class FirebaseService {
           eventStickers: (eventData['eventStickers'] as List<dynamic>?)
               ?.map((stickerName) => Sticker(name: stickerName as String))
               .toList() ?? [],
+          eventCategories: List<String>.from(eventData['eventCategories'] ?? []),
         );
 
         eventList.add(event);
@@ -85,13 +87,40 @@ class FirebaseService {
 
 
   // Function to filter events based on a search query
-  List<Event> filterEvents(List<Event> events, String query) {
-    if (query.isEmpty) {
-      return events;
+  List<Event> filterEvents(List<Event> events, Map<String, dynamic> filters) {
+
+    String query = filters['search'] ?? '';
+    RangeValues range = filters['range'] ?? RangeValues(0, 100);
+    List<int> categoryIndex = List<int>.from(filters['categoryIndex'] ?? []);
+    List<String> categoryList = List<String>.from(filters['categoryList'] ?? []);
+
+    print("filtering: ${range.start}, ${range.end}");
+
+    // Apply search query filter
+    List<Event> filteredEvents = events;
+    if (query.isNotEmpty) {
+      filteredEvents = filteredEvents.where((event) {
+        return event.eventTitle.toLowerCase().contains(query.toLowerCase());
+      }).toList();
     }
-    return events.where((event) {
-      return event.eventTitle.toLowerCase().contains(query.toLowerCase());
+
+    // Apply range filter
+    filteredEvents = filteredEvents.where((event) {
+      return event.eventPoints >= range.start && event.eventPoints <= range.end;
     }).toList();
+
+    // Apply category filter with support for multiple categories per event
+    if (categoryIndex.isNotEmpty &&
+        !(categoryIndex.length == categoryList.length || categoryIndex.contains(0))) {
+      filteredEvents = filteredEvents.where((event) {
+        return event.eventCategories.any((category) {
+          int categoryIdx = categoryList.indexOf(category);
+          return categoryIndex.contains(categoryIdx);
+        });
+      }).toList();
+    }
+
+    return filteredEvents;
   }
 
   // Function to fetch user details from Firestore
@@ -279,6 +308,7 @@ class FirebaseService {
         eventStickers: (eventData['eventStickers'] as List<dynamic>?)
             ?.map((stickerName) => Sticker(name: stickerName as String))
             .toList() ?? [],
+        eventCategories: List<String>.from(eventData['eventCategories'] ?? []),
       );
       return event;
     }
@@ -393,6 +423,7 @@ class FirebaseService {
           eventStickers: (eventData['eventStickers'] as List<dynamic>?)
               ?.map((stickerName) => Sticker(name: stickerName as String))
               .toList() ?? [],
+          eventCategories: List<String>.from(eventData['eventCategories'] ?? []),
         );
 
         eventList.add(event);
