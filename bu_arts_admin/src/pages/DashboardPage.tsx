@@ -6,7 +6,9 @@ import ViewAllEventsPage from "./ViewEventPage";
 const Dashboard: React.FC = () => {
   return (
     <div>
-      <ViewAllEventsPage />
+      <div className="flex items-center space-x-4 mb-6">
+        <h1 className="text-2xl font-semibold text-bured">Dashboard</h1>
+      </div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ import NavMenu from './NavMenu';
 
 const Sidebar: React.FC = () => {
     return (
-        <aside className="w-64 h-screen bg-white p-6 shadow-md flex flex-col items-start text-white">
+        <aside className="w-80 h-screen bg-white p-6 shadow-md flex flex-col items-start text-white">
             {/* Logo and Title */}
             <div className="mb-8">
                 <img src="../public/icons/bu_arts.png" alt="BU Arts Initiative" />

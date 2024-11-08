@@ -49,7 +49,7 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
                 {/* Scrollable events container */}
                 <div className="flex-grow h-96 overflow-y-auto bg-slate-50">
                     {events.length > 0 ? (
-                        <ul className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {events.map((event) => (
                                 <EventBox key={event.eventID} event={event} />
                             ))}

@@ -11,7 +11,7 @@ import Sidebar from './components/sidebar/Sidebar.tsx';
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-row bg-gray-50 overflow-x-hidden">
+      <div className="min-h-screen flex flex-row bg-gray-100 overflow-x-hidden">
         {/* Sidebar */}
         <Sidebar></Sidebar>
 

@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Event } from "../interfaces/Event";
 import { fetchSingleEvent, updateSingleEvent } from '../firebase/firebaseService';
 import { DateTime } from 'luxon';
+
+import TitleEdit from '../components/eventEdit/TitleEdit.tsx'
+import CategoryEdit from '../components/eventEdit/CategoryEdit.tsx'
+import PointEdit from '../components/eventEdit/PointEdit.tsx'
 // import { APIProvider } from '@vis.gl/react-google-maps';
 // import { Map, Marker } from "@vis.gl/react-google-maps";
 
@@ -56,8 +60,9 @@ const EditEvent: React.FC = () => {
   if (error) return <p>{error}</p>;
   if (!event) return <p>Event not found</p>;
 
+
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow-md overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow-md overflow-y-auto">
       {/* Header Section with Event Image */}
       {event.eventPhoto && (
         <div className="relative mb-6">
@@ -66,67 +71,52 @@ const EditEvent: React.FC = () => {
         </div>
       )}
 
-      {/* Event Title and Edit Icon */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-3xl font-bold text-gray-800">{event.eventTitle}</h2>
-        <button className="text-red-500 p-2 rounded-full">✎</button>
-      </div>
+      <TitleEdit event={event} setEvent={setEvent}></TitleEdit>
+      <CategoryEdit event={event} setEvent={setEvent}></CategoryEdit>
 
-      {/* Date and Categories */}
-      <div className="flex items-center mb-6">
-        <p className="text-gray-600 font-semibold mr-2">Date:</p>
-        <span className="text-gray-700">{new Date(event.eventStartDate).toLocaleDateString()} - {new Date(event.eventEndDate).toLocaleDateString()}</span>
-        <button className="ml-2 text-red-500">✎</button>
-      </div>
-      <div className="flex space-x-2 mb-6">
-        {event.eventCategories.map((category, index) => (
-          <span key={index} className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">{category}</span>
-        ))}
-      </div>
+      <hr className="border-gray-400 mb-4" />
 
-      {/* Points Section */}
-      <div className="flex items-center mb-6">
-        <span className="text-red-500 text-2xl mr-2">🏅</span>
-        <p className="text-gray-700 font-semibold">Pts: {event.eventPoints}</p>
-        <button className="ml-2 text-red-500">✎</button>
-      </div>
-
-      {/* Location and Description */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {/* Location Section on the Left */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* First Column: Points Section */}
         <div>
-          <h3 className="text-gray-700 font-semibold mb-2">Location:</h3>
-          <div className="rounded overflow-hidden">
-            <iframe
-              width="100%"
-              height="200"
-              style={{ border: 0 }}
-              src={`https://www.google.com/maps/embed/v1/place?key=${googleMapKey}&q=${encodeURIComponent(event.eventLocation)}`}
-              allowFullScreen
-            ></iframe>
+          <PointEdit event={event} setEvent={setEvent}></PointEdit>
+
+          <hr className="border-gray-400 mb-4" />
+
+          {/* Location Section */}
+          <div>
+            <h3 className="text-gray-700 text-3xl font-semibold mb-2">Location:</h3>
+            <div className="rounded overflow-hidden">
+              <iframe
+                width="100%"
+                height="200"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps/embed/v1/place?key=${googleMapKey}&q=${encodeURIComponent(event.eventLocation)}`}
+                allowFullScreen
+              ></iframe>
+            </div>
           </div>
         </div>
 
-        {/* Description Section on the Right */}
+        {/* Second Column: Description and Link */}
         <div>
-          <h3 className="text-gray-700 font-semibold mb-2">Description:</h3>
+          {/* Description Section */}
+          <h3 className="text-gray-700 text-3xl font-semibold mb-2">Description:</h3>
           <textarea
             className="w-full border border-gray-300 p-2 rounded mt-1 resize-none h-40"
             value={event.eventDescription}
             onChange={(e) => setEvent({ ...event, eventDescription: e.target.value })}
             placeholder="Enter the event description here..."
           />
-        </div>
-      </div>
-      
 
-      {/* Hours and Link */}
-      {/* <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-600"><span className="font-semibold">Hours:</span> 11:00am - 5:00pm</p>
-        <button className="text-red-500">✎</button>
-      </div> */}
-      <div className="mb-6">
-        <span className="font-semibold text-gray-700">Link:</span> <a href={event.eventURL} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">{event.eventURL}</a>
+          {/* Link Section */}
+          <div className="mt-4">
+            <span className="font-semibold text-xl text-gray-700">Link:</span>
+            <a href={event.eventURL} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-2">
+              {event.eventURL}
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Sessions */}
@@ -166,9 +156,10 @@ const EditEvent: React.FC = () => {
       </div>
 
       {/* Save and Cancel Buttons */}
+      {/* Save and Cancel Buttons */}
       <div className="flex justify-end space-x-3">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/events")}
           className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
         >
           Cancel

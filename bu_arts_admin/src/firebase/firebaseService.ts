@@ -33,7 +33,7 @@ export const searchEvents = async (searchText: string): Promise<Event[]> => {
   titleSnapshot.forEach((doc) => {
     eventsMap.set(doc.id, { ...(doc.data() as Event) });
   });
-  
+
   return Array.from(eventsMap.values());
 };
 
