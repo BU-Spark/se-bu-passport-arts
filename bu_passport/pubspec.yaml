@@ -51,7 +51,7 @@ dependencies:
   google_sign_in: ^5.2.1
   chip_list: ^3.0.0
   fluttertoast: ^8.0.9
-  provider: ^6.1.2
+  dropdown_textfield: ^1.2.0
 
 dev_dependencies:
   flutter_test:

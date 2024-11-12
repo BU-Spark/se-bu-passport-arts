@@ -21,15 +21,18 @@ class _ExplorePageState extends State<ExplorePage> {
   List<Event> eventList = [];
   late Future<List<Event>> fetchEventsFuture;
   HashSet<String> categories = HashSet<String>();
-  bool showFilters = false; // Toggle state for filter view
+  HashSet<String> locations = HashSet<String>();
+  bool showFilters = false;
   FirebaseService firebaseService =
   FirebaseService(db: FirebaseFirestore.instance);
   Map<String, dynamic> _filters = {
-    'range': RangeValues(0, 100), // Range filter
-    'search': '', // Search query filter
+    'range': null,
+    'search': '',
     'categoryIndex': [],
     'categoryList': [],
+    'location': "",
   };
+  bool _isFilterActive = false;
 
 
   @override
@@ -45,13 +48,13 @@ class _ExplorePageState extends State<ExplorePage> {
     });
   }
 
-  void onApplyFilters(RangeValues ptsRange, List<int> selectedChips, List<String> categoryList){
-    //print("apply filter");
+  void onApplyFilters(RangeValues ptsRange, List<int> selectedChips, List<String> categoryList, bool isFilterActive, String location){
     setState(() {
-
-      _filters['range'] = ptsRange;  // Update the range filter
+      _filters['range'] = ptsRange;
       _filters['categoryIndex'] = selectedChips;
       _filters['categoryList'] = categoryList;
+      _filters['location'] = location=="All places"?"":location;
+      _isFilterActive = isFilterActive;
     });
   }
   void onResetFilters(){
@@ -76,8 +79,9 @@ class _ExplorePageState extends State<ExplorePage> {
         actions: [
           IconButton(
             icon: Icon(
-              showFilters ? Icons.list : Icons.filter_alt, // Switch icons
+              showFilters ? Icons.list : Icons.filter_alt_rounded, // Switch icons
             ),
+            color: _isFilterActive&&(!showFilters) ? Theme.of(context).primaryColor : Colors.grey.shade700,
             onPressed: () {
               setState(() {
                 showFilters = !showFilters; // Toggle view
@@ -94,9 +98,11 @@ class _ExplorePageState extends State<ExplorePage> {
           onResetFilters: onResetFilters,
           initRange: _filters['range'],
           categories: categories,
+          locations: locations,
           goBackToEvents: goBackToEvents,
           selectedChips: (_filters['categoryIndex'] as List<dynamic>).map((item) => item as int)
               .toList(),
+          selectedLocation: _filters['location'] == "" ? "All places" :_filters['location'].toString(),
         )
             : // Display event list view
         ListView(
@@ -125,9 +131,10 @@ class _ExplorePageState extends State<ExplorePage> {
                   if (events != null && events.isNotEmpty) {
                     // get all categories
                     for(Event e in events){
+                      locations.add(e.eventLocation);
                       for(String s in e.eventCategories){
                         categories.add(s);
-                        print(s);
+                        //print(s);
                       }
                     }
                     //

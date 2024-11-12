@@ -93,6 +93,7 @@ class FirebaseService {
     RangeValues range = filters['range'] ?? RangeValues(0, 100);
     List<int> categoryIndex = List<int>.from(filters['categoryIndex'] ?? []);
     List<String> categoryList = List<String>.from(filters['categoryList'] ?? []);
+    String location =  filters['location'] ?? '';
 
     print("filtering: ${range.start}, ${range.end}");
 
@@ -101,6 +102,14 @@ class FirebaseService {
     if (query.isNotEmpty) {
       filteredEvents = filteredEvents.where((event) {
         return event.eventTitle.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    }
+
+
+    //Apply location filter
+    if (location!="") {
+      filteredEvents = filteredEvents.where((event) {
+        return event.eventLocation==location;
       }).toList();
     }
 
@@ -119,6 +128,7 @@ class FirebaseService {
         });
       }).toList();
     }
+
 
     return filteredEvents;
   }

@@ -3,14 +3,53 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:chip_list/chip_list.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
+
+class Label extends StatelessWidget {
+  final String text;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final Color color;
+
+  const Label({
+    Key? key,
+    required this.text,
+    this.fontSize = 16.0,
+    this.fontWeight = FontWeight.bold,
+    this.color = Colors.grey,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        RichText(
+          text: TextSpan(
+            style: TextStyle(fontSize: fontSize, color: color),
+            children: [
+              TextSpan(
+                text: text,
+                style: TextStyle(fontWeight: fontWeight),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 20),
+      ],
+    );
+  }
+}
 
 class FilterWidget extends StatefulWidget {
-  final RangeValues initRange;
-  final Function(RangeValues, List<int>, List<String>) onApplyFilters;
+  final RangeValues? initRange;
+  final Function(RangeValues, List<int>, List<String>, bool, String) onApplyFilters;
   final Function onResetFilters;
   final Function goBackToEvents;
   final HashSet<String> categories;
+  //final HashSet<String> locations;
   final List<int> selectedChips;
+  final HashSet<String> locations;
+  final String selectedLocation;
 
   FilterWidget({
     required this.onApplyFilters,
@@ -19,6 +58,9 @@ class FilterWidget extends StatefulWidget {
     required this.categories,
     required this.goBackToEvents,
     required this.selectedChips,
+    required this.locations,
+    required this.selectedLocation,
+    //required this.locations,
   });
 
   @override
@@ -27,27 +69,41 @@ class FilterWidget extends StatefulWidget {
 
 class _FilterWidgetState extends State<FilterWidget> {
   late RangeValues _currentRangeValues;
-  RangeValues _initialRangeValues = RangeValues(0, 100);
+  final RangeValues _initialRangeValues = RangeValues(0, 100);
   late List<int> _selectedChips;
   late List<String> _chips;
   final TextEditingController _minPtsController = TextEditingController();
   final TextEditingController _maxPtsController = TextEditingController();
+  late List<String> _locations;
+  late String _currentLocation;
+  late MultiValueDropDownController _cntMulti;
+  //List<String> locations = ["1","2","3"];
 
   @override
   void initState() {
     super.initState();
     // Initialize the range values with the passed initRange
-    _currentRangeValues = widget.initRange;
+    _currentRangeValues = widget.initRange==null ? _initialRangeValues : widget.initRange!;
     //_initialSelectedChips = [0];
     _chips = widget.categories.toList();
     _chips.insert(0, "All");
     _selectedChips = widget.selectedChips.isEmpty?List.generate(_chips.length, (index) => index):widget.selectedChips;
     _minPtsController.text = _currentRangeValues.start.toInt().toString();
     _maxPtsController.text = _currentRangeValues.end.toInt().toString();
+    _locations = widget.locations.toList();
+    _locations.insert(0, "All places");
+    _currentLocation = widget.selectedLocation;
   }
 
   void applyFilter(){
-    widget.onApplyFilters(_currentRangeValues, _selectedChips, _chips);
+    bool filterState = false;
+    if(_currentRangeValues.start!=0||
+        _currentRangeValues.end!=100||
+        (_selectedChips.length!=0&&_selectedChips.length!=_chips.length)||
+        _currentLocation!="All places"){
+      filterState=true;
+    }
+    widget.onApplyFilters(_currentRangeValues, _selectedChips, _chips, filterState, _currentLocation);
     //widget.goBackToEvents();
   }
 
@@ -68,15 +124,16 @@ class _FilterWidgetState extends State<FilterWidget> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
+    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.03);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
     return Padding(
       padding: EdgeInsets.all(edgeInsets * 2),
-      child: Stack(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
                 "Event Filter",
@@ -86,181 +143,188 @@ class _FilterWidgetState extends State<FilterWidget> {
                   color: Colors.grey.shade700,
                 ),
               ),
-              SizedBox(height: sizedBoxHeight),
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 16.0, color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: 'Pts: \n',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  //SizedBox(width: screenWidth/30,),
-                  // First TextField on the left
-                  SizedBox(
-                    width: screenWidth/2.5, // Adjust the width as needed
-                    child: TextField(
-                      controller: _minPtsController,
-                      decoration: InputDecoration(
-                        hintText: _currentRangeValues.start.toString(),
-                        filled: true,
-                        fillColor: Colors.white, // Background color for a box effect
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0), // Rounded box shape
-                          //borderSide: BorderSide(color: Colors.red, width: 0.7), // Light grey border
-                        ),
-                      ),
-                      onSubmitted: (pts) {
-                        // Try to parse the input and check if it's a valid integer within the range
-                        int? value = int.tryParse(pts);
-
-                        if (value == null || value < 0 || value > 100 || value > _currentRangeValues.end) {
-                          // If the value is invalid, show a toast message
-                          invalidPtsToast();
-                        } else {
-                          // If the value is valid, update the RangeValues
-                          setState(() {
-                            _currentRangeValues = RangeValues(value.toDouble(), _currentRangeValues.end);
-                            _minPtsController.text = value.toString(); // Update the text field
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  // Spacer for space between the TextFields
-                  Spacer(),
-                  // Second TextField on the right
-                  SizedBox(
-                    width: screenWidth/2.5, // Adjust the width as needed
-                    child: TextField(
-                      controller: _maxPtsController,
-                      decoration: InputDecoration(
-                        hintText: _currentRangeValues.end.toString(),
-                        filled: true,
-                        fillColor: Colors.white, // Background color for a box effect
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0), // Rounded box shape
-                          //borderSide: BorderSide(color: Colors.red, width: 0.7), // Light grey border
-                        ),
-                      ),
-                      onSubmitted: (pts) {
-                        // Try to parse the input and check if it's a valid integer within the range
-                        int? value = int.tryParse(pts);
-
-                        if (value == null || value < 0 || value > 100|| value< _currentRangeValues.start) {
-                          // If the value is invalid, show a toast message
-                          invalidPtsToast();
-                        } else {
-                          // If the value is valid, update the RangeValues
-                          setState(() {
-                            _currentRangeValues = RangeValues(_currentRangeValues.start, value.toDouble());
-                            _maxPtsController.text = value.toString(); // Update the text field
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  //SizedBox(width: screenWidth/30,),
-                ],
-              ),
-              SizedBox(height: sizedBoxHeight),
-
-              RangeSlider(
-                values: _currentRangeValues,
-                max: 100,
-                divisions: 100,
-                // labels: RangeLabels(
-                //   _currentRangeValues.start.round().toString(),
-                //   _currentRangeValues.end.round().toString(),
-                // ),
-                onChanged: (RangeValues values) {
-                  setState(() {
-                    _currentRangeValues = values;
-                    _minPtsController.text = _currentRangeValues.start.toInt().toString();
-                    _maxPtsController.text = _currentRangeValues.end.toInt().toString();
-                  });
-                  applyFilter();
-                  //widget.onRangeChanged(values); // Inform parent of range change
-                },
-              ),
-              SizedBox(height: sizedBoxHeight),
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 16.0, color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: 'Tags: \n',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              ChipList(
-                listOfChipNames: _chips,
-                activeBgColorList: [Theme.of(context).primaryColor],
-                inactiveBgColorList: [Colors.white],
-                activeTextColorList: [Colors.white],
-                inactiveTextColorList: [Theme.of(context).primaryColor],
-                listOfChipIndicesCurrentlySelected: _selectedChips,
-                supportsMultiSelect: true,
-                shouldWrap: true,
-                showCheckmark: false,
-                extraOnToggle: (val) {
-                  //print(val);
-                  setState(() {
-                    if(val==0){
-                      if(!_selectedChips.contains(0)){
-                        _selectedChips = [];
-                      }else{
-                        _selectedChips = List.generate(_chips.length, (index) => index);
-                      }
-                    }
-                  });
-                  applyFilter();
-
-                },
-                //borderColorList: [Theme.of(context).primaryColor],
-              ),
-              // ElevatedButton(
-              //   onPressed: (){
-              //     //TODO: add selected categories
-              //     applyFilter();
-              //   }, // Apply filter logic
-              //   child: Text('Apply Filters'),
-              // ),
-            ],
-          ),
-
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
+              Spacer(),
+              TextButton(
                 onPressed: () {
                   setState(() {
-                    _currentRangeValues = _initialRangeValues; // Reset slider values
+                    _currentRangeValues = _initialRangeValues;
                     _selectedChips = List.generate(_chips.length, (index) => index);
                     _minPtsController.text = _currentRangeValues.start.toInt().toString();
                     _maxPtsController.text = _currentRangeValues.end.toInt().toString();
+                    _currentLocation = "All places";
                   });
-                  widget.onResetFilters(); // Notify parent for reset action
+                  widget.onResetFilters();
                   applyFilter();
-                  //TODO: Does resetting automatically leads to applying?
                 },
-                child: Text('Reset'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(80, 40),
+                child: Text(
+                  'Reset all',
+                  style: TextStyle(
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+              )
+
+            ],
+          ),
+          SizedBox(height: sizedBoxHeight),
+          Label(text: "Location"),
+          DropdownMenu<String>(
+            initialSelection: _currentLocation,
+            expandedInsets: EdgeInsets.zero,
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
+            menuStyle: MenuStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.white),
+            ),
+            dropdownMenuEntries: _locations.map((location) {
+              return DropdownMenuEntry<String>(
+                value: location,
+                label: location,
+              );
+            }).toList(),
+            onSelected: (l){
+              if(l!=null){
+                _currentLocation=l!;
+                applyFilter();
+              }
+
+            },
           ),
+          SizedBox(height: sizedBoxHeight),
+          Label(text: "Pts"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: screenWidth/2.3,
+                child: TextField(
+                  controller: _minPtsController,
+                  decoration: InputDecoration(
+                    hintText: _currentRangeValues.start.toString(),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onSubmitted: (pts) {
+                    int? value = int.tryParse(pts);
+
+                    if (value == null || value < 0 || value > 100 || value > _currentRangeValues.end) {
+                      invalidPtsToast();
+                    } else {
+                      setState(() {
+                        _currentRangeValues = RangeValues(value.toDouble(), _currentRangeValues.end);
+                        _minPtsController.text = value.toString(); // Update the text field
+                      });
+                    }
+                  },
+                ),
+              ),
+              Spacer(),
+              SizedBox(
+                width: screenWidth/2.3, // Adjust the width as needed
+                child: TextField(
+                  controller: _maxPtsController,
+                  decoration: InputDecoration(
+                    hintText: _currentRangeValues.end.toString(),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onSubmitted: (pts) {
+                    // Try to parse the input and check if it's a valid integer within the range
+                    int? value = int.tryParse(pts);
+
+                    if (value == null || value < 0 || value > 100|| value< _currentRangeValues.start) {
+                      invalidPtsToast();
+                    } else {
+                      setState(() {
+                        _currentRangeValues = RangeValues(_currentRangeValues.start, value.toDouble());
+                        _maxPtsController.text = value.toString();
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: sizedBoxHeight/2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text("${_initialRangeValues.start.toInt().toString()}pt",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor
+                ),
+              ),
+              Spacer(),
+              Text("${_initialRangeValues.end.toInt().toString()}pt",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor
+                ),
+              ),
+            ],
+          ),
+          RangeSlider(
+            activeColor: Theme.of(context).primaryColor,
+            values: _currentRangeValues,
+            max: 100,
+            divisions: 100,
+            onChanged: (RangeValues values) {
+              setState(() {
+                _currentRangeValues = values;
+                _minPtsController.text = _currentRangeValues.start.toInt().toString();
+                _maxPtsController.text = _currentRangeValues.end.toInt().toString();
+              });
+              applyFilter();
+            },
+          ),
+          SizedBox(height: sizedBoxHeight),
+          Label(text: "Tags"),
+          ChipList(
+            listOfChipNames: _chips,
+            activeBgColorList: [Theme.of(context).primaryColor],
+            inactiveBgColorList: [Colors.grey],
+            activeTextColorList: [Colors.white],
+            inactiveTextColorList: [Colors.white],
+            listOfChipIndicesCurrentlySelected: _selectedChips,
+            supportsMultiSelect: true,
+            shouldWrap: true,
+            showCheckmark: false,
+            extraOnToggle: (val) {
+              //print(val);
+              setState(() {
+                if(val==0){
+                  if(!_selectedChips.contains(0)){
+                    _selectedChips = [];
+                  }else{
+                    _selectedChips = List.generate(_chips.length, (index) => index);
+                  }
+                }else{
+                  if(!_selectedChips.contains(val)){
+                    _selectedChips.remove(0);
+                  }
+                }
+              });
+              applyFilter();
+
+            },
+          ),
+          SizedBox(height: sizedBoxHeight),
+
         ],
       ),
     );

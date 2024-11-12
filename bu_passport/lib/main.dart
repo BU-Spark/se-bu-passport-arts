@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-
+        primaryColor: Color(0xFFCC0000),
         // Define the default brightness and colors.
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color(0xFFCC0000),
