@@ -1,6 +1,6 @@
 // src/firebase/firebaseService.ts
 import { db } from "./firebaseConfig";
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, where } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, where, startAt, endAt } from "firebase/firestore";
 import { Event } from "../interfaces/Event"
 
 const eventTableName = "new_events";
@@ -15,26 +15,29 @@ export const fetchAllEvents = async (): Promise<Event[]> => {
 
 // Function to add data to a collection
 export const searchEvents = async (searchText: string): Promise<Event[]> => {
-  const descriptionQuery = query(
-    collection(db, eventTableName),
-    where('Description', '==', searchText)
-  );
-  const titleQuery = query(collection(db, eventTableName), where("Title", "==", searchText));
+  if (searchText === "") {
+    const querySnapshot = await getDocs(collection(db, eventTableName));
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Event), // Explicitly cast to Event
+    }));
+  }
 
-  const [descriptionSnapshot, titleSnapshot] = await Promise.all([
-    getDocs(descriptionQuery),
-    getDocs(titleQuery),
-  ]);
+  const lowerSearchText = searchText.toLowerCase();
+  const eventsSnapshot = await getDocs(collection(db, eventTableName));
 
-  const eventsMap = new Map<string, Event>();
-  descriptionSnapshot.forEach((doc) => {
-    eventsMap.set(doc.id, { ...(doc.data() as Event) });
+  const events: Event[] = [];
+  eventsSnapshot.forEach((doc) => {
+    const eventData = doc.data() as Event;
+    // Perform client-side filtering
+    if (
+      eventData.eventTitle.toLowerCase().includes(lowerSearchText) ||
+      eventData.eventDescription.toLowerCase().includes(lowerSearchText)
+    ) {
+      events.push(eventData);
+    }
   });
-  titleSnapshot.forEach((doc) => {
-    eventsMap.set(doc.id, { ...(doc.data() as Event) });
-  });
-
-  return Array.from(eventsMap.values());
+  return events;
 };
 
 export const fetchSingleEvent = async (eventId: string): Promise<Event | null> => {

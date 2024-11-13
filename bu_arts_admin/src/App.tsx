@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Dashboard from './pages/DashboardPage.tsx';
-import ViewEventPage from './pages/ViewEventPage.tsx';
+import ViewEventPage from './pages/ViewEventsPage.tsx';
 import EditEventPage from './pages/EditEventPage.tsx';
 import Sidebar from './components/sidebar/Sidebar.tsx';
 

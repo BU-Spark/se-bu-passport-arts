@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchAllEvents } from "../firebase/firebaseService"
 import { Event } from "../interfaces/Event"
 import EventBox from "../components/EventBox"
+import { searchEvents } from '../firebase/firebaseService';
 
 interface FetchAllEventsProps {
 }
@@ -11,11 +12,21 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState('');
+
+    // Handle input change and call search
+    const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const text = event.target.value;
+        setSearchText(text);
+        let result = await searchEvents(text);
+        // console.log(result);
+        setEvents(result); // Update the events with the search results
+    };
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const eventsData = await fetchAllEvents();
+                const eventsData = await searchEvents(''); // Fetch all events by default
                 setEvents(eventsData);
             } catch (error) {
                 setError('Failed to load events');
@@ -39,6 +50,8 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
                     <input
                         type="text"
                         placeholder="Search anything here..."
+                        value={searchText}
+                        onChange={handleInputChange}
                         className="border border-gray-300 rounded-full py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <img className="w-5 h-5 text-gray-400 absolute right-3 top-2.5" src="/public/icons/search.png" alt="search_icon" />

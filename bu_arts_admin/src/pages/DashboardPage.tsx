@@ -1,7 +1,7 @@
 // src/components/Dashboard.tsx
 import React from 'react';
 
-import ViewAllEventsPage from "./ViewEventPage";
+import ViewAllEventsPage from "./ViewEventsPage";
 
 const Dashboard: React.FC = () => {
   return (
