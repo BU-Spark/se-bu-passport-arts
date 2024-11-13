@@ -298,18 +298,9 @@ class _ProfilePageState extends State<ProfilePage>
                 ),
               ),
 
-              // Passport book widget
-              Expanded(
-                flex: 3,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: sizedBoxHeight),
-                  child: PassportBookWidget(),
-                ),
-              ),
-
               // Events menu section with TabBar and TabBarView
               Expanded(
-                flex: 2,
+                flex: 3,
                 child: DefaultTabController(
                   length: 2,
                   child: Scaffold(

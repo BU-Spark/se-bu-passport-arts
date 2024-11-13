@@ -4,6 +4,7 @@ import 'package:bu_passport/pages/login_page.dart';
 import 'package:bu_passport/pages/profile_page.dart';
 import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
+import 'package:bu_passport/pages/passport_page.dart';
 import 'package:bu_passport/classes/passport_model.dart';
 
 import 'package:timezone/timezone.dart' as tz;
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
           '/signup': (context) => const SignUpPage(),
           '/home': (context) => const AuthGate(),
           '/explore_page': (context) => const ExplorePage(),
+          '/passport_page': (context) => const PassportPage(),
           '/profile_page': (context) => const ProfilePage(),
         },
       ),

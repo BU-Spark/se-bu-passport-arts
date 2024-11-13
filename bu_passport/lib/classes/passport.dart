@@ -16,17 +16,32 @@ class Passport {
 
 class Sticker {
   final int id;
-  final String imagePath;
+  late final String imagePath;
 
-  Sticker({required this.id, required this.imagePath});
+  Sticker({required this.id}) {
+    imagePath = _getImagePathById(id);
+  }
+
+  String _getImagePathById(int id) {
+    // Map of id to image paths
+    const Map<int, String> imagePaths = {
+      0: 'assets/images/passport/empty_sticker.png',
+      1: 'assets/images/passport/music_sticker.png',
+      2: 'assets/images/passport/paintbrush_sticker.png',
+      3: 'assets/images/passport/theater_sticker.png',
+      // Add more mappings as needed
+    };
+
+    return imagePaths[id] ?? 'assets/images/passport/empty_sticker.png';
+  }
 }
 
 class StickerRepository {
   final List<Sticker> allStickers = [
-    Sticker(id: 1, imagePath: '../assets/images/passport/sticker_1.png'),
-    Sticker(id: 2, imagePath: '../assets/images/passport/sticker_2.png'),
-    Sticker(id: 3, imagePath: '../assets/images/passport/sticker_3.png'),
-    Sticker(id: 4, imagePath: '../assets/images/passport/sticker_4.png')
+    Sticker(id: 1),
+    Sticker(id: 2),
+    Sticker(id: 3),
+    Sticker(id: 4),
   ];
 
   Sticker getRandomSticker() {
