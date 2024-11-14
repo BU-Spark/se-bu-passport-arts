@@ -289,7 +289,14 @@ class _ProfilePageState extends State<ProfilePage>
                           ),
                         ),
                         if (!_isEditing) ...[
-                          Text(fullName, style: TextStyle(fontSize: 20)),
+                          Text(fullName, style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.22,
+                            ),
+                          ),
                           Text('${userPoints} points'),
                         ], // Display name and points if not in edit mode
                       ],
@@ -306,9 +313,33 @@ class _ProfilePageState extends State<ProfilePage>
                   child: Scaffold(
                     appBar: TabBar(
                       controller: _tabController,
-                      tabs: [
-                        Tab(text: 'Saved'),
-                        Tab(text: 'Attended'),
+                      tabs: const [
+                        Tab(child: Text(
+                          'Saved',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF444444),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            height: 0.10,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                        ),
+                        Tab(child: Text(
+                          'Attended',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF444444),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            height: 0.10,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                        ),
                       ],
                     ),
                     body: TabBarView(

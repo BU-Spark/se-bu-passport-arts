@@ -28,7 +28,7 @@ class _PassportPageState extends State<PassportPage>
   late Future<DocumentSnapshot>
       _userProfileFuture; // Future for retrieving user data from Firestore.
 
-  List<Sticker> dummy_stickers = [Sticker(id: 2)];
+  List<Sticker> dummy_stickers = [Sticker(id: 2), Sticker(id: 3)];
 
   @override
   void initState() {
@@ -56,23 +56,38 @@ class _PassportPageState extends State<PassportPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Passport'),
+        title: const Text('My Passport', style: TextStyle(
+                color: Colors.black,
+                fontSize: 30,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                height: 0.5,
+                letterSpacing: -0.33,)
+        ),
+        backgroundColor: Colors.white,
       ),
       body: Column(
         children: [
           SizedBox(height: sizedBoxHeight),
           // Passport book widget
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
               margin: EdgeInsets.only(bottom: 16.0),
               child: PassportBookWidget(),
             ),
           ),
-          SizedBox(height: sizedBoxHeight),
           // Stickers
+          const Text("Stickers", textAlign: TextAlign.left, 
+            style: TextStyle(color: Color(0xFF847F8B),
+            fontSize: 16,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w500,
+            height: 3,
+            letterSpacing: 0.10,)
+          ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Center(
               child: StickerWidget(
                 stickers: dummy_stickers,
