@@ -21,14 +21,32 @@ class StickerWidget extends StatelessWidget {
         itemCount: 9, // Always show 9 items
         itemBuilder: (context, index) {
           if (index < stickers.length) {
-            return Container(
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(stickers[index].imagePath),
-                  fit: BoxFit.cover,
+            return Draggable<Sticker>(
+              data: stickers[index],
+              feedback: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(stickers[index].imagePath),
+                    fit: BoxFit.cover,
+                  ),
+                  border: Border.all(color: Colors.transparent, width: 0),
                 ),
-                border: Border.all(color: Colors.transparent, width: 0), // Remove grid lines
+              ),
+              childWhenDragging: Container(
+                width: 60,
+                height: 60,
+                color: Colors.white,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(stickers[index].imagePath),
+                    fit: BoxFit.cover,
+                  ),
+                  border: Border.all(color: Colors.transparent, width: 0),
+                ),
               ),
             );
           } else {
