@@ -1,15 +1,17 @@
 // src/firebase/firebaseService.ts
 import { db } from "./firebaseConfig";
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, where, startAt, endAt } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, updateDoc} from "firebase/firestore";
 import { Event } from "../interfaces/Event"
+import { User } from "../interfaces/User";
 
 const eventTableName = "new_events";
+const userTableName = "users";
 // Function to get data from a collection
 export const fetchAllEvents = async (): Promise<Event[]> => {
   const querySnapshot = await getDocs(collection(db, eventTableName));
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
-    ...(doc.data() as Event), // Explicitly cast to Event
+    ...(doc.data() as Event),
   }));
 };
 
@@ -47,10 +49,9 @@ export const fetchSingleEvent = async (eventId: string): Promise<Event | null> =
 
     if (!docSnapshot.exists()) {
       console.error("No matching event found");
-      return null; // or throw an error if you want to handle this in the calling function
+      return null;
     }
 
-    // Get the event data from the document snapshot
     const eventData = docSnapshot.data() as Event;
     return eventData;
   } catch (error) {
@@ -84,14 +85,59 @@ export const updateSingleEvent = async (event: Event): Promise<boolean> => {
   }
 };
 
-// Function to update a document
-export const updateDocument = async (collectionName: string, docId: string, data: any) => {
-  const docRef = doc(db, collectionName, docId);
-  await updateDoc(docRef, data);
-};
+export const fetchAllUsers = async (): Promise<User[]> => {
+  const querySnapshot = await getDocs(collection(db, userTableName));
+  let users = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as User),
+  }));
+  console.log(users)
+  return users
+}
 
-// Function to delete a document
-export const deleteDocument = async (collectionName: string, docId: string) => {
-  const docRef = doc(db, collectionName, docId);
-  await deleteDoc(docRef);
-};
+export const searchUsers = async (searchText: string): Promise<User[]> => {
+  try {
+    if (searchText === "") {
+      return await fetchAllUsers()
+    }
+    const lowerSearchText = searchText.toLowerCase();
+    const usersSnapshot = await getDocs(collection(db, userTableName));
+    const users: User[] = [];
+    usersSnapshot.forEach((doc) => {
+      const userData = doc.data() as User;
+
+      const firstNameMatch = userData.firstName.toLowerCase().startsWith(lowerSearchText);
+      const lastNameMatch = userData.lastName.toLowerCase().startsWith(lowerSearchText);
+
+      const isBUIDSearch = lowerSearchText.startsWith("u");
+      const buidMatch = isBUIDSearch && userData.userBUID.toLowerCase().startsWith(lowerSearchText);
+
+      if (firstNameMatch || lastNameMatch || buidMatch) {
+        users.push(userData);
+      }
+    });
+    return users
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return [];
+  }
+}
+
+export const fetchSingleUser = async (userId: string): Promise<User | null> => {
+  try {
+    const eventRef = doc(db, userTableName, userId);
+    const docSnapshot = await getDoc(eventRef);
+
+    if (!docSnapshot.exists()) {
+      console.error("No matching event found");
+      return null;
+    }
+
+    const userData = docSnapshot.data() as User;
+    return userData;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user");
+  }
+}
+

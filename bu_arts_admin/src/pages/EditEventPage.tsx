@@ -10,8 +10,6 @@ import PointEdit from '../components/eventEdit/PointEdit.tsx'
 import PhotoEdit from '../components/eventEdit/PhotoEdit.tsx';
 import DescriptionEdit from '../components/eventEdit/DescriptionEdit.tsx';
 import URLEdit from '../components/eventEdit/LinkEdit.tsx';
-// import { APIProvider } from '@vis.gl/react-google-maps';
-// import { Map, Marker } from "@vis.gl/react-google-maps";
 
 const googleMapKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 

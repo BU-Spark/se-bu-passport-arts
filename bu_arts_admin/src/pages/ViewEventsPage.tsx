@@ -1,6 +1,5 @@
 // src/components/FetchAllEvents.tsx
 import React, { useEffect, useState } from 'react';
-import { fetchAllEvents } from "../firebase/firebaseService"
 import { Event } from "../interfaces/Event"
 import EventBox from "../components/EventBox"
 import { searchEvents } from '../firebase/firebaseService';
@@ -19,8 +18,7 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
         const text = event.target.value;
         setSearchText(text);
         let result = await searchEvents(text);
-        // console.log(result);
-        setEvents(result); // Update the events with the search results
+        setEvents(result);
     };
 
     useEffect(() => {

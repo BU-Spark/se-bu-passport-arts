@@ -3,7 +3,7 @@ import React from 'react';
 
 import ViewAllEventsPage from "./ViewEventsPage";
 
-const Dashboard: React.FC = () => {
+const DashboardPage: React.FC = () => {
   return (
     <div>
       <div className="flex items-center space-x-4 mb-6">
@@ -13,4 +13,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

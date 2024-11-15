@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ReactNode } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 interface CollapsibleMenuProps {
   title: string;
@@ -23,14 +23,13 @@ const CollapsibleMenu: React.FC<CollapsibleMenuProps> = ({
   const defaultImageSrc = `${image}`;
   const hoverImageSrc = `${hoverImage}`;
 
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
   const [iconSrc, setIconSrc] = useState(defaultImageSrc);
 
   useEffect(() => {
-    if (activeLink === title) {
+    if (activeLink.slice(0,7) === title) {
       setIconSrc(hoverImageSrc);
     } else {
       setIconSrc(defaultImageSrc);
