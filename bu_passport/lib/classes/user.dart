@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Users {
   final String firstName;
   final String lastName;
@@ -9,7 +11,9 @@ class Users {
   final int userPoints;
   final String userProfileURL;
   final Map<String, dynamic> userSavedEvents;
-  final bool admin;
+  final Map<int, bool> userCollectedStickers;
+  final List<String> userPhotos;
+  final Timestamp userCreatedAt;
 
   Users({
     required this.firstName,
@@ -22,6 +26,8 @@ class Users {
     required this.userSavedEvents,
     required this.userPoints,
     required this.userProfileURL,
-    required this.admin,
+    required this.userCollectedStickers,
+    required this.userPhotos,
+    required this.userCreatedAt,
   });
 }
