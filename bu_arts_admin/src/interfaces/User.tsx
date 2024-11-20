@@ -1,5 +1,6 @@
-// src/types/Session.ts
 import { Timestamp } from "firebase/firestore";
+
+// src/types/Session.ts
 export interface User {
     firstName: string;
     lastName: string;
@@ -11,4 +12,5 @@ export interface User {
     userUID: string;
     userYear: string;
     userSavedEvents: string;
+    userCreated: Timestamp;
 }

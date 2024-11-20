@@ -1,5 +1,4 @@
 // src/pages/SignInPage.js
-import React from 'react';
 import { SignIn } from '@clerk/clerk-react';
 
 const SignInPage = () => (

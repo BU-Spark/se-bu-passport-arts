@@ -36,7 +36,7 @@ const NavMenu: React.FC = () => {
                     </li>
                     <li>
                         <NavLink
-                            to="/events"
+                            to="/events/past"
                             className={({ isActive }) => `pl-4 ${isActive ? 'text-sidebar-red' : 'text-sidebar-grey hover:text-sidebar-red'}`}
                             onClick={() => setActiveLink("Events-past")}
                         >

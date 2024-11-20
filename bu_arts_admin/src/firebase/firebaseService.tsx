@@ -3,6 +3,7 @@ import { db } from "./firebaseConfig";
 import { collection, getDocs, getDoc, doc, updateDoc} from "firebase/firestore";
 import { Event } from "../interfaces/Event"
 import { User } from "../interfaces/User";
+import {getLastXMonths, generateMonthRange} from "../utils/utils";
 
 const eventTableName = "new_events";
 const userTableName = "users";
@@ -140,4 +141,68 @@ export const fetchSingleUser = async (userId: string): Promise<User | null> => {
     throw new Error("Failed to fetch user");
   }
 }
+
+export const fetchUserRegistrationStats = async (numMonths: number) => {
+  const userCollection = collection(db, userTableName);
+
+  const snapshot = await getDocs(userCollection);
+  const userData = snapshot.docs.map((doc) => doc.data());
+
+  // Process the data: Group registrations by month
+  const registrationsByMonth: { [month: string]: number } = {};
+  userData.forEach((user) => {
+    const userCreated = user.userCreated; // Assuming userCreated is a timestamp
+    if (userCreated) {
+      const date = new Date(userCreated.seconds * 1000); // Convert Firestore timestamp to JS Date
+      const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // Format as YYYY-MM
+      registrationsByMonth[month] = (registrationsByMonth[month] || 0) + 1;
+    }
+  });
+
+  // Generate the latest x months
+  let months: string[];
+
+  if (numMonths === 0) {
+    // Fetch all months starting from the earliest one
+    const allMonths = Object.keys(registrationsByMonth).sort(); // Sort months in ascending order
+    const startMonth = allMonths[0]; // Earliest month
+    const endMonth = allMonths[allMonths.length - 1]; // Latest month
+    months = generateMonthRange(startMonth, endMonth); // Generate all months in the range
+  } else {
+    // Generate the latest numMonths
+    months = getLastXMonths(numMonths);
+  }
+
+  // Map user counts to the generated months, set to 0 if no data
+  const registrations = months.map((month) => registrationsByMonth[month] || 0);
+
+  return { months, registrations };
+};
+
+export const countCurrentMonthEvents = async (): Promise<number> => {
+  const eventCollection = collection(db, eventTableName);
+
+  const snapshot = await getDocs(eventCollection);
+  const events = snapshot.docs.map((doc) => doc.data() as Event);
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  let count = 0;
+  events.forEach((event) => {
+    Object.values(event.eventSessions).forEach((session) => {
+      const startTime = session.startTime.toDate(); // Convert Firestore Timestamp to JS Date
+      if (startTime.getFullYear() === currentYear && startTime.getMonth() === currentMonth) {
+        count++;
+      }
+    });
+  });
+  return count;
+}
+
+
+// export const fetchUserPastEvents = async(userId: string): Promise<Event | null> => {
+  
+// }
 

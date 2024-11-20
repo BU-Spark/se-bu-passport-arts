@@ -8,6 +8,7 @@ import EditEventPage from './pages/EditEventPage.tsx';
 import Sidebar from './components/sidebar/Sidebar.tsx';
 import ViewStudentsPage from './pages/ViewStudentsPage.tsx';
 import StudentDetailPage from './pages/StudentDetailPage.tsx';
+import PastEventsPage from './pages/PastEventsPage.tsx';
 
 
 const App: React.FC = () => {
@@ -34,6 +35,14 @@ const App: React.FC = () => {
               }
             />
             <Route
+              path="/events/past"
+              element={
+                <SignedIn>
+                  <PastEventsPage />
+                </SignedIn>
+              }
+            />
+            <Route
               path="*"
               element={
                 <SignedOut>
@@ -44,6 +53,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/edit-event/:eventID" element={<EditEventPage />} />
+            <Route path="/event/:eventID/:sessionId" element={<EditEventPage />} />
             <Route path="/students" element={<ViewStudentsPage />} />
             <Route path="/students/:userID" element={<StudentDetailPage />} />
           </Routes>
