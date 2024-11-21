@@ -180,16 +180,16 @@ class _EventWidgetState extends State<EventWidget> {
               right: sizedBoxHeight,
               child: GestureDetector(
                 onTap: () async {
-                  _isSaved = await firebaseService.hasUserSavedEvent(
-                      userUID, widget.event.eventID);
-                  if (_isSaved) {
-                    firebaseService.unsaveEvent(widget.event.eventID);
-                  } else {
-                    firebaseService.saveEvent(widget.event.eventID);
-                  }
-                  setState(() {
-                    _isSaved = !_isSaved; // Toggle saved status
-                  });
+                  // _isSaved = await firebaseService.hasUserSavedEvent(
+                  //     userUID, widget.event.eventID);
+                  // if (_isSaved) {
+                  //   firebaseService.unsaveEvent(widget.event.eventID);
+                  // } else {
+                  //   firebaseService.saveEvent(widget.event.eventID);
+                  // }
+                  // setState(() {
+                  //   _isSaved = !_isSaved; // Toggle saved status
+                  // });
                 },
                 child: Icon(
                   _isSaved ? Icons.favorite : Icons.favorite_border,

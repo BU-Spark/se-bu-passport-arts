@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bu_passport/classes/event.dart';
+import 'package:bu_passport/components/sessionCheckList.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
@@ -16,9 +17,11 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
+import '../components/ChipList.dart';
 import '../components/checkin_options_dialog.dart';
 import '../components/checkin_success_dialog.dart';
 import '../components/time_span.dart';
+import '../config/secrets.dart';
 import '../services/firebase_service.dart';
 import '../services/web_image_service.dart';
 
@@ -42,8 +45,12 @@ class _EventPageState extends State<EventPage> {
   GeocodingService geocodingService = GeocodingService();
 
   bool _isSaved = false; // Track whether the user is interested in the event
+  String? _savedSession = null;
   bool _isCheckedIn = false; // To track if the user has checked in
   String photoUrl = "";
+  bool _isSessionListVisible = false;
+  String? _selectedSession = null;
+  bool _eventHasUpcomingSessions = true;
 
 
   Future<ui.Image> _loadImage(File file) async {
@@ -73,8 +80,40 @@ class _EventPageState extends State<EventPage> {
     super.initState();
     checkIfUserSaved();
     checkIfUserIsCheckedIn();
+    _eventHasUpcomingSessions = widget.event.hasUpcomingSessions(DateTime.now());
   }
 
+
+  String saveButtonText(){
+    if(_isCheckedIn){
+      return "Save";
+    }else{
+      if(_eventHasUpcomingSessions){
+        if(_isSessionListVisible){
+          return "Save";
+        }else{
+          if(_isSaved){
+            return "Edit schedule";
+          }else{
+            return "Add to schedule";
+          }
+        }
+      }else{// Event expired
+        if(_isSaved){
+          return "Remove from schedule";
+        }else{
+          return "Event expired";
+        }
+      }
+    }
+  }
+
+  bool saveButtonStatus(){
+    if(_isCheckedIn||(!_eventHasUpcomingSessions&&(!_isSaved))){
+      return false;
+    }
+    return true;
+  }
   // Function to check if user has saved the event
 
   void checkIfUserSaved() async {
@@ -86,10 +125,19 @@ class _EventPageState extends State<EventPage> {
     }
     bool isSaved =
         await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
+    String? savedSession = await firebaseService.userSavedSession(userUID, widget.event.eventID);
     setState(() {
       // changing save to saved
       _isSaved = isSaved;
+      _savedSession = savedSession;
     });
+  }
+
+  void onSelectionChanges(String? selectedSession){
+    setState(() {
+      _selectedSession = selectedSession;
+    });
+    print("selected is $_selectedSession");
   }
 
   // Function to check if user has checked in to the event
@@ -193,6 +241,8 @@ class _EventPageState extends State<EventPage> {
             );
           },
         );
+
+        firebaseService.unsaveEvent(widget.event.eventID);
       }else{
 
       }
@@ -225,6 +275,7 @@ class _EventPageState extends State<EventPage> {
           );
         },
       );
+      firebaseService.unsaveEvent(widget.event.eventID);
     }catch(e){
       return;
     }
@@ -241,152 +292,259 @@ class _EventPageState extends State<EventPage> {
 
     return Scaffold(
       appBar: AppBar(),
-      body: ListView(
-        // crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          Image(
-            image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: screenHeight * 0.4,
-          ),
-          Padding(
-            padding: EdgeInsets.all(edgeInsets * 2.5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.event.eventTitle,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+          ListView(
+          // crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Image(
+              image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: screenHeight * 0.4,
+            ),
+            Padding(
+              padding: EdgeInsets.all(edgeInsets * 2.5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.event.eventTitle,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      WidgetSpan(
-                        child: Icon(Icons.location_on),
-                      ),
-                      TextSpan(
-                        text: " ${widget.event.eventLocation}",
-                      ),
-                    ],
+                  //SizedBox(height: sizedBoxHeight),
+                  ChipList(
+                    labels: widget.event.eventCategories,
+                    onChipPressed: (label) {
+                      //print("Selected label: $label");
+                    },
                   ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                AllSessionsDisplay(
-                  sessions: widget.event.eventSessions,
-                ),
-                SizedBox(height: sizedBoxHeight),
-                GestureDetector(
-                  onTap: () async {
-                    var url = Uri.parse(widget.event.eventURL);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
-                    } else {
-                      throw 'Could not launch $url';
-                    }
-                  },
-                  child: RichText(
+                  SizedBox(height: sizedBoxHeight*0.8),
+                  Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                  ),
+                  //TODO: Add attending users
+                  Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                  ),
+                  SizedBox(height: sizedBoxHeight),
+                  // AllSessionsDisplay(
+                  //   sessions: widget.event.eventSessions,
+                  // ),
+                  SizedBox(height: sizedBoxHeight),
+                  GestureDetector(
+                    onTap: () async {
+                      var url = Uri.parse(widget.event.eventURL);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(fontSize: 16.0, color: Colors.black),
+                        children: [
+                          WidgetSpan(
+                            child: Icon(Icons.link),
+                          ),
+                          TextSpan(
+                            text: "  ${widget.event.eventURL}",
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: sizedBoxHeight),
+                  RichText(
                     text: TextSpan(
                       style: TextStyle(fontSize: 16.0, color: Colors.black),
                       children: [
-                        WidgetSpan(
-                          child: Icon(Icons.link),
+                        TextSpan(
+                          text: 'Description: \n\n',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         TextSpan(
-                          text: "  ${widget.event.eventURL}",
-                          style: TextStyle(color: Colors.blue),
+                          text: widget.event.eventDescription,
                         ),
                       ],
                     ),
                   ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                  SizedBox(height: sizedBoxHeight),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: 'Description: \n',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        flex: 3, // 1 part
+                        child: RichText(
+                          text: const TextSpan(
+                            style: TextStyle(fontSize: 16.0, color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: 'Hours: ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      TextSpan(
-                        text: widget.event.eventDescription,
-                      ),
+                      Expanded(
+                        flex: 8, // 4 parts
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // Align children to the left
+                          children: widget.event.eventSessions.map<Widget>((session) {
+                            // Format the start and end times with month abbreviation
+                            final startTime = DateFormat('MMM d, yyyy, hh:mma').format(session.sessionStartTime);
+                            final endTime = DateFormat('hh:mma').format(session.sessionEndTime);
+
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                              child: Align(
+                                alignment: Alignment.centerLeft,  // Align text to the left
+                                child: Text(
+                                  "$startTime - $endTime",
+                                  style: TextStyle(fontSize: 14.0), // Adjust the text size as needed
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      )
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(edgeInsets),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: (
-                          !widget.event.isEventHappening() ||
-                          _isCheckedIn)
-                      ? null
-                      : () async {
-
-                          // Your check-in logic here. On successful check-in, update the _isCheckedIn state.
-                          bool success = await checkIn();
-                          if (success) {
-                            bool withPhoto = await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CheckInOptionsDialog();
-                              },
-                            );
-                            if(withPhoto){
-                              checkInWithPhoto();
-                            } else {
-                              checkInWithoutPhoto();
-                            }
-
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text(
-                                    "Unable to check in: location too far or permission denied.")));
-                          }
-                        },
-                  child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isCheckedIn
-                        ? Colors.grey
-                        : (Colors.red),
+                  SizedBox(height: sizedBoxHeight),
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(fontSize: 16.0, color: Colors.black),
+                      children: [
+                        WidgetSpan(
+                          child: Icon(Icons.location_on),
+                        ),
+                        TextSpan(
+                          text: " ${widget.event.eventLocation}",
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(width: sizedBoxHeight * 3), // Optional spacing
-                ElevatedButton(
-                  onPressed: () async {
-                    String userUID =
-                        FirebaseAuth.instance.currentUser?.uid ?? "";
-                    String eventId = widget.event.eventID;
-                    bool isSaved = await firebaseService.hasUserSavedEvent(
-                        userUID, eventId);
-                    if (isSaved) {
-                      firebaseService.unsaveEvent(eventId);
-                    } else {
-                      firebaseService.saveEvent(eventId);
-                    }
-                    setState(() {
-                      _isSaved = !_isSaved; // Toggle saved status
-                    });
-                    widget.onUpdateEventPage();
-                  },
-                  child: Text(_isSaved ? 'Unsave' : 'Save'),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: sizedBoxHeight*4,),
+
+          ],
+        ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: Offset(0, -2), // Offset shadow upwards
+                  )
+                ]
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(edgeInsets, edgeInsets * 2, edgeInsets, edgeInsets * 6),
+                child: Column(
+                  children: [
+                    AnimatedSize(
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      child: _isSessionListVisible
+                          ? SessionCheckList(sessions: widget.event.eventSessions, onSelectionChanges: onSelectionChanges, lastSavedSession: _savedSession,) // Your custom widget
+                          : SizedBox.shrink(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: (
+                              !widget.event.isEventHappening() ||
+                                  _isCheckedIn)
+                              ? null
+                              : () async {
+                            bool success = await checkIn();
+                            if (success) {
+                              bool withPhoto = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CheckInOptionsDialog();
+                                },
+                              );
+                              if(withPhoto){
+                                checkInWithPhoto();
+                              } else {
+                                checkInWithoutPhoto();
+                              }
+
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                  content: Text(
+                                      "Unable to check in: location too far or permission denied.")));
+                            }
+                          },
+                          child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _isCheckedIn
+                                ? Colors.grey
+                                : (Colors.red),
+                          ),
+                        ),
+                        SizedBox(width: sizedBoxHeight * 3),
+                        ElevatedButton(
+                          onPressed: (!saveButtonStatus())?null:() async {
+                            if(!widget.event.hasUpcomingSessions(DateTime.now())){
+                              String eventId = widget.event.eventID;
+                              if(_isSaved){
+                                firebaseService.unsaveEvent(eventId);
+                              }
+                              checkIfUserSaved();
+                              widget.onUpdateEventPage();
+                              return;
+                            }
+                            if(_isSessionListVisible){
+                              String userUID =
+                                  FirebaseAuth.instance.currentUser?.uid ?? "";
+                              String eventId = widget.event.eventID;
+                              String? sessionId = _selectedSession;
+                              bool isSaved = await firebaseService.hasUserSavedEvent(
+                                  userUID, eventId);
+                              if (sessionId!=null) {
+                                print("update: $sessionId");
+                                firebaseService.saveEvent(eventId, sessionId);
+                              } else {
+                                firebaseService.unsaveEvent(eventId);
+                              }
+                              checkIfUserSaved();
+                              widget.onUpdateEventPage();
+                            }
+                            setState(() {
+                              _isSessionListVisible = !_isSessionListVisible;
+                            });
+                          },
+                          child:Text(saveButtonText())
+                          //child: Text(_eventHasUpcomingSessions?(_isSessionListVisible ? 'Save' : (_isSaved?"Edit schedule":"Add to schedule")):(_isSaved?"Remove from schedule":"Event expired")),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+        )
+              ]
       ),
     );
   }

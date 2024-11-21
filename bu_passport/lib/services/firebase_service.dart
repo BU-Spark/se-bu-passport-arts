@@ -172,7 +172,7 @@ class FirebaseService {
   }
 
   // Function to save an event to userSavedEvents
-  Future<void> saveEvent(String eventId) async {
+  Future<void> saveEvent(String eventId, String sessionId) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final userDoc = this.db.collection('users').doc(userUID);
 
@@ -180,11 +180,11 @@ class FirebaseService {
       // Atomically add the new event ID to the user's saved events list
       // Atomically add the new event ID to the user's saved events map with value `false`
       await userDoc.update({
-        'userSavedEvents.$eventId': false,
+        'userSavedEvents.$eventId': sessionId,
       });
-      await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
-        'savedUsers': FieldValue.arrayUnion([userUID]),
-      });
+      // await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
+      //   'savedUsers': FieldValue.arrayUnion([userUID]),
+      // });
     } catch (error) {
       print("Failed to save event: $error");
     }
@@ -200,9 +200,9 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': FieldValue.delete(),
       });
-      await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
-        'savedUsers': FieldValue.arrayRemove([userUID]),
-      });
+      // await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
+      //   'savedUsers': FieldValue.arrayRemove([userUID]),
+      // });
     } catch (error) {
       print("Failed to unsave event: $error");
     }
@@ -226,6 +226,26 @@ class FirebaseService {
       }
     }
     return false;
+  }
+
+  Future<String?> userSavedSession(String userUID, String eventId) async{
+    DocumentSnapshot userDocSnapshot =
+    await this.db.collection('users').doc(userUID).get();
+
+    if (userDocSnapshot.exists) {
+      final userData = userDocSnapshot.data() as Map<String, dynamic>;
+      if (userData['userSavedEvents'] is Map) {
+        Map<String, dynamic> savedEvents = userData['userSavedEvents'] != null
+            ? Map<String, dynamic>.from(userData['userSavedEvents'])
+            : {};
+
+        // Check if the eventId exists in the list
+        if(savedEvents.containsKey(eventId)){
+          return savedEvents[eventId];
+        }
+      }
+    }
+    return null;
   }
 
   // Function to categorize events into attended and saved events
