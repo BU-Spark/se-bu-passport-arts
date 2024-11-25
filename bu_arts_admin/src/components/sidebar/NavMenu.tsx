@@ -21,13 +21,13 @@ const NavMenu: React.FC = () => {
                     title="Events"
                     image="/icons/event_grey.png"
                     hoverImage="/icons/event_red.png"
-                    to="/events"
+                    to="/events/upcoming"
                     activeLink={activeLink}
                     setActiveLink={setActiveLink}
                 >
                     <li className="mt-2">
                         <NavLink
-                            to="/upcoming-events"
+                            to="/events/upcoming"
                             className={({ isActive }) => `pl-4 ${isActive ? 'text-sidebar-red' : 'text-sidebar-grey hover:text-sidebar-red'}`}
                             onClick={() => setActiveLink("Events-upcomping")}
                         >

@@ -7,6 +7,7 @@ const MonthlyEventCountWidget: React.FC = () => {
     const fetchMonthlyEvents = async () => {
         try {
             const count = await countCurrentMonthEvents();
+            console.log("Monthly event count:", count);
             setEventCount(count);
         } catch (error) {
             console.error("Error fetching events:", error);
@@ -23,10 +24,6 @@ const MonthlyEventCountWidget: React.FC = () => {
             <div className="mb-4">
                 <h2 className="text-gray-600 text-lg font-medium">Monthly Events</h2>
                 <p className="text-back text-5xl font-bold my-2">{eventCount}</p>
-                {/* Uncomment if needed */}
-                {/* <p className="text-gray-500 text-sm">
-          Update your payout method in Settings
-        </p> */}
             </div>
 
             {/* Button Section */}

@@ -79,36 +79,6 @@ const StudentDetailPage = () => {
     if (error) return <p>{error}</p>;
     if (!user) return <p>User not found</p>;
 
-    const userProfile = {
-        name: "Barbra Brown",
-        avatar: "https://via.placeholder.com/150", // Replace with actual image
-        interests: ["Theatre", "Music", "Musicals"],
-        friends: 23,
-        ranking: "diamond", // You can set your ranking icon here
-        reviewed: [
-            {
-                title: "Boston Youth Symphony Orchestras Concert",
-                location: "808 Commonwealth",
-                date: "09/13/2023",
-                points: 25,
-                rating: 4,
-            },
-            {
-                title: "Boston Youth Symphony Orchestras Concert",
-                location: "808 Commonwealth",
-                date: "09/13/2023",
-                points: 40,
-                rating: 5,
-            },
-        ],
-        upcoming: [
-            {
-                title: "Boston Youth Symphony Orchestras Concert",
-                location: "808 Commonwealth",
-                date: "09/20/2023",
-            },
-        ],
-    };
 
     return (
         <div className="p-8 bg-gray-50">

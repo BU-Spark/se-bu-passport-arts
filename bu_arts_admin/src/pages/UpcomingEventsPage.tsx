@@ -2,30 +2,34 @@
 import React, { useEffect, useState } from 'react';
 import { Event } from "../interfaces/Event"
 import EventBox from "../components/EventBox"
-import { searchEvents } from '../firebase/firebaseService';
+import { fetchFutureEvents } from '../firebase/firebaseService';
 
 interface FetchAllEventsProps {
 }
 
-const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
+const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
 
+
     // Handle input change and call search
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const text = event.target.value;
         setSearchText(text);
-        let result = await searchEvents(text);
-        setEvents(result);
+        const futureEvents = await fetchFutureEvents(text);
+
+
+        setEvents(futureEvents);
     };
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const eventsData = await searchEvents(''); // Fetch all events by default
-                setEvents(eventsData);
+
+                const futureEvents = await fetchFutureEvents('');
+                setEvents(futureEvents);
             } catch (error) {
                 setError('Failed to load events');
                 console.error('Error fetching events:', error);
@@ -43,7 +47,7 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
     return (
         <div>
             <div className="flex items-center space-x-4 mb-6">
-                <h1 className="text-2xl font-semibold text-bured">Event</h1>
+                <h1 className="text-2xl font-semibold text-bured">Upcoming Events</h1>
                 <div className="relative">
                     <input
                         type="text"
@@ -74,4 +78,4 @@ const ViewAllEventsPage: React.FC<FetchAllEventsProps> = () => {
     );
 };
 
-export default ViewAllEventsPage;
+export default UpcomingEventsPage;

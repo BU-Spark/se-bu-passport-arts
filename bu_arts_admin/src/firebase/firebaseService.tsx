@@ -1,9 +1,9 @@
 // src/firebase/firebaseService.ts
+import { collection, getDocs, getDoc, doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "./firebaseConfig";
-import { collection, getDocs, getDoc, doc, updateDoc} from "firebase/firestore";
 import { Event } from "../interfaces/Event"
 import { User } from "../interfaces/User";
-import {getLastXMonths, generateMonthRange} from "../utils/utils";
+import { getLastXMonths, generateMonthRange } from "../utils/utils";
 
 const eventTableName = "new_events";
 const userTableName = "users";
@@ -182,27 +182,72 @@ export const fetchUserRegistrationStats = async (numMonths: number) => {
 export const countCurrentMonthEvents = async (): Promise<number> => {
   const eventCollection = collection(db, eventTableName);
 
-  const snapshot = await getDocs(eventCollection);
-  const events = snapshot.docs.map((doc) => doc.data() as Event);
+  try {
+    const snapshot = await getDocs(eventCollection);
+    const events = snapshot.docs.map((doc) => doc.data() as Event);
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    let count = 0;
 
-  let count = 0;
-  events.forEach((event) => {
-    Object.values(event.eventSessions).forEach((session) => {
-      const startTime = session.startTime.toDate(); // Convert Firestore Timestamp to JS Date
-      if (startTime.getFullYear() === currentYear && startTime.getMonth() === currentMonth) {
-        count++;
-      }
+    events.forEach((event) => {
+      Object.values(event.eventSessions).forEach((session) => {
+        if (session?.startTime) { // Check if startTime exists
+          const startTime = session.startTime.toDate(); // Convert Firestore Timestamp to JS Date
+          if (startTime.getFullYear() === currentYear && startTime.getMonth() === currentMonth) {
+            count++;
+          }
+        }
+      });
     });
-  });
-  return count;
+
+    return count;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return 0; // Return 0 in case of an error
+  }
+};
+
+export const fetchPastEvents = async (searchText: string): Promise<Event[]> => {
+  const eventsData = await searchEvents(searchText); // Fetch all events by default
+  const now = Timestamp.now();
+
+  const pastEvents = eventsData
+    .filter(event =>
+      Object.values(event.eventSessions).some(session => session.endTime < now)
+    )
+    .map(event => ({
+      ...event,
+      eventSessions: Object.fromEntries(
+        Object.entries(event.eventSessions).filter(
+          ([, session]) => session.endTime < now
+        )
+      )
+    }))
+    .filter(event => Object.keys(event.eventSessions).length > 0)
+  return pastEvents;
 }
 
+export const fetchFutureEvents = async (searchText: string): Promise<Event[]> => {
+  const eventsData = await searchEvents(searchText);
 
-// export const fetchUserPastEvents = async(userId: string): Promise<Event | null> => {
-  
-// }
+  const now = Timestamp.now();
 
+  const futureEvents = eventsData
+    .filter(event =>
+      Object.values(event.eventSessions).some(session => session.endTime > now)
+    )
+    .map(event => ({
+      ...event,
+      eventSessions: Object.fromEntries(
+        Object.entries(event.eventSessions).filter(
+          ([, session]) => session.endTime > now
+        )
+      )
+    }))
+    .filter(event => Object.keys(event.eventSessions).length > 0);
+
+  console.log(futureEvents);
+  return futureEvents;
+}

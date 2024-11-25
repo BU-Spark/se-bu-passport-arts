@@ -49,10 +49,8 @@ const DashboardPage: React.FC = () => {
       <div className="flex items-center space-x-4 mb-4">
         <h1 className="text-2xl font-semibold text-bured">Dashboard</h1>
       </div>
-      {/* Flex container to position the chart and widget side by side */}
-      <div className="flex justify-between items-start w-full space-x-1">
-        {/* Chart: 8/12 of the width */}
-        <div className="w-8/12">
+      <div className="flex justify-normal items-start w-full space-x-1 m-6">
+        <div className="w-max mr-9 ml-9">
           <NewUserLineChart
             xLabels={xLabels}
             yData={yData}
@@ -61,7 +59,7 @@ const DashboardPage: React.FC = () => {
           />
         </div>
         {/* Widget: 4/12 of the width */}
-        <div className="w-4/12">
+        <div className="w-96">
           <MonthlyEventCountWidget />
         </div>
       </div>

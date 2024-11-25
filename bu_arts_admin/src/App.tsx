@@ -3,12 +3,13 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Dashboard from './pages/DashboardPage.tsx';
-import ViewEventPage from './pages/ViewEventsPage.tsx';
+import PastEventViewPage from './pages/PastEventDetailPage.tsx';
 import EditEventPage from './pages/EditEventPage.tsx';
 import Sidebar from './components/sidebar/Sidebar.tsx';
 import ViewStudentsPage from './pages/ViewStudentsPage.tsx';
-import StudentDetailPage from './pages/StudentDetailPage.tsx';
+import StudentDetailPage from './pages/StudentProfilePage.tsx';
 import PastEventsPage from './pages/PastEventsPage.tsx';
+import UpcomingEventsPage from './pages/UpcomingEventsPage.tsx';
 
 
 const App: React.FC = () => {
@@ -27,10 +28,10 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/events"
+              path="/events/upcoming"
               element={
                 <SignedIn>
-                  <ViewEventPage />
+                  <UpcomingEventsPage />
                 </SignedIn>
               }
             />
@@ -53,6 +54,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/edit-event/:eventID" element={<EditEventPage />} />
+            <Route path="/view-event/:eventID" element={<PastEventViewPage />} />
             <Route path="/event/:eventID/:sessionId" element={<EditEventPage />} />
             <Route path="/students" element={<ViewStudentsPage />} />
             <Route path="/students/:userID" element={<StudentDetailPage />} />

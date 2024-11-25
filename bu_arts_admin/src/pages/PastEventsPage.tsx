@@ -1,9 +1,8 @@
 // src/components/FetchAllEvents.tsx
 import React, { useEffect, useState } from 'react';
 import { Event } from "../interfaces/Event"
-import EventBox from "../components/EventBox"
-import { searchEvents } from '../firebase/firebaseService';
-import { Timestamp } from "firebase/firestore";
+import PastEventBox from "../components/PastEventBox"
+import { fetchPastEvents } from '../firebase/firebaseService';
 
 interface FetchAllEventsProps {
 }
@@ -18,31 +17,7 @@ const PastEventsPage: React.FC<FetchAllEventsProps> = () => {
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const text = event.target.value;
         setSearchText(text);
-        let result = await searchEvents(text);
-
-        const now = Timestamp.now();
-
-        const pastEvents = result
-            .filter(event =>
-                Object.values(event.eventSessions).some(session => session.endTime < now)
-            )
-            .map(event => ({
-                ...event,
-                eventSessions: Object.fromEntries(
-                    Object.entries(event.eventSessions).filter(
-                        ([, session]) => session.endTime < now
-                    )
-                )
-            }))
-            .sort((a, b) => {
-                const aEarliestStart = Math.min(
-                    ...Object.values(a.eventSessions).map(session => session.startTime.toMillis())
-                );
-                const bEarliestStart = Math.min(
-                    ...Object.values(b.eventSessions).map(session => session.startTime.toMillis())
-                );
-                return aEarliestStart - bEarliestStart;
-            });
+        let pastEvents = await fetchPastEvents(text);
 
         setEvents(pastEvents);
     };
@@ -50,8 +25,8 @@ const PastEventsPage: React.FC<FetchAllEventsProps> = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const eventsData = await searchEvents(''); // Fetch all events by default
-                setEvents(eventsData);
+                const pastEvents = await fetchPastEvents(''); // Fetch all events by default
+                setEvents(pastEvents);
             } catch (error) {
                 setError('Failed to load events');
                 console.error('Error fetching events:', error);
@@ -69,7 +44,7 @@ const PastEventsPage: React.FC<FetchAllEventsProps> = () => {
     return (
         <div>
             <div className="flex items-center space-x-4 mb-6">
-                <h1 className="text-2xl font-semibold text-bured">Event</h1>
+                <h1 className="text-2xl font-semibold text-bured">Past Events</h1>
                 <div className="relative">
                     <input
                         type="text"
@@ -88,7 +63,7 @@ const PastEventsPage: React.FC<FetchAllEventsProps> = () => {
                     {events.length > 0 ? (
                         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {events.map((event) => (
-                                <EventBox key={event.eventID} event={event} />
+                                <PastEventBox key={event.eventID} event={event} />
                             ))}
                         </ul>
                     ) : (

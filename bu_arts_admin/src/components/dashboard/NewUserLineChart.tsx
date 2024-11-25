@@ -33,13 +33,14 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
         return '';
     }
   };
+  const totalUsers = yData.reduce((sum, value) => sum + value, 0);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 max-w-fit mx-auto">
+    <div className="bg-white shadow-lg rounded-lg p-6 w-max mx-auto">
       {/* Header Section */}
       <div className="flex flex-col items-start mb-4">
-        <h2 className="text-gray-600 text-lg font-medium">Total Participant</h2>
-        <p className="text-red-600 text-5xl font-bold underline">3,278</p>
+        <h2 className="text-gray-600 text-lg font-medium">Total New Users</h2>
+        <p className="text-red-600 text-5xl font-bold underline">{totalUsers}</p>
         <p className="text-gray-500 text-sm mt-1">{getRangeDescription(range)}</p>
       </div>
 
