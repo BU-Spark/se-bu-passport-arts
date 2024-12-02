@@ -1,49 +1,33 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchSingleUser } from "../firebase/firebaseService";
-import { User } from "../interfaces/User";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { User } from "../interfaces/User";
+import { Event } from "../interfaces/Event";
+import { fetchSingleUser, fetchUserAttendedEvents } from "../firebase/firebaseService";
 
 const StudentDetailPage = () => {
     const navigate = useNavigate();
 
     const { userID } = useParams<{ userID: string }>();
     const [user, setUser] = useState<User>();
+    const [attendedEvents, setAttendedEvents] = useState<Event[]>([]);
     const [activeTab, setActiveTab] = useState<string>("reviewed");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const reviewedEvents = [
-        {
-            title: "Boston Youth Symphony Orchestras Concert",
-            location: "808 Commonwealth",
-            date: "09/13/2023",
-            image: "https://via.placeholder.com/300x200",
-            points: 25,
-            rating: 4,
-        },
-        {
-            title: "Broadway Show",
-            location: "Main Theater",
-            date: "09/14/2023",
-            image: "https://via.placeholder.com/300x200",
-            points: 40,
-            rating: 5,
-        },
-    ];
-
+    // The following data is for demonstration purposes only
     const upcomingEvents = [
         {
-            title: "Jazz Night",
-            location: "Downtown Club",
+            eventTitle: "Jazz Night",
+            eventLocation: "Downtown Club",
             date: "09/20/2023",
-            image: "https://via.placeholder.com/300x200",
+            eventPhoto: "https://via.placeholder.com/300x200",
         },
         {
-            title: "Art Gallery Exhibition",
-            location: "City Art Center",
+            eventTitle: "Art Gallery Exhibition",
+            eventLocation: "City Art Center",
             date: "09/25/2023",
-            image: "https://via.placeholder.com/300x200",
+            eventPhoto: "https://via.placeholder.com/300x200",
         },
     ];
 
@@ -66,6 +50,9 @@ const StudentDetailPage = () => {
                 } else {
                     setError("No user found with the given ID");
                 }
+
+                const attendedEvents = await fetchUserAttendedEvents(userID);
+                setAttendedEvents(attendedEvents);
             } catch (err) {
                 setError("Failed to load user details.");
             } finally {
@@ -142,8 +129,9 @@ const StudentDetailPage = () => {
                         </button>
                     </div>
 
+                    {/* TODO: implement db query to user's reserved events */}
                     <div className="mt-8 grid grid-cols-2 gap-4">
-                        {(activeTab === "reviewed" ? reviewedEvents : upcomingEvents).map(
+                        {(activeTab === "reviewed" ? attendedEvents : upcomingEvents).map(
                             (event, index) => (
                                 <div
                                     key={index}
@@ -152,16 +140,16 @@ const StudentDetailPage = () => {
                                     {/* Event Image */}
                                     <div className="relative">
                                         <img
-                                            src={event.image}
-                                            alt={event.title}
+                                            src={event.eventPhoto}
+                                            alt={event.eventTitle}
                                             className="w-full h-48 object-cover"
                                         />
                                         <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30 flex flex-col justify-end p-4">
-                                            <h2 className="text-white text-lg font-bold">{event.title}</h2>
-                                            <p className="text-gray-300">{event.location}</p>
+                                            <h2 className="text-white text-lg font-bold">{event.eventTitle}</h2>
+                                            <p className="text-gray-300">{event.eventLocation}</p>
                                         </div>
                                         <div className="absolute bottom-4 right-4 bg-white text-red-600 font-bold px-2 py-1 rounded-lg shadow-lg">
-                                            {event.points}pts
+                                            {event.eventPoints}pts
                                         </div>
                                     </div>
 
@@ -171,7 +159,6 @@ const StudentDetailPage = () => {
                                             <span className="text-gray-400 text-sm font-bold block">
                                                 {activeTab === "reviewed" ? "Attended" : "Upcoming"}
                                             </span>
-                                            <span className="text-gray-600 text-sm">{event.date}</span>
                                         </div>
                                         {activeTab === "reviewed" && (
                                             <div className="flex items-center">

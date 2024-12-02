@@ -2,11 +2,13 @@
 import { collection, getDocs, getDoc, doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import { Event } from "../interfaces/Event"
-import { User } from "../interfaces/User";
+import { User, AttendanceUser } from "../interfaces/User";
+import { Attendance } from "../interfaces/Attendance";
 import { getLastXMonths, generateMonthRange } from "../utils/utils";
 
 const eventTableName = "new_events";
 const userTableName = "users";
+const attendanceTableName = "attendances";
 // Function to get data from a collection
 export const fetchAllEvents = async (): Promise<Event[]> => {
   const querySnapshot = await getDocs(collection(db, eventTableName));
@@ -251,3 +253,180 @@ export const fetchFutureEvents = async (searchText: string): Promise<Event[]> =>
   console.log(futureEvents);
   return futureEvents;
 }
+
+export const fetchEventAttendance = async (eventId: string): Promise<Attendance[]> => {
+  const attendanceCollection = collection(db, attendanceTableName);
+  const snapshot = await getDocs(attendanceCollection);
+
+  const attendances: Attendance[] = snapshot.docs
+    .map((doc) => doc.data() as Attendance) // Cast to Attendance
+    .filter((attendance) => attendance.eventID === eventId); // Filter by eventId
+
+  console.log("fetchEventAttendance:", attendances);
+  return attendances;
+};
+
+
+export const fetchPastEventSessions = async (eventId: string): Promise<string[]> => {
+  try {
+    // Reference to the specific event document
+    const eventDocRef = doc(collection(db, "eventTableName"), eventId); // Replace "eventTableName" with your actual collection name
+
+    // Fetch the event document
+    const eventDocSnap = await getDoc(eventDocRef);
+
+    if (eventDocSnap.exists()) {
+      const eventData = eventDocSnap.data() as Event;
+      const currentTime = Timestamp.now();
+
+      // Filter past sessions
+      const pastSessions = Object.values(eventData.eventSessions).filter(
+        (session) => session.endTime.toMillis() < currentTime.toMillis()
+      );
+
+      // Extract and return session IDs
+      return pastSessions.map((session) => session.sessionId);
+    } else {
+      console.error(`Event with ID ${eventId} not found.`);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching past event sessions:", error);
+    return [];
+  }
+};
+
+export const fetchRegisteredUsers = async (eventId: string): Promise<AttendanceUser[]> => {
+  try {
+    // Fetch past event sessions for the given eventId
+    const pastEventSessions = await fetchPastEventSessions(eventId);
+
+    // Reference to the users collection
+    const usersCollectionRef = collection(db, "users"); // Replace "users" with your actual users collection name
+
+    // Fetch all user documents
+    const userDocsSnapshot = await getDocs(usersCollectionRef);
+
+    const users: AttendanceUser[] = [];
+
+    userDocsSnapshot.forEach((doc) => {
+      const userData = doc.data() as AttendanceUser;
+
+      // Check if the user's saved events contain the eventId and a sessionId in pastEventSessions
+      const savedEvents = userData.userSavedEvents;
+
+      if (savedEvents.has(eventId) && pastEventSessions.includes(savedEvents.get(eventId)!)) {
+        users.push(userData);
+      }
+    });
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching registered users:", error);
+    return [];
+  }
+};
+
+
+export const fetchEventAttendanceWithProfiles = async (eventId: string): Promise<{ attendance: Attendance; userProfile: User | null }[]> => {
+  const attendanceCollection = collection(db, attendanceTableName);
+  const userCollection = collection(db, userTableName); // Correctly get a reference to the users collection.
+
+  // Fetch attendance records for the event
+  const snapshot = await getDocs(attendanceCollection);
+
+  const eventAttendances: Attendance[] = snapshot.docs
+    .map((doc) => doc.data() as Attendance) // Cast to Attendance
+    .filter((attendance) => attendance.eventID === eventId); // Filter by eventId
+
+  const results: { attendance: Attendance; userProfile: User | null }[] = [];
+
+  const registeredUsers = await fetchRegisteredUsers(eventId);
+
+  for (const attendance of eventAttendances) {
+    for (const user of registeredUsers) {
+      if (attendance.userID === user.userUID) {
+        user.isAttended = true;
+      }
+    }
+  }
+  console.log("registeredUsers:", registeredUsers);
+
+  const isAttended: Map<string, boolean> = new Map();
+  for (const user of registeredUsers) {
+    isAttended.set(user.userUID, false);
+  }
+  for (const attendance of eventAttendances) {
+    isAttended.set(attendance.userID, true);
+  }
+
+  // Fetch user profile for each attendance record
+  for (const attendance of eventAttendances) {
+    const userDocRef = doc(userCollection, attendance.userID); // Pass userCollection and document ID correctly
+    const userDoc = await getDoc(userDocRef);
+
+    const userProfile = userDoc.exists() ? (userDoc.data() as User) : null;
+
+    results.push({ attendance, userProfile });
+  }
+
+  let attendedCount = 0;
+  let notAttendedCount = 0;
+
+  isAttended.forEach((value) => {
+    if (value) {
+      attendedCount++;
+    } else {
+      notAttendedCount++;
+    }
+  });
+
+
+  console.log("fetchEventAttendanceWithProfiles:", results);
+  return results;
+};
+
+export const fetchEventName = async (eventId: string): Promise<string> => {
+  try {
+    const eventRef = doc(db, eventTableName, eventId);
+    const docSnapshot = await getDoc(eventRef);
+
+    if (!docSnapshot.exists()) {
+      console.error("No matching event found");
+      return "";
+    }
+
+    const eventData = docSnapshot.data() as Event;
+    return eventData.eventTitle;
+  } catch (error) {
+    console.error("Error fetching event:", error);
+    throw new Error("Failed to fetch event");
+  }
+}
+
+export const fetchUserAttendedEvents = async (userId: string): Promise<Event[]> => {
+  const attendanceCollection = collection(db, attendanceTableName);
+  const eventCollection = collection(db, eventTableName);
+
+  const snapshot = await getDocs(attendanceCollection);
+
+  const attendedEvents: Event[] = [];
+
+  for (const document of snapshot.docs) {
+    const attendance = document.data() as Attendance;
+
+    if (attendance.userID === userId) {
+      const eventDocRef = doc(eventCollection, attendance.eventID);
+
+      // Await the event document fetch
+      const eventDoc = await getDoc(eventDocRef);
+
+      if (eventDoc.exists()) {
+        const eventData = eventDoc.data() as Event;
+        attendedEvents.push(eventData);
+      }
+    }
+  }
+
+  return attendedEvents;
+};

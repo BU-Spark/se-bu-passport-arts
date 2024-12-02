@@ -10,6 +10,7 @@ import ViewStudentsPage from './pages/ViewStudentsPage.tsx';
 import StudentDetailPage from './pages/StudentProfilePage.tsx';
 import PastEventsPage from './pages/PastEventsPage.tsx';
 import UpcomingEventsPage from './pages/UpcomingEventsPage.tsx';
+import AttendancePage from './pages/AttendancePage.tsx';
 
 
 const App: React.FC = () => {
@@ -58,6 +59,7 @@ const App: React.FC = () => {
             <Route path="/event/:eventID/:sessionId" element={<EditEventPage />} />
             <Route path="/students" element={<ViewStudentsPage />} />
             <Route path="/students/:userID" element={<StudentDetailPage />} />
+            <Route path="/events/:eventID/attendance" element={<AttendancePage />} />
           </Routes>
         </main>
       </div>
