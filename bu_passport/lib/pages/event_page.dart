@@ -1,14 +1,28 @@
+//import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:bu_passport/classes/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bu_passport/services/geocoding_service.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:bu_passport/classes/event.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:ui' as ui;
+import '../components/checkin_options_dialog.dart';
+import '../components/checkin_success_dialog.dart';
+import '../components/time_span.dart';
+import '../services/firebase_service.dart';
+import '../services/web_image_service.dart';
+
+import 'package:http/http.dart' as http;
 
 class EventPage extends StatefulWidget {
   final Event event;
@@ -29,7 +43,30 @@ class _EventPageState extends State<EventPage> {
 
   bool _isSaved = false; // Track whether the user is interested in the event
   bool _isCheckedIn = false; // To track if the user has checked in
+  String photoUrl = "";
 
+
+  Future<ui.Image> _loadImage(File file) async {
+    final bytes = await file.readAsBytes();
+    return await decodeImageFromList(bytes);
+  }
+
+  Future<ui.Image> _loadImageFromAssets(String path) async {
+    // Load the image data from the assets
+    final ByteData data = await rootBundle.load(path);
+    final List<int> bytes = data.buffer.asUint8List();
+
+    // Decode the image data to a ui.Image
+    return await decodeImageFromList(Uint8List.fromList(bytes));
+  }
+
+  Future<ui.Image> _loadImageFromUrl(String url) async {
+    final response = await http.get(Uri.parse(url));
+    final Uint8List bytes = response.bodyBytes;
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, completer.complete);
+    return completer.future;
+  }
 // Checks if user saved event -- if so, the button will reflect that
   @override
   void initState() {
@@ -127,6 +164,73 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
+  Future<void> checkInWithPhoto() async {
+    try{
+      firebaseService.checkInUserForEvent(
+          widget.event.eventID, widget.event.eventPoints+5, widget.event.eventStickers);
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      if(pickedFile!=null){
+        final Uint8List imageBytes = await pickedFile.readAsBytes();
+        firebaseService.uploadCheckinImage(widget.event.eventID, imageBytes);
+        final photo = await _loadImage(File(pickedFile.path));
+        final frame = await _loadImageFromAssets('assets/images/stickers/frame.png');
+        ui.Image? sticker1;
+        ui.Image? sticker2;
+        if (widget.event.eventStickers.isNotEmpty) sticker1 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[0].name+".png");
+        if (widget.event.eventStickers.length > 1) sticker2 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[1].name+".png");
+        widget.onUpdateEventPage();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SuccessDialog(
+              points: widget.event.eventPoints+5,
+              eventTitle: widget.event.eventTitle,
+              image: photo,
+              frame: frame,
+              sticker1: sticker1,
+              sticker2: sticker2,
+            );
+          },
+        );
+      }else{
+
+      }
+
+    }catch(e){
+      print("Unable to checkin: ${e.toString()}");
+      return;
+    }
+
+  }
+
+  Future<void> checkInWithoutPhoto()async {
+    try{
+      firebaseService.checkInUserForEvent(
+          widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
+      ui.Image? sticker1;
+      ui.Image? sticker2;
+      if (widget.event.eventStickers.isNotEmpty) sticker1 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[0].name+".png");
+      if (widget.event.eventStickers.length > 1) sticker2 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[1].name+".png");
+      final icon = await _loadImageFromUrl(widget.event.eventPhoto);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SuccessDialog(
+            points: widget.event.eventPoints,
+            eventTitle: widget.event.eventTitle,
+            logo: icon,
+            sticker1: sticker1,
+            sticker2: sticker2,
+          );
+        },
+      );
+    }catch(e){
+      return;
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -140,11 +244,11 @@ class _EventPageState extends State<EventPage> {
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset(
-            widget.event.eventPhoto,
+          Image(
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
             fit: BoxFit.cover,
             width: double.infinity,
-            height: screenHeight * 0.4, // Adjust the height as needed
+            height: screenHeight * 0.4,
           ),
           Padding(
             padding: EdgeInsets.all(edgeInsets * 2.5),
@@ -173,36 +277,8 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'Start: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                            .format(widget.event.eventStartTime),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'End: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text: DateFormat('h:mm a, EEEE, MMMM d, y')
-                            .format(widget.event.eventEndTime),
-                      ),
-                    ],
-                  ),
+                AllSessionsDisplay(
+                  sessions: widget.event.eventSessions,
                 ),
                 SizedBox(height: sizedBoxHeight),
                 GestureDetector(
@@ -253,22 +329,29 @@ class _EventPageState extends State<EventPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: (!_isSaved ||
-                          !isEventToday(widget.event.eventStartTime) ||
+                  onPressed: (
+                          !widget.event.isEventHappening() ||
                           _isCheckedIn)
                       ? null
                       : () async {
+
                           // Your check-in logic here. On successful check-in, update the _isCheckedIn state.
                           bool success = await checkIn();
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Checked in successfully!")));
-                            firebaseService.checkInUserForEvent(
-                                widget.event.eventID, widget.event.eventPoints);
+                            bool withPhoto = await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CheckInOptionsDialog();
+                              },
+                            );
+                            if(withPhoto){
+                              checkInWithPhoto();
+                            } else {
+                              checkInWithoutPhoto();
+                            }
 
-                            widget.onUpdateEventPage();
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text(
                                     "Unable to check in: location too far or permission denied.")));
                           }
@@ -277,7 +360,7 @@ class _EventPageState extends State<EventPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isCheckedIn
                         ? Colors.grey
-                        : (_isSaved ? Colors.red : Colors.grey),
+                        : (Colors.red),
                   ),
                 ),
                 SizedBox(width: sizedBoxHeight * 3), // Optional spacing

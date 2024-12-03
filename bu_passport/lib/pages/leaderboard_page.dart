@@ -19,7 +19,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
   int userTickets = 0;
   int? userRank; // Variable to store user rank
   FirebaseService firebaseService =
-      FirebaseService(db: FirebaseFirestore.instance);
+  FirebaseService(db: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();

@@ -1,10 +1,11 @@
+import 'package:bu_passport/classes/event.dart';
 import 'package:bu_passport/components/event_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:bu_passport/services/firebase_service.dart';
-import 'package:bu_passport/classes/event.dart';
+
+import '../services/firebase_service.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -42,7 +43,9 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  void updateEventPage() {}
+  void updateEventPage() {
+    _fetchEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,10 +117,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   // Provide events to the calendar
                   eventLoader: (day) {
                     return _allEvents
-                        .where((event) =>
-                            event.eventStartTime.year == day.year &&
-                            event.eventStartTime.month == day.month &&
-                            event.eventStartTime.day == day.day)
+                        .where((event) =>event.hasSessionOnDay(day))
                         .toList();
                   },
                 ),
@@ -136,12 +136,15 @@ class _CalendarPageState extends State<CalendarPage> {
                           child: ListView.builder(
                             itemCount: selectedEvents.length,
                             itemBuilder: (context, index) {
+                              final uniqueKey =
+                                  '${selectedEvents[index].eventID}-${DateTime.now().millisecondsSinceEpoch.hashCode}';
                               return Container(
                                 margin: EdgeInsets.symmetric(
                                   vertical: itemVerticalMargin,
                                   horizontal: itemHorizontalMargin,
                                 ),
                                 child: EventWidget(
+                                    key: ValueKey(uniqueKey),
                                     event: selectedEvents[index],
                                     onUpdateEventPage: updateEventPage),
                               );

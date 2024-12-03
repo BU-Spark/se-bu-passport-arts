@@ -1,11 +1,14 @@
 import 'package:bu_passport/classes/event.dart';
+import 'package:bu_passport/components/time_span.dart';
 import 'package:bu_passport/pages/event_page.dart';
-import 'package:bu_passport/services/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+
+import '../services/firebase_service.dart';
+import '../services/web_image_service.dart';
 
 class EventWidget extends StatefulWidget {
   final Event event;
@@ -97,7 +100,7 @@ class _EventWidgetState extends State<EventWidget> {
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: Colors.grey),
           image: DecorationImage(
-            image: AssetImage(widget.event.eventPhoto),
+            image: WebImageService.buildImageProvider(widget.event.eventPhoto),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.black.withOpacity(0.3), BlendMode.multiply),
@@ -139,14 +142,8 @@ class _EventWidgetState extends State<EventWidget> {
                               ),
                             ),
                             SizedBox(height: sizedBoxHeight * 0.5),
-                            Text(
-                              DateFormat.yMMMd()
-                                  .format(widget.event.eventStartTime),
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
+                            EventDateRangeDisplay(
+                              sessions: widget.event.eventSessions,
                             ),
                           ],
                         ),
