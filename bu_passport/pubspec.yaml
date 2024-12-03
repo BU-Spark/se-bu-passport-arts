@@ -49,6 +49,7 @@ dependencies:
   permission_handler: ^11.3.1
   url_launcher: ^6.2.5
   google_sign_in: ^5.2.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -83,8 +84,10 @@ flutter:
   assets:
     - assets/images/onboarding/
     - assets/images/arts/
-    - assets/images/leaderboard/
+    - assets/images/leaderboard/  
+    - assets/images/passport/
     - assets/images/stickers/
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
