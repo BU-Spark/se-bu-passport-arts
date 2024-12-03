@@ -79,11 +79,12 @@ class _LoginPageState extends State<LoginPage> {
             'userProfileURL': user.photoURL,
             'userPoints': 0,
             'userSavedEvents': {},
-            // Additional fields to be filled by the user
             'userBUID': '',
             'userSchool': '',
             'userYear': 0,
-            'admin': false,
+            'userCollectedStickers': {},
+            'userPhotos': [],
+            'userCreatedAt': FieldValue.serverTimestamp(),
           });
           // Set newUser flag
           newUser = true;
