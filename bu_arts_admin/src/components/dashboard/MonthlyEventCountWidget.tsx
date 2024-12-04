@@ -25,7 +25,7 @@ const MonthlyEventCountWidget: React.FC = () => {
     }, []);
 
     return (
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl mx-auto text-center">
+        <div className="bg-white shadow-lg rounded-lg p-6 w-11/12 max-w-2xl mx-auto text-center">
             {/* Header Section */}
             <div className="mb-4">
                 <h2 className="text-gray-600 text-lg font-medium">Monthly Events</h2>
