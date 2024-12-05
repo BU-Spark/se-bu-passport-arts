@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class Passport {
-  static const int maxStickersPerPage = 6;
+  static const int maxStickersPerPage = 9;
   List<List<Sticker>> pages = [[]];
 
   void addSticker(Sticker sticker) {
