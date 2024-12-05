@@ -95,6 +95,10 @@ se-bu-passport-arts/bu_arts_admin/src
 └── vite-env.d.ts          # TypeScript declaration file for Vite environment variables
 ```
 
+## Known Bugs and Issues
+
+- **View Attendance Profile**: When clicking "going back" button, the admin is redirected to the View Students Page, instead of the Event Detail Page.
+
 ## Future Work
 
 ### 1) Past Event Attendance
