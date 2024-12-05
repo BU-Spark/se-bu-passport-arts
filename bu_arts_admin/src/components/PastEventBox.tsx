@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Event } from "../interfaces/Event";
 
-const EventBox = ({ event }: { event: Event }) => {
+const PastEventBox = ({ event }: { event: Event }) => {
     const navigate = useNavigate();
 
     const handleEdit = () => {
-        navigate(`/edit-event/${event.eventID}`);
+        navigate(`/view-event/${event.eventID}`);
     };
 
     return (
@@ -20,12 +20,12 @@ const EventBox = ({ event }: { event: Event }) => {
             }}
         >
             <div className="absolute inset-0 bg-black opacity-40 rounded-lg pointer-events-none"></div>
-            {/* "Go Edit Event" Button */}
+            {/* "See Event Details" Button */}
             <button
                 onClick={handleEdit}
                 className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 rounded-md text-sm"
             >
-                Go Edit Event
+                See Event Details
             </button>
 
             {/* "Free!" Label */}
@@ -42,4 +42,4 @@ const EventBox = ({ event }: { event: Event }) => {
     );
 };
 
-export default EventBox;
+export default PastEventBox;

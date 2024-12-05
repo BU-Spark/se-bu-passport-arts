@@ -14,6 +14,7 @@ const NoncollapsibleMenu: React.FC<NoncollapsibleMenuProps> = ({ title, image, h
     const location = useLocation();
     const [iconSrc, setIconSrc] = useState(image);
     const [selected, setSelected] = useState(false); // Track if the item is selected
+    activeLink
 
     useEffect(() => {
         // Check if the current path matches the menu item's path

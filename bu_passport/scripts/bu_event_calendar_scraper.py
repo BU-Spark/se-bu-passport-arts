@@ -56,7 +56,7 @@ class CFAEvent:
                 for session_id, session in self.sessions.items()
             },
         }
-        
+
     def to_dict_no_sessions(self):
         return {
             "eventID": self.event_id,
@@ -65,7 +65,7 @@ class CFAEvent:
             "eventURL": self.event_url,
             "eventDescription": self.description,
             "eventPhoto": self.photo,
-            "eventPoints": 0,
+            # "eventPoints": 0,
         }
 
 
@@ -157,7 +157,7 @@ def scrape_session_location(raw_detail):
     try:
         # Find the dd tag with the location class
         dd_tag = raw_detail.find("dd", class_="single-event-info-location")
-        
+
         # Check if the dd tag exists and return its text
         if dd_tag:
             return dd_tag.text.strip()
@@ -233,10 +233,12 @@ def update_database(db, cfa_events, table_name):
             # Merge event data without eventSessions
             event_dict = event.to_dict()
             if updated_sessions:
-                existing_sessions.update({
-                    session_id: session.to_dict()
-                    for session_id, session in updated_sessions.items()
-                })
+                existing_sessions.update(
+                    {
+                        session_id: session.to_dict()
+                        for session_id, session in updated_sessions.items()
+                    }
+                )
                 doc_ref.set({"eventSessions": existing_sessions}, merge=True)
             else:
                 event_dict.pop("eventSessions", None)  # Exclude if no new sessions
@@ -249,11 +251,11 @@ def update_database(db, cfa_events, table_name):
             doc_ref.set(event.to_dict())
 
 
-def main(table_name):
+def main(table_name, start_date):
     db = initialize_firestore()
     print("Starting scraper")
 
-    url = "https://www.bu.edu/cfa/news/calendar/?amp%3B&topic=8639&date=20241024"
+    url = f"https://www.bu.edu/cfa/news/calendar/?amp%3B&topic=8639&date={start_date}"
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
@@ -296,11 +298,11 @@ def main(table_name):
         event.sessions[session_id].start_time, event.sessions[session_id].end_time = (
             scrape_session_datetime(raw_detail)
         )
-        print(event.location)
+        # print(event.location)
 
     update_database(db, cfa_events, table_name)
 
     print("Event Scraping has completed")
 
 
-main("new_events1")
+main("new_events", "20241130")

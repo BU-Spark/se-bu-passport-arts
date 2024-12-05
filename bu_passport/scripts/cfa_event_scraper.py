@@ -354,4 +354,4 @@ def main(table_name):
     print("Event Scraping has completed")
 
 
-main("new_events1")
+main("new_events")

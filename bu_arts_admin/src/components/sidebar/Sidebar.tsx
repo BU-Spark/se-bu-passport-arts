@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
         <aside className="w-80 h-screen bg-white p-6 shadow-md flex flex-col items-start text-white">
             {/* Logo and Title */}
             <div className="mb-8">
-                <img src="../public/icons/bu_arts.png" alt="BU Arts Initiative" />
+                <img src="/public/icons/bu_arts.png" alt="BU Arts Initiative" />
                 <h1 className="text-white text-2xl font-bold">BU Arts Initiative</h1>
             </div>
 
