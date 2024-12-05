@@ -6,6 +6,7 @@ import 'package:bu_passport/pages/signup_page.dart';
 import 'package:bu_passport/pages/onboarding_page.dart';
 import 'package:bu_passport/pages/passport_page.dart';
 import 'package:bu_passport/classes/passport_model.dart';
+import 'package:bu_passport/classes/passport.dart';
 
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PassportModel(),
+      create: (_) => PassportModel(Passport()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

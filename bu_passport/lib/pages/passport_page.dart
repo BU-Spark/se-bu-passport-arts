@@ -24,16 +24,14 @@ class _PassportPageState extends State<PassportPage>
           .instance); // Firebase service instance for database operations.
 
   User? finalUser = FirebaseAuth.instance.currentUser;
-  late TabController _tabController; // Controller for managing tabs.
   late Future<DocumentSnapshot>
       _userProfileFuture; // Future for retrieving user data from Firestore.
 
-  List<Sticker> dummy_stickers = [Sticker(id: 2), Sticker(id: 3)];
+  List<Sticker> dummy_stickers = [Sticker(id: 1), Sticker(id: 2), Sticker(id: 3), Sticker(id: 4), Sticker(id: 5), Sticker(id: 6), Sticker(id: 7), Sticker(id: 8), Sticker(id: 9)];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     if (finalUser != null) {
       _userProfileFuture = FirebaseFirestore.instance
           .collection('users')
@@ -41,13 +39,6 @@ class _PassportPageState extends State<PassportPage>
           .get();
     }
   }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
 
   @override
   Widget build(BuildContext context) {

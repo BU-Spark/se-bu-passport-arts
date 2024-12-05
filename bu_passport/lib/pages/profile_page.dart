@@ -12,7 +12,6 @@ import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
 
 import 'package:bu_passport/services/firebase_service.dart';
-import 'package:bu_passport/components/passport_widget.dart';
 import '../classes/categorized_events.dart';
 import '../classes/event.dart';
 
@@ -194,7 +193,7 @@ class _ProfilePageState extends State<ProfilePage>
               child: EventWidget(
                   key: ValueKey(uniqueKey),
                   event: event, onUpdateEventPage: updateEventPage));
-          // Use your EventWidget to display each event
+          // Use EventWidget to display each event
         },
       );
     }
