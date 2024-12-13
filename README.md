@@ -64,7 +64,7 @@ Link to [Troubleshooting](#troubleshooting) for errors with running the app or m
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
   - There is a leaderboard page to showcase the highest raffle ticket earners
 -  **Passport**
-  - Certain events award users stickers for attending. They can add these stickers to their collection on the passport page
+   - Certain events award users stickers for attending. They can add these stickers to their collection on the passport page
 
 ### Testing
 To run all the automated tests under the '/test' directory for this project, ensure that you are in the '/bu_passport' directory and execute the following command:
