@@ -35,7 +35,7 @@ development, ensuring that admins can view the platform statistics and manage ev
 
 ![image](./structure.png)
 
-## Tech Satck
+## Tech Stack
 
 - Frontend: React.ts, Tailwind CSS, TypeScript
 - Database: Firebase
