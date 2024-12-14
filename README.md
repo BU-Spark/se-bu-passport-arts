@@ -133,3 +133,9 @@ flutter test test/file_name_here.dart
 - **Friends**: Develop a friends system where users can add friends, view each other's profile and passport, and invite each other to upcoming events
 - **Event comments**: Allow users to comment on events in order to provide feedback to administrators
 - **Privacy**: Give users the option to hide their profile from others and/or leave anonymous event comments
+
+## Team (Fall 2024)
+
+- Jida Li - [jidali03@bu.edu](mailto:jidali03@bu.edu)
+- Yadi He - [ydhe@bu.edu](mailto:ydhe@bu.edu)
+- Jaimey Frank - [jaimeyf@bu.edu](mailto:jaimeyf@bu.edu)
