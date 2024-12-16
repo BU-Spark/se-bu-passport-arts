@@ -305,4 +305,4 @@ def main(table_name, start_date):
     print("Event Scraping has completed")
 
 
-main("new_events", "20241130")
+main("new_events", "20241216")
