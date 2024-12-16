@@ -59,10 +59,8 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                     <img className="w-5 h-5 text-gray-400 absolute right-3 top-2.5" src="/public/icons/search.png" alt="search_icon" />
                 </div>
             </div>
-            <div className="min-h-screen flex flex-col mx-auto p-6">
-
-                {/* Scrollable events container */}
-                <div className="flex-grow h-96 overflow-y-auto bg-slate-50">
+            <div className="min-h-screen flex flex-col mx-auto p-6 overflow-x-hidden">
+                <div className="flex-grow h-96 overflow-y-auto bg-slate-50 px-4">
                     {events.length > 0 ? (
                         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {events.map((event) => (

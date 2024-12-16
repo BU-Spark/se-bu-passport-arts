@@ -11,7 +11,7 @@ const EventBox = ({ event }: { event: Event }) => {
     return (
         
         <div
-            className="relative event-box w-96 p-4 m-10 border rounded-lg shadow-md mb-4 text-white overflow-hidden"
+            className="relative event-box p-4 border rounded-lg shadow-md text-white overflow-hidden"
             style={{
                 backgroundImage: `url(${event.eventPhoto})`,
                 backgroundSize: 'cover',
