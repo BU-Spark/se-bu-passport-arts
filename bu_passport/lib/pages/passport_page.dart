@@ -24,30 +24,52 @@ class _PassportPageState extends State<PassportPage>
           .instance); // Firebase service instance for database operations.
 
   User? finalUser = FirebaseAuth.instance.currentUser;
-  late TabController _tabController; // Controller for managing tabs.
   late Future<DocumentSnapshot>
       _userProfileFuture; // Future for retrieving user data from Firestore.
 
-  List<Sticker> dummy_stickers = [Sticker(id: 2), Sticker(id: 3)];
+  List<int> userStickerIds = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     if (finalUser != null) {
       _userProfileFuture = FirebaseFirestore.instance
           .collection('users')
           .doc(finalUser!.uid)
           .get();
+      fetchUserStickers();
     }
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Future<void> fetchUserStickers() async {
+    try {
+      if (finalUser != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(finalUser!.uid)
+            .get();
+        if (userDoc.exists) {
+          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+          List<dynamic> collectedStickers = userData['userCollectedStickers'] ?? [];
+          List<int> stickerIds = collectedStickers.cast<int>();
+          setState(() {
+            userStickerIds = stickerIds;
+            isLoading = false;
+          });
+        } else {
+          print("User document does not exist");
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching user stickers: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -66,36 +88,38 @@ class _PassportPageState extends State<PassportPage>
         ),
         backgroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          SizedBox(height: sizedBoxHeight),
-          // Passport book widget
-          Expanded(
-            flex: 3,
-            child: Container(
-              margin: EdgeInsets.only(bottom: 16.0),
-              child: PassportBookWidget(),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                SizedBox(height: sizedBoxHeight),
+                // Passport book widget
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 16.0),
+                    child: PassportBookWidget(),
+                  ),
+                ),
+                // Stickers
+                const Text("Stickers", textAlign: TextAlign.left, 
+                  style: TextStyle(color: Color(0xFF847F8B),
+                  fontSize: 16,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w500,
+                  height: 3,
+                  letterSpacing: 0.10,)
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: StickerWidget(
+                      stickerIds: userStickerIds,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          // Stickers
-          const Text("Stickers", textAlign: TextAlign.left, 
-            style: TextStyle(color: Color(0xFF847F8B),
-            fontSize: 16,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.w500,
-            height: 3,
-            letterSpacing: 0.10,)
-          ),
-          Expanded(
-            flex: 2,
-            child: Center(
-              child: StickerWidget(
-                stickers: dummy_stickers,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

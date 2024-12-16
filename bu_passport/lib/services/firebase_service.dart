@@ -117,10 +117,10 @@ class FirebaseService {
           userUID: userData['userUID'],
           userYear: userData['userYear'],
           userPoints: userData['userPoints'],
-          userSavedEvents:
-          Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
-          admin: userData['admin'],
-          userStickerCollection: stickerCollection,
+          userSavedEvents: Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userCollectedStickers: Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
+          userPhotos: List<String>.from(userData['userPhotos'] ?? []),
+          userCreatedAt: userData['userCreatedAt'],
         );
         return user;
       } else {
@@ -422,17 +422,17 @@ class FirebaseService {
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
+          userProfileURL: userData['userProfileURL'],
           userBUID: userData['userBUID'],
           userEmail: userData['userEmail'],
           userSchool: userData['userSchool'],
           userUID: userData['userUID'],
           userYear: userData['userYear'],
-          userSavedEvents:
-          Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
           userPoints: userData['userPoints'],
-          userProfileURL: userData['userProfileURL'],
-          admin: userData['admin'],
-          userStickerCollection: stickerCollection,
+          userSavedEvents: Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userCollectedStickers: Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
+          userPhotos: List<String>.from(userData['userPhotos'] ?? []),
+          userCreatedAt: userData['userCreatedAt'],
         );
         users.add(user);
       });
