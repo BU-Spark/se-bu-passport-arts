@@ -70,8 +70,9 @@ flutter run
   - Users can search for events using specific criteria such as location, tags, and point values
 - **Event Saving**
   - Users are able to save the events they are interested in, which will also be reflected onto their profile page
-- **Geolocation Checkin**
+- **Geolocation Checkin and Photo Upload**
   - When it is the day of the event, and the user is within 400 meters to the event location, they are able to checkin and track their participation
+  - Users can upload a photo while checking in to earn extra points
 - **Point Tracking**
   - When a user successfully checks in to an event, they are awarded points
   - These points are saved to the user, and earning 100 points will reward them with a raffle ticket
@@ -126,6 +127,7 @@ flutter test test/file_name_here.dart
 - Passport doesn't hold state -- when you leave the page, the passport resets to its blank state, removing all stickers
 - Righthand page of passport can't take stickers
 - Redirect to onboarding page (for collecting BUID, school, etc.) upon signup doesn't always occur on the first login
+- In branch "event_filter_and_local_notification", the notification feature is not working on android devices due to dependency version issues
 
 ### Features to be Implemented
 - **Interests Page**: Develop a page where students can select their interests, and see events based on their interests
