@@ -1,5 +1,4 @@
 import React from 'react';
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Dashboard from './pages/DashboardPage.tsx';
