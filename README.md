@@ -60,6 +60,18 @@ flutter run
 - Error building application for simulator or launching application
   - Re-run 'flutter run' or 'flutter clean' and restart the steps of installing and running to be extra safe
 
+### Running in Android Studio 
+1. Install Android Studio and Flutter.
+2. Open 'se-bu-passport-arts/bu_passport' directory as a project in Android Studio.
+3. Run 'flutter pub get' in the terminal to get dependencies.
+4. Start an Android Virtual Device (AVD) in Device Manager and select it as the target device. __OR__ if you are a Mac user and wish to run/debug the app on an iOS simulator, open a IOS simulator and select it as the target device.
+5. Click the "Run" button to start the app
+   
+#### Troubleshooting
+- Do not upgrade dependencies, which can cause incompatible dependencies.
+- Issues may arise due to incompatible Android SDK version and AVD API version.
+- Check [Note on Running the BUAI Mobile App](https://heady-dibble-7cf.notion.site/Running-the-BUAI-Mobile-App-15fd6be61527806893dfeaadd1762f80) for more detailed instructions.
+
 ## Design Overview
 ### Features
 - **Login and Profile**
