@@ -1,9 +1,11 @@
 import 'package:bu_passport/pages/explore_page.dart';
 import 'package:bu_passport/pages/leaderboard_page.dart'; // Uncomment this line
 import 'package:bu_passport/pages/calendar_page.dart';
+import 'package:bu_passport/pages/passport_page.dart';
 import 'package:bu_passport/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 
 // NavigationPage is a StatelessWidget that constructs the main navigation structure.
 class NavigationPage extends StatelessWidget {
@@ -34,6 +36,7 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
     ExplorePage(), // Page for exploring events.
     CalendarPage(), // Calendar page.
     LeaderboardPage(), // Leaderboard page.
+    PassportPage(), // User passport page.
     ProfilePage(), // User profile page.
   ];
 
@@ -70,6 +73,12 @@ class _NavigationPageContentState extends State<NavigationPageContent> {
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events),
             label: 'Leaderboard', // Label for the leaderboard page.
+          ),
+
+          // Passport icon
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.book_fill),
+            label: 'Passport', // Label for the passport page.
           ),
 
           // Profile icon

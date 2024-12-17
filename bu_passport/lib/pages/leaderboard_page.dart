@@ -131,7 +131,16 @@ class LeaderboardPageState extends State<LeaderboardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Leaderboard"),
+        title: const Text("Leaderboard", 
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w500,
+            height: 0.5,
+            letterSpacing: -0.33,
+          )
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

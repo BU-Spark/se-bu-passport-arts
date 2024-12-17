@@ -11,9 +11,10 @@ import 'package:bu_passport/components/event_widget.dart';
 import 'package:bu_passport/util/profile_pic.dart';
 import 'package:bu_passport/util/image_select.dart';
 
+import 'package:bu_passport/services/firebase_service.dart';
 import '../classes/categorized_events.dart';
 import '../classes/event.dart';
-import '../services/firebase_service.dart';
+
 
 // The ProfilePage is a StatefulWidget that allows users to view and edit their profile.
 class ProfilePage extends StatefulWidget {
@@ -35,6 +36,10 @@ class _ProfilePageState extends State<ProfilePage>
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _buIDController = TextEditingController();
+  final TextEditingController _schoolController = TextEditingController();
+  final TextEditingController _yearController = TextEditingController();
+
   File? selectedImageFile; // The file for a selected profile image.
   bool _isEditing =
       false; // Flag to check if the user is editing their profile.
@@ -42,12 +47,15 @@ class _ProfilePageState extends State<ProfilePage>
   String? userProfileImageUrl; // URL for the user's profile image.
 
   // Method to save profile changes to Firestore and Firebase Auth.
-  void _saveProfileChanges(String firstName, String lastName) async {
+  void _saveProfileChanges(String firstName, String lastName, String buID, String school, int year) async {
     final userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
     await userDoc.update({
       'firstName': firstName,
       'lastName': lastName,
+      'userBUID': buID,
+      'userSchool': school,
+      'userYear': year,
     });
     final user = FirebaseAuth.instance.currentUser;
     await user?.updateDisplayName("$firstName $lastName");
@@ -185,7 +193,7 @@ class _ProfilePageState extends State<ProfilePage>
               child: EventWidget(
                   key: ValueKey(uniqueKey),
                   event: event, onUpdateEventPage: updateEventPage));
-          // Use your EventWidget to display each event
+          // Use EventWidget to display each event
         },
       );
     }
@@ -196,12 +204,13 @@ class _ProfilePageState extends State<ProfilePage>
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.05);
+    double sizedBoxHeight = screenHeight * 0.03;
 
     DocumentReference userDoc =
         FirebaseFirestore.instance.collection('users').doc(finalUser!.uid);
 
     return Scaffold(
+      // Main screen scaffold
       appBar: AppBar(
         leading: Container(),
         actions: <Widget>[
@@ -212,6 +221,9 @@ class _ProfilePageState extends State<ProfilePage>
                 _saveProfileChanges(
                   _firstNameController.text,
                   _lastNameController.text,
+                  _buIDController.text,
+                  _schoolController.text,
+                  int.parse(_yearController.text),
                 );
               }
               setState(() {
@@ -228,56 +240,134 @@ class _ProfilePageState extends State<ProfilePage>
           ),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          // Name and Profile Photo
-          Expanded(
-            flex: 2,
-            child: FutureBuilder<DocumentSnapshot>(
-              future: _userProfileFuture,
-              builder: (BuildContext context,
-                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error fetching user data"));
-                }
-                if (!snapshot.hasData || !snapshot.data!.exists) {
-                  return Center(child: Text("User data not found"));
-                }
-                var userData = snapshot.data!.data() as Map<String, dynamic>;
-                String fullName =
-                    '${userData['firstName'] ?? 'Not set'} ${userData['lastName'] ?? ''}';
-                int userPoints = userData['userPoints'] ?? 0;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    if (selectedImageFile != null) ...[
-                      Image.file(selectedImageFile!),
-                      SizedBox(height: sizedBoxHeight),
-                    ],
-                    GestureDetector(
-                      onTap: () {
-                        selectImage(); // Invoke the method for image selection and upload
-                      },
-                      child: CircleAvatar(
-                        key: ValueKey(DateTime.now()
-                            .millisecondsSinceEpoch), // Use a unique key
-                        radius: 50,
-                        backgroundImage: _image != null
-                            ? MemoryImage(
-                                _image!) // Use MemoryImage if _image is not null
-                            : (userProfileImageUrl != null
-                                    ? NetworkImage(
-                                        userProfileImageUrl!) // Use the network image if available
+
+      body: Stack(
+        children: [
+          // Main content Column
+          Column(
+            children: <Widget>[
+              // Profile photo and name section
+              Expanded(
+                flex: 2,
+                child: FutureBuilder<DocumentSnapshot>(
+                  future: _userProfileFuture,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text("Error fetching user data"));
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return Center(child: Text("User data not found"));
+                    }
+
+                    var userData = snapshot.data!.data() as Map<String, dynamic>;
+                    String fullName =
+                        '${userData['firstName'] ?? 'Not set'} ${userData['lastName'] ?? ''}';
+                    int userPoints = userData['userPoints'] ?? 0;
+
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        // Display selected image or placeholder
+                        if (selectedImageFile != null) ...[
+                          Image.file(selectedImageFile!),
+                          SizedBox(height: sizedBoxHeight),
+                        ],
+                        GestureDetector(
+                          onTap: () {
+                            selectImage(); // Method to select and upload image
+                          },
+                          child: CircleAvatar(
+                            key: ValueKey(DateTime.now().millisecondsSinceEpoch), 
+                            radius: 50,
+                            backgroundImage: _image != null
+                                ? MemoryImage(_image!)
+                                : (userProfileImageUrl != null
+                                    ? NetworkImage(userProfileImageUrl!)
                                     : NetworkImage(
-                                        'https://via.placeholder.com/150') // Default image
+                                        'https://via.placeholder.com/150')
                                 ) as ImageProvider,
-                      ),
+                          ),
+                        ),
+                        if (!_isEditing) ...[
+                          Text(fullName, style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.22,
+                            ),
+                          ),
+                          Text('${userPoints} points'),
+                        ], // Display name and points if not in edit mode
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+              // Events menu section with TabBar and TabBarView
+              Expanded(
+                flex: 3,
+                child: DefaultTabController(
+                  length: 2,
+                  child: Scaffold(
+                    appBar: TabBar(
+                      controller: _tabController,
+                      tabs: const [
+                        Tab(child: Text(
+                          'Saved',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF444444),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            height: 0.10,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                        ),
+                        Tab(child: Text(
+                          'Attended',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF444444),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            height: 0.10,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: sizedBoxHeight),
-                    if (_isEditing) ...[
+                    body: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildEventsList(userSavedEvents, "No saved events."),
+                        _buildEventsList(attendedEvents, "No attended events."),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Overlay editing UI with SingleChildScrollView when _isEditing is true
+          if (_isEditing)
+            Positioned.fill(
+              child: Container(
+                color: Colors.white.withOpacity(0.9),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
                       TextField(
                         controller: _firstNameController,
                         decoration: InputDecoration(labelText: 'First Name'),
@@ -286,40 +376,23 @@ class _ProfilePageState extends State<ProfilePage>
                         controller: _lastNameController,
                         decoration: InputDecoration(labelText: 'Last Name'),
                       ),
-                    ] else ...[
-                      Text(fullName, style: TextStyle(fontSize: 20)),
-                      Text(userPoints.toString() + ' points'),
+                      TextField(
+                        controller: _buIDController,
+                        decoration: InputDecoration(labelText: 'BU ID'),
+                      ),
+                      TextField(
+                        controller: _schoolController,
+                        decoration: InputDecoration(labelText: 'School'),
+                      ),
+                      TextField(
+                        controller: _yearController,
+                        decoration: InputDecoration(labelText: 'Year'),
+                      ),
                     ],
-                  ],
-                );
-              },
-            ),
-          ),
-          // This is the Events Menu
-          Expanded(
-            flex: 3,
-            child: DefaultTabController(
-              length: 2,
-              child: Scaffold(
-                appBar: TabBar(
-                  controller: _tabController,
-                  tabs: [
-                    Tab(text: 'Saved'),
-                    Tab(text: 'Attended'),
-                  ],
-                ),
-                body: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildEventsList(userSavedEvents,
-                        "No saved events."), // Saved events list
-                    _buildEventsList(attendedEvents,
-                        "No attended events."), // Attended events list
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

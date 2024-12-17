@@ -75,7 +75,16 @@ class _ExplorePageState extends State<ExplorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Events'),
+        title: const Text('Events',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w500,
+            height: 0.5,
+            letterSpacing: -0.33,
+          )
+        ),
         actions: [
           IconButton(
             icon: Icon(

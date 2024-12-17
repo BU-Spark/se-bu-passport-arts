@@ -60,7 +60,16 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: const Text('Calendar', 
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w500,
+            height: 0.5,
+            letterSpacing: -0.33,
+          )
+        ),
       ),
       body: FutureBuilder<List<Event>>(
         future: _allEventsFuture,
