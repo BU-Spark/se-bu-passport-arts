@@ -41,8 +41,11 @@ development, ensuring that admins can view the platform statistics and manage ev
 - Database: Firebase
 - Authorization: Clerk
 - DevOps Tools: Git
+- Testing: Vitest
 
 ## Get Started
+
+- Link for setup video: [Setup Video](https://youtu.be/9uUGthWto8E).
 
 1. Go to the terminal and make sure you are in `se-bu-passport-arts/bu_arts_admin`.
 2. Download dependencies:
