@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.14.0",
@@ -18,6 +19,7 @@
     "@mui/x-charts": "^7.22.2",
     "@tailwindcss/typography": "^0.5.15",
     "@vis.gl/react-google-maps": "^1.4.0",
+    "date-fns": "^4.1.0",
     "firebase": "^11.0.1",
     "luxon": "^3.5.0",
     "react": "^18.3.1",
@@ -29,6 +31,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
@@ -43,11 +47,13 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "jsdom": "^25.0.1",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.3",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vitest": "^2.1.8"
   }
 }
