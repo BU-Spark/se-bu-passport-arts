@@ -51,7 +51,6 @@ pod install
 ```bash
 flutter run
 ```
-Running this command will run the app locally.
 
 ### Troubleshooting
 - Pod Install Version Mismatches
@@ -127,6 +126,7 @@ flutter test test/file_name_here.dart
 - Passport doesn't hold state -- when you leave the page, the passport resets to its blank state, removing all stickers
 - Righthand page of passport can't take stickers
 - Redirect to onboarding page (for collecting BUID, school, etc.) upon signup doesn't always occur on the first login
+- Error fetching saved and attended events on profile page
 
 ### Features to be Implemented
 - **Interests Page**: Develop a page where students can select their interests, and see events based on their interests
