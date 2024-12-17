@@ -94,7 +94,7 @@ To acquire `VITE_CLERK_PUBLISHABLE_KEY`, you can follow the steps in this docs: 
 
 ## Testing
 
-To run all the automated tests under the '/test' directory for this project, ensure that you are in the '/bu_arts_admin' directory and execute the following command:
+To run all the automated tests under the `/test` directory for this project, ensure that you are in the `/bu_arts_admin` directory and execute the following command:
 
 ```bash
 pnpm test
