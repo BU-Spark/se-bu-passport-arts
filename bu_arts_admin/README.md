@@ -68,16 +68,57 @@ development, ensuring that admins can view the platform statistics and manage ev
 
 4. Run `pnpm run dev` and you should be ready to go.
 
+### How to get Google Map API key
+
+To acquire `VITE_GOOGLE_MAPS_API_KEY`, you can follow the steps in this docs: [Acquire Google Map API key](https://developers.google.com/maps/documentation/embed/get-api-key):
+
+1. You should be able to find `VITE_GOOGLE_MAPS_API_KEY` under API Key Section:
+
+    <img src="./docs/google_map1.png" alt="google_map1" height="400"/>
+
+2. And then you could copy and paste the key in `.env`:
+
+    <img src="./docs/google_map2.png" alt="google_map2" height="400"/>
+
+### How to setup Clerk
+
+To acquire `VITE_CLERK_PUBLISHABLE_KEY`, you can follow the steps in this docs: [Setup Clerk](https://clerk.com/docs/quickstarts/setup-clerk):
+
+1. When creating a new application, be sure you turn Google on and others off:
+
+   <img src="./docs/clerk_instruction1.png" alt="clerk_instruction" height="400"/>
+
+2. Acquire `VITE_CLERK_PUBLISHABLE_KEY` and paste into `.env`:
+
+   <img src="./docs/clerk_instruction2.png" alt="clerk_instruction" height="400"/>
+
+## Testing
+
+To run all the automated tests under the `/test` directory for this project, ensure that you are in the `/bu_arts_admin` directory and execute the following command:
+
+```bash
+pnpm test
+```
+
+To run a specific test file, execute the following command:
+
+```bash
+pnpm test test/file_name_here.tsx
+```
+
 ## File Structure
 
 ```shell
 se-bu-passport-arts/bu_arts_admin
 .
-├── README.md              # Project documentation and information
-├── dist/                   # Compiled output directory
-├── index.html             # Main HTML file for the application
-├── public/                 # Public assets directory
-├── src/                    # Source code directory
+├── README.md                # Project documentation and information
+├── dist/                    # Compiled output directory
+├── index.html               # Main HTML file for the application
+├── public/                  # Public assets directory
+├── structure.drawio         # Diagram source file for project structure
+├── structure.png            # Image file for project structure diagram
+├── src/                     # Source code directory
+└── test/                    # Directory for test files
 ```
 
 ```shell

@@ -11,25 +11,26 @@ const StudentDetailPage = () => {
     const { userID } = useParams<{ userID: string }>();
     const [user, setUser] = useState<User>();
     const [attendedEvents, setAttendedEvents] = useState<Event[]>([]);
+    const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
     const [activeTab, setActiveTab] = useState<string>("reviewed");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     // The following data is for demonstration purposes only
-    const upcomingEvents = [
-        {
-            eventTitle: "Jazz Night",
-            eventLocation: "Downtown Club",
-            date: "09/20/2023",
-            eventPhoto: "https://via.placeholder.com/300x200",
-        },
-        {
-            eventTitle: "Art Gallery Exhibition",
-            eventLocation: "City Art Center",
-            date: "09/25/2023",
-            eventPhoto: "https://via.placeholder.com/300x200",
-        },
-    ];
+    // const upcomingEvents = [
+    //     {
+    //         eventTitle: "Jazz Night",
+    //         eventLocation: "Downtown Club",
+    //         date: "09/20/2023",
+    //         eventPhoto: "https://via.placeholder.com/300x200",
+    //     },
+    //     {
+    //         eventTitle: "Art Gallery Exhibition",
+    //         eventLocation: "City Art Center",
+    //         date: "09/25/2023",
+    //         eventPhoto: "https://via.placeholder.com/300x200",
+    //     },
+    // ];
 
 
     const handleArrowClick = () => {
@@ -53,6 +54,8 @@ const StudentDetailPage = () => {
 
                 const attendedEvents = await fetchUserAttendedEvents(userID);
                 setAttendedEvents(attendedEvents);
+                // TODO: fetch upcoming events
+                setUpcomingEvents(attendedEvents);
             } catch (err) {
                 setError("Failed to load user details.");
             } finally {
@@ -160,7 +163,7 @@ const StudentDetailPage = () => {
                                                 {activeTab === "reviewed" ? "Attended" : "Upcoming"}
                                             </span>
                                         </div>
-                                        {activeTab === "reviewed" && (
+                                        {/* {activeTab === "reviewed" && (
                                             <div className="flex items-center">
                                                 {[...Array(5)].map((_, starIndex) => (
                                                     <svg
@@ -177,7 +180,7 @@ const StudentDetailPage = () => {
                                                     </svg>
                                                 ))}
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 </div>
                             )
