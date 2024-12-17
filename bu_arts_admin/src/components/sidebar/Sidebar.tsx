@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
             {/* User Profile */}
             <div className="mt-auto w-full">
                 <SignedOut>
-                    <SignInButton>
+                    <SignInButton fallbackRedirectUrl="/dashboard">
                         <button className="w-full px-4 py-2 bg-white text-red-800 rounded hover:bg-gray-200 transition">
                             Sign In
                         </button>

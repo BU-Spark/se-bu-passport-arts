@@ -20,6 +20,14 @@ const App: React.FC = () => {
         <main className="flex-grow container max-w-full p-6 h-screen overflow-y-auto">
           <Routes>
             <Route
+              path="/"
+              element={
+                <SignedIn>
+                  <Dashboard />
+                </SignedIn>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <SignedIn>
