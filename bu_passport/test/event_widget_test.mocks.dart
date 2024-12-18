@@ -8,6 +8,7 @@ import 'dart:async' as _i5;
 import 'package:bu_passport/classes/categorized_events.dart' as _i3;
 import 'package:bu_passport/classes/event.dart' as _i6;
 import 'package:bu_passport/classes/user.dart' as _i7;
+import 'package:bu_passport/classes/sticker.dart';
 import 'package:bu_passport/services/firebase_service.dart' as _i4;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -177,16 +178,14 @@ class MockFirebaseService extends _i1.Mock implements _i4.FirebaseService {
       ) as _i5.Future<_i6.Event?>);
 
   @override
-  void checkInUserForEvent(
-    String? eventID,
-    int? eventPoints,
-  ) =>
+  void checkInUserForEvent(String eventID, int eventPoints, List<Sticker> stickers) =>
       super.noSuchMethod(
         Invocation.method(
           #checkInUserForEvent,
           [
             eventID,
             eventPoints,
+            stickers,
           ],
         ),
         returnValueForMissingStub: null,

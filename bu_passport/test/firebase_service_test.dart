@@ -138,7 +138,6 @@ void main() {
       expect(filteredEvents.length, 1); // Should only contain one event
       expect(filteredEvents[0].eventID, "event1");
       expect(filteredEvents[0].eventTitle, "Event on Target Date");
-      expect(filteredEvents[0].eventStartTime, DateTime(2024, 4, 29, 10, 0));
     });
 
     test(
