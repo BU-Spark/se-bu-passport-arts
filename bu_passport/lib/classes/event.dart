@@ -1,6 +1,5 @@
 import 'package:bu_passport/classes/session.dart';
 import 'package:bu_passport/classes/sticker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event {
   final String eventID;

@@ -11,18 +11,18 @@ import 'package:mockito/mockito.dart';
 import 'event_widget_test.mocks.dart';
 import 'mock.dart';
 
-final event = Event(
-  eventID: '1',
-  eventTitle: 'Test Event',
-  eventPhoto: "assets/images/arts/image9.jpeg",
-  eventLocation: 'Test Location',
-  eventStartTime: DateTime(2024, 4, 18, 10, 0), // April 18, 2024, 10:00 AM
-  eventEndTime: DateTime(2024, 4, 18, 12, 0), // April 18, 2024, 12:00 PM
-  eventDescription: 'Test Description',
-  eventPoints: 30,
-  eventURL: 'http://example.com',
-  savedUsers: ['user1', 'user2'],
-);
+final testEvent = Event(
+      eventID: '1',
+      eventTitle: 'Test Event',
+      eventPhoto: "assets/images/arts/image9.jpeg",
+      eventLocation: 'Test Location',
+      eventDescription: 'Test Description',
+      eventPoints: 30,
+      eventURL: 'http://example.com',
+      savedUsers: ['user1', 'user2'],
+      eventSessions: [],
+      eventStickers: [],
+    );
 
 @GenerateMocks([FirebaseService])
 void main() async {
@@ -44,7 +44,7 @@ void main() async {
     // Wrap EventWidget in MaterialApp or Directionality
     await tester.pumpWidget(
       MaterialApp(
-        home: EventWidget(event: event, onUpdateEventPage: () {}),
+        home: EventWidget(event: testEvent, onUpdateEventPage: () {}),
       ),
     );
 

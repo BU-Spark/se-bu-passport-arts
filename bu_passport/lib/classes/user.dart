@@ -30,4 +30,43 @@ class Users {
     required this.userPhotos,
     required this.userCreatedAt,
   });
+
+// Method to convert Users object to a map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'firstName': firstName,
+      'lastName': lastName,
+      'userBUID': userBUID,
+      'userEmail': userEmail,
+      'userSchool': userSchool,
+      'userUID': userUID,
+      'userYear': userYear,
+      'userPoints': userPoints,
+      'userProfileURL': userProfileURL,
+      'userSavedEvents': userSavedEvents,
+      'userCollectedStickers': userCollectedStickers,
+      'userPhotos': userPhotos,
+      'userCreatedAt': userCreatedAt,
+    };
+  }
+
+  // Method to create Users object from a map
+  factory Users.fromMap(Map<String, dynamic> map) {
+    return Users(
+      firstName: map['firstName'],
+      lastName: map['lastName'],
+      userBUID: map['userBUID'],
+      userEmail: map['userEmail'],
+      userSchool: map['userSchool'],
+      userUID: map['userUID'],
+      userYear: map['userYear'],
+      userPoints: map['userPoints'],
+      userProfileURL: map['userProfileURL'],
+      userSavedEvents: Map<String, dynamic>.from(map['userSavedEvents']),
+      userCollectedStickers: Map<int, bool>.from(map['userCollectedStickers']),
+      userPhotos: List<String>.from(map['userPhotos']),
+      userCreatedAt: map['userCreatedAt'],
+    );
+  }
+
 }

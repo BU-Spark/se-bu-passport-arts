@@ -29,12 +29,12 @@ void main() {
       eventTitle: 'Test Event',
       eventPhoto: "assets/images/arts/image9.jpeg",
       eventLocation: 'Test Location',
-      eventStartTime: DateTime(2024, 4, 18, 10, 0),
-      eventEndTime: DateTime(2024, 4, 18, 12, 0),
       eventDescription: 'Test Description',
       eventPoints: 30,
       eventURL: 'http://example.com',
       savedUsers: ['user1', 'user2'],
+      eventSessions: [],
+      eventStickers: [],
     );
 
     // Build our widget and trigger a frame.

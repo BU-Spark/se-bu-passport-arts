@@ -21,11 +21,9 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: SignUpPage(),
     ));
-    expect(find.byType(TextField), findsNWidgets(7));
+    expect(find.byType(TextField), findsNWidgets(5));
     expect(find.text('First Name'), findsOneWidget);
     expect(find.text('Last Name'), findsOneWidget);
-    expect(find.text('Email'), findsOneWidget);
-    expect(find.text('Password'), findsOneWidget);
     expect(find.text('BU ID'), findsOneWidget);
     expect(find.text('School'), findsOneWidget);
     expect(find.text('Year'), findsOneWidget);

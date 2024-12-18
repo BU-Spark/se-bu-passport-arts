@@ -84,8 +84,7 @@ flutter:
   assets:
     - assets/images/onboarding/
     - assets/images/arts/
-    - assets/images/leaderboard/  
-    - assets/images/passport/
+    - assets/images/leaderboard/
     - assets/images/stickers/
     
   # An image asset can refer to one or more resolution-specific "variants", see
