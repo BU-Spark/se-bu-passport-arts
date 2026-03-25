@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DateTime } from 'luxon';
-import { fetchSingleEvent, updateSingleEvent } from '../firebase/firebaseService';
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { fetchSingleBuEvent } from '../services/buEventsService';
 
 import { Event } from "../interfaces/Event";
 import TitleEdit from '../components/eventEdit/TitleEdit.tsx'
@@ -12,8 +12,7 @@ import PhotoEdit from '../components/eventEdit/PhotoEdit.tsx';
 import DescriptionEdit from '../components/eventEdit/DescriptionEdit.tsx';
 import URLEdit from '../components/eventEdit/LinkEdit.tsx';
 import LocationEdit from '../components/eventEdit/LocationEdit.tsx';
-
-const googleMapKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+import { googleMapKey } from '../config';
 
 
 const EditEvent: React.FC = () => {
@@ -31,7 +30,7 @@ const EditEvent: React.FC = () => {
         return;
       }
       try {
-        const data = await fetchSingleEvent(eventID);
+        const data = await fetchSingleBuEvent(eventID);
         if (data) {
           setEvent(data);
         } else {
@@ -51,16 +50,7 @@ const EditEvent: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (event && eventID) {
-      try {
-        const success = await updateSingleEvent(event);
-        if (success) {
-          navigate("/events/upcoming"); // Redirect after save
-        }
-      } catch (error) {
-        console.error("Error saving event:", error);
-      }
-    }
+    setError("BU API events are read-only in the admin.");
   };
 
   if (loading) return <p>Loading...</p>;
@@ -81,6 +71,9 @@ const EditEvent: React.FC = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow-md overflow-y-auto">
+        <div className="mb-4 rounded-md bg-yellow-50 p-4 text-sm text-yellow-800">
+          Events now load directly from the BU events API. This view is read-only and does not save changes back to Firebase.
+        </div>
         <PhotoEdit event={event} setEvent={setEvent}></PhotoEdit>
         <TitleEdit event={event} setEvent={setEvent}></TitleEdit>
         <CategoryEdit event={event} setEvent={setEvent}></CategoryEdit>
@@ -111,9 +104,10 @@ const EditEvent: React.FC = () => {
                 <input
                   type="datetime-local"
                   className="w-full border border-gray-300 p-2 rounded mt-1"
+                  readOnly
                   value={
                     session.startTime
-                      ? DateTime.fromJSDate(session.startTime.toDate())
+                      ? DateTime.fromJSDate(session.startTime)
                         .setZone('America/New_York')
                         .toFormat("yyyy-MM-dd'T'HH:mm")
                       : ''
@@ -123,9 +117,10 @@ const EditEvent: React.FC = () => {
                 <input
                   type="datetime-local"
                   className="w-full border border-gray-300 p-2 rounded mt-1"
+                  readOnly
                   value={
                     session.endTime
-                      ? DateTime.fromJSDate(session.endTime.toDate())
+                      ? DateTime.fromJSDate(session.endTime)
                         .setZone('America/New_York')
                         .toFormat("yyyy-MM-dd'T'HH:mm")
                       : ''
@@ -146,9 +141,10 @@ const EditEvent: React.FC = () => {
           </button>
           <button
             onClick={handleSave}
-            className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 flex items-center space-x-2"
+            disabled
+            className="px-5 py-2 bg-gray-400 text-white rounded-full cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
           >
-            <span>Save</span>
+            <span>Read Only</span>
             <span>
               <img className="w-5" src="/public/icons/save.png" alt="save" />
             </span>

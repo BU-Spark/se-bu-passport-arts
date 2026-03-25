@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
 import { Event } from "../../interfaces/Event.tsx";
+import { getEventVisualSrc } from '../../utils/eventVisuals';
 
 interface PhotoDisplayProps {
     event: Event;
@@ -9,6 +10,7 @@ interface PhotoDisplayProps {
 const PhotoEdit: React.FC<PhotoDisplayProps> = ({ event, setEvent }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [tempPhoto, setTempPhoto] = useState(event.eventPhoto);
+    const eventVisualSrc = getEventVisualSrc(event);
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -31,7 +33,7 @@ const PhotoEdit: React.FC<PhotoDisplayProps> = ({ event, setEvent }) => {
     return (
         <div className="relative mb-6">
             <div className="relative w-full h-80">
-                <img src={event.eventPhoto} alt="Event Preview" className="w-full h-full object-cover rounded" />
+                <img src={eventVisualSrc} alt="Event Preview" className="w-full h-full object-cover rounded" />
                 <button 
                     onClick={handleEditClick} 
                     className="absolute top-4 right-4"

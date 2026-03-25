@@ -4,6 +4,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { User } from "../interfaces/User";
 import { Event } from "../interfaces/Event";
 import { fetchSingleUser, fetchUserAttendedEvents } from "../firebase/firebaseService";
+import { getEventVisualSrc } from "../utils/eventVisuals";
 
 const StudentDetailPage = () => {
     const navigate = useNavigate();
@@ -143,7 +144,7 @@ const StudentDetailPage = () => {
                                     {/* Event Image */}
                                     <div className="relative">
                                         <img
-                                            src={event.eventPhoto}
+                                            src={getEventVisualSrc(event)}
                                             alt={event.eventTitle}
                                             className="w-full h-48 object-cover"
                                         />

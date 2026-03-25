@@ -4,17 +4,16 @@ import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import UpcomingEventsPage from '../src/pages/UpcomingEventsPage';
-import { fetchFutureEvents } from '../src/firebase/firebaseService';
-import { Timestamp } from 'firebase/firestore';
+import { fetchFutureBuEvents } from '../src/services/buEventsService';
 import { Event } from '../src/interfaces/Event';
 
 // Mock fetchPastEvents function
-vi.mock('../src/firebase/firebaseService', () => ({
-    fetchFutureEvents: vi.fn(),
+vi.mock('../src/services/buEventsService', () => ({
+    fetchFutureBuEvents: vi.fn(),
 }));
 
 describe('UpcomingEventsPage', () => {
-    const mockFetchUpcomingEvents = fetchFutureEvents as Mock;
+    const mockFetchUpcomingEvents = fetchFutureBuEvents as Mock;
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -22,7 +21,6 @@ describe('UpcomingEventsPage', () => {
     it('renders without crashing', async () => {
         const mockEvents: Event[] = [];
         mockFetchUpcomingEvents.mockResolvedValue(mockEvents);
-        console.log('Mock events:', mockFetchUpcomingEvents.mock.results);
         render(
             <MemoryRouter>
                 <UpcomingEventsPage />
@@ -37,8 +35,6 @@ describe('UpcomingEventsPage', () => {
     it('renders no events found', async () => {
         const mockEvents: Event[] = [];
         mockFetchUpcomingEvents.mockResolvedValue(mockEvents);
-        console.log('Mock events:', mockFetchUpcomingEvents.mock.results);
-
         render(
             <MemoryRouter>
                 <UpcomingEventsPage />
@@ -78,9 +74,10 @@ describe('UpcomingEventsPage', () => {
                 eventSessions: {
                     session1: {
                         sessionId: 'session1',
-                        startTime: new Timestamp(1672531200, 0), // Mock Timestamp
+                        startTime: new Date('2026-04-01T10:00:00Z'),
                         savedUsers: [],
-                        endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                        endTime: new Date('2026-04-01T12:00:00Z'),
+                        occurrenceId: null,
                     },
                 },
             },
@@ -97,13 +94,13 @@ describe('UpcomingEventsPage', () => {
                     session1: {
                         sessionId: 'session1',
                         savedUsers: [],
-                        startTime: new Timestamp(1672531200, 0), // Mock Timestamp
-                        endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                        startTime: new Date('2026-04-02T10:00:00Z'),
+                        endTime: new Date('2026-04-02T12:00:00Z'),
+                        occurrenceId: null,
                     },
                 },
             },
         ];
-        // const mockedFetchPastEvents = vi.mocked(fetchPastEvents);
         mockFetchUpcomingEvents.mockResolvedValue(mockEvents);
 
         render(

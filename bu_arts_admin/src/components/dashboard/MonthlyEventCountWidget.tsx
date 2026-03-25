@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { countCurrentMonthEvents } from '../../firebase/firebaseService';
+import { countCurrentMonthBuEvents } from '../../services/buEventsService';
 
 const MonthlyEventCountWidget: React.FC = () => {
     const [eventCount, setEventCount] = useState<number>(0);
@@ -12,7 +12,7 @@ const MonthlyEventCountWidget: React.FC = () => {
 
     const fetchMonthlyEvents = async () => {
         try {
-            const count = await countCurrentMonthEvents();
+            const count = await countCurrentMonthBuEvents();
             console.log("Monthly event count:", count);
             setEventCount(count);
         } catch (error) {

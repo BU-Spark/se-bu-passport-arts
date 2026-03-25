@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { User } from "../interfaces/User";
 import AttendanceTable from "../components/passtEvent/AttendanceTable";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { fetchEventAttendanceWithProfiles, fetchEventName } from "../firebase/firebaseService";
-import { Attendance } from "../interfaces/Attendance";
+import { fetchEventAttendanceWithProfiles } from "../firebase/firebaseService";
+import { fetchBuEventName } from "../services/buEventsService";
 
 const AttendancePage = () => {
     const { eventID } = useParams<{ eventID: string }>();
@@ -30,12 +30,11 @@ const AttendancePage = () => {
                     return;
                 }
                 const eventAttendanceWithProfiles = await fetchEventAttendanceWithProfiles(eventID);
-                const attendances: Attendance[] = eventAttendanceWithProfiles.map((item) => item.attendance);
                 const attendedStudents: User[] = eventAttendanceWithProfiles
                     .map((item) => item.userProfile)
                     .filter((profile): profile is User => profile !== null);
                 setattendedUsers(attendedStudents);
-                const eventName = await fetchEventName(eventID);
+                const eventName = await fetchBuEventName(eventID);
                 if (eventName) {
                     setEventName(eventName);
                 } else {

@@ -3,11 +3,11 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import { Timestamp } from 'firebase/firestore';
 import EditEventPage from '../src/pages/EditEventPage';
 import { Event } from '../src/interfaces/Event';
-import { fetchSingleEvent } from '../src/firebase/firebaseService';
+import { fetchSingleBuEvent } from '../src/services/buEventsService';
 import { googleMapKey } from '../src/config';
+import { getEventVisualSrc } from '../src/utils/eventVisuals';
 
 import URLEdit from '../src/components/eventEdit/LinkEdit';
 import PointEdit from '../src/components/eventEdit/PointEdit';
@@ -18,9 +18,8 @@ import TitleEdit from '../src/components/eventEdit/TitleEdit';
 import CategoryEdit from '../src/components/eventEdit/CategoryEdit';
 
 
-vi.mock('../src/firebase/firebaseService', () => ({
-    fetchSingleEvent: vi.fn(),
-    fetchEventAttendanceWithProfiles: vi.fn(),
+vi.mock('../src/services/buEventsService', () => ({
+    fetchSingleBuEvent: vi.fn(),
 }));
 
 const mockEvent: Event = {
@@ -35,16 +34,17 @@ const mockEvent: Event = {
     eventSessions: {
         session1: {
             sessionId: 'session1',
-            startTime: new Timestamp(1672531200, 0), // Mock Timestamp
+            startTime: new Date('2026-04-01T10:00:00Z'),
             savedUsers: [],
-            endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+            endTime: new Date('2026-04-01T12:00:00Z'),
+            occurrenceId: null,
         },
     },
 };
 
 describe('EditEventPage', () => {
     beforeEach(() => {
-        (fetchSingleEvent as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockEvent);
+        (fetchSingleBuEvent as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockEvent);
     });
 
     it('renders without crashing', async () => {
@@ -72,7 +72,7 @@ describe('EditEventPage', () => {
 
         await waitFor(() => {
             // Check if eventPhoto is rendered
-            expect(screen.getByAltText('Event Preview')).toHaveAttribute('src', mockEvent.eventPhoto);
+            expect(screen.getByAltText('Event Preview')).toHaveAttribute('src', getEventVisualSrc(mockEvent));
 
             // Check if eventTitle is rendered
             expect(screen.getByText(mockEvent.eventTitle)).toBeInTheDocument();
@@ -110,9 +110,10 @@ describe('PointEdit Component', () => {
         eventSessions: {
             session1: {
                 sessionId: 'session1',
-                startTime: new Timestamp(1672531200, 0),
+                startTime: new Date('2026-04-01T10:00:00Z'),
                 savedUsers: [],
-                endTime: new Timestamp(1672538400, 0),
+                endTime: new Date('2026-04-01T12:00:00Z'),
+                occurrenceId: null,
             },
         },
     };
@@ -269,7 +270,7 @@ describe('PhotoEdit Component', () => {
         render(<PhotoEdit event={mockEvent} setEvent={mockSetEvent} />);
 
         const photoImg = screen.getByAltText('Event Preview');
-        expect(photoImg).toHaveAttribute('src', mockEvent.eventPhoto);
+        expect(photoImg).toHaveAttribute('src', getEventVisualSrc(mockEvent));
 
         const editButton = screen.getByAltText('Edit');
         fireEvent.click(editButton);
@@ -305,7 +306,7 @@ describe('PhotoEdit Component', () => {
         fireEvent.click(cancelButton);
 
         expect(mockSetEvent).not.toHaveBeenCalled();
-        expect(screen.getByAltText('Event Preview')).toHaveAttribute('src', mockEvent.eventPhoto);
+        expect(screen.getByAltText('Event Preview')).toHaveAttribute('src', getEventVisualSrc(mockEvent));
     });
 });
 

@@ -1,10 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { format, subMonths } from 'date-fns';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import DashboardPage from '../src/pages/DashboardPage';
+import { fetchUserRegistrationStats } from '../src/firebase/firebaseService';
+import { countCurrentMonthBuEvents } from '../src/services/buEventsService';
 
 const getLastNMonths = (months: number): string[] => {
     const labels: string[] = [];
@@ -18,7 +20,27 @@ const getLastNMonths = (months: number): string[] => {
     return labels;
 };
 
+vi.mock('../src/firebase/firebaseService', () => ({
+    fetchUserRegistrationStats: vi.fn(),
+}));
+
+vi.mock('../src/services/buEventsService', () => ({
+    countCurrentMonthBuEvents: vi.fn(),
+}));
+
 describe('DashboardPage', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        (countCurrentMonthBuEvents as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(8);
+        (fetchUserRegistrationStats as unknown as ReturnType<typeof vi.fn>).mockImplementation(async (numMonths: number) => {
+            const months = getLastNMonths(numMonths === 0 ? 12 : numMonths);
+            return {
+                months,
+                registrations: months.map((_, index) => index + 1),
+            };
+        });
+    });
+
     it('renders without crashing', async () => {
         render(
             <MemoryRouter>

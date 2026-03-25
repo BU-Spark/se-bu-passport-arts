@@ -4,17 +4,16 @@ import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import PastEventsPage from '../src/pages/PastEventsPage';
-import { fetchPastEvents } from '../src/firebase/firebaseService';
-import { Timestamp } from 'firebase/firestore';
+import { fetchPastBuEvents } from '../src/services/buEventsService';
 import { Event } from '../src/interfaces/Event';
 
 // Mock fetchPastEvents function
-vi.mock('../src/firebase/firebaseService', () => ({
-    fetchPastEvents: vi.fn(),
+vi.mock('../src/services/buEventsService', () => ({
+    fetchPastBuEvents: vi.fn(),
 }));
 
 describe('PastEventsPage', () => {
-    const mockFetchPastEvents = fetchPastEvents as Mock;
+    const mockFetchPastEvents = fetchPastBuEvents as Mock;
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -22,7 +21,6 @@ describe('PastEventsPage', () => {
     it('renders without crashing', async () => {
         const mockEvents: Event[] = [];
         mockFetchPastEvents.mockResolvedValue(mockEvents);
-        console.log('Mock events:', mockFetchPastEvents.mock.results);
         render(
             <MemoryRouter>
                 <PastEventsPage />
@@ -37,8 +35,6 @@ describe('PastEventsPage', () => {
     it('renders no events found', async () => {
         const mockEvents: Event[] = [];
         mockFetchPastEvents.mockResolvedValue(mockEvents);
-        console.log('Mock events:', mockFetchPastEvents.mock.results);
-
         render(
             <MemoryRouter>
                 <PastEventsPage />
@@ -78,9 +74,10 @@ describe('PastEventsPage', () => {
                 eventSessions: {
                     session1: {
                         sessionId: 'session1',
-                        startTime: new Timestamp(1672531200, 0), // Mock Timestamp
+                        startTime: new Date('2026-03-01T10:00:00Z'),
                         savedUsers: [],
-                        endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                        endTime: new Date('2026-03-01T12:00:00Z'),
+                        occurrenceId: null,
                     },
                 },
             },
@@ -97,13 +94,13 @@ describe('PastEventsPage', () => {
                     session1: {
                         sessionId: 'session1',
                         savedUsers: [],
-                        startTime: new Timestamp(1672531200, 0), // Mock Timestamp
-                        endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                        startTime: new Date('2026-03-02T10:00:00Z'),
+                        endTime: new Date('2026-03-02T12:00:00Z'),
+                        occurrenceId: null,
                     },
                 },
             },
         ];
-        // const mockedFetchPastEvents = vi.mocked(fetchPastEvents);
         mockFetchPastEvents.mockResolvedValue(mockEvents);
 
         render(

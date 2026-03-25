@@ -42,9 +42,10 @@ describe('StudentDetailPage', () => {
             eventSessions: {
                 session1: {
                     sessionId: 'session1',
-                    startTime: new Timestamp(1672531200, 0), // Mock Timestamp
+                    startTime: new Date('2026-04-01T10:00:00Z'),
                     savedUsers: [],
-                    endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                    endTime: new Date('2026-04-01T12:00:00Z'),
+                    occurrenceId: null,
                 },
             },
         },
@@ -60,9 +61,10 @@ describe('StudentDetailPage', () => {
             eventSessions: {
                 session2: {
                     sessionId: 'session2',
-                    startTime: new Timestamp(1672531200, 0), // Mock Timestamp
+                    startTime: new Date('2026-04-02T10:00:00Z'),
                     savedUsers: [],
-                    endTime: new Timestamp(1672538400, 0), // Mock Timestamp
+                    endTime: new Date('2026-04-02T12:00:00Z'),
+                    occurrenceId: null,
                 },
             },
         },

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Event } from "../interfaces/Event"
 import EventBox from "../components/EventBox"
-import { fetchFutureEvents } from '../firebase/firebaseService';
+import { fetchFutureBuEvents } from '../services/buEventsService';
 
 interface FetchAllEventsProps {
 }
@@ -12,34 +12,43 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
 
 
-    // Handle input change and call search
-    const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const text = event.target.value;
-        setSearchText(text);
-        const futureEvents = await fetchFutureEvents(text);
-
-
-        setEvents(futureEvents);
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
     };
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchEvents = async () => {
             try {
+                setLoading(true);
+                setError(null);
+                const futureEvents = await fetchFutureBuEvents({ searchText, selectedDate });
 
-                const futureEvents = await fetchFutureEvents('');
-                setEvents(futureEvents);
+                if (isMounted) {
+                    setEvents(futureEvents);
+                }
             } catch (error) {
-                setError('Failed to load events');
+                if (isMounted) {
+                    setError('Failed to load events');
+                }
                 console.error('Error fetching events:', error);
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchEvents();
-    }, []);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [searchText, selectedDate]);
 
     if (loading) return <p className="text-center text-lg text-gray-500">Loading events...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -58,6 +67,12 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                     />
                     <img className="w-5 h-5 text-gray-400 absolute right-3 top-2.5" src="/public/icons/search.png" alt="search_icon" />
                 </div>
+                <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(event) => setSelectedDate(event.target.value)}
+                    className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
             </div>
             <div className="min-h-screen flex flex-col mx-auto p-6 overflow-x-hidden">
                 <div className="flex-grow h-96 overflow-y-auto bg-slate-50 px-4">

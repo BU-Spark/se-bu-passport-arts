@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Event } from "../interfaces/Event";
-import { fetchSingleEvent, fetchEventAttendanceWithProfiles } from '../firebase/firebaseService';
+import { fetchEventAttendanceWithProfiles } from '../firebase/firebaseService';
+import { fetchSingleBuEvent } from '../services/buEventsService';
 import { Attendance } from '../interfaces/Attendance';
 import { User } from '../interfaces/User';
 import { DateTime } from 'luxon';
 import { FaArrowLeftLong } from "react-icons/fa6";
-
-const googleMapKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+import { googleMapKey } from '../config';
+import { getEventVisualSrc } from '../utils/eventVisuals';
 
 
 const PastEventViewPage: React.FC = () => {
@@ -27,7 +28,7 @@ const PastEventViewPage: React.FC = () => {
         return;
       }
       try {
-        const data = await fetchSingleEvent(eventID);
+        const data = await fetchSingleBuEvent(eventID);
         const eventAttendanceWithProfiles = await fetchEventAttendanceWithProfiles(eventID);
         const attendances: Attendance[] = eventAttendanceWithProfiles.map((item) => item.attendance);
         const attendedStudents: User[] = eventAttendanceWithProfiles
@@ -40,11 +41,9 @@ const PastEventViewPage: React.FC = () => {
         }
         if (attendances) {
           setattendanceCount(attendances.length);
-          console.log("attendanceCount:", attendanceCount)
         }
         if (attendedStudents) {
           setStudentProfiles(attendedStudents.map((student) => student.userProfileURL));
-          console.log("attendanceProfiles", attendanceProfiles)
         }
       } catch (err) {
         setError("Failed to load event details.");
@@ -69,6 +68,8 @@ const PastEventViewPage: React.FC = () => {
   if (error) return <p>{error}</p>;
   if (!event) return <p>Event not found</p>;
 
+  const eventVisualSrc = getEventVisualSrc(event);
+
 
   return (
     <div>
@@ -87,7 +88,7 @@ const PastEventViewPage: React.FC = () => {
         {/* eventPhoto */}
         <div className="relative mb-6">
           <div className="relative w-full h-80">
-            <img src={event.eventPhoto} alt="Event Preview" className="w-full h-full object-cover rounded" />
+            <img src={eventVisualSrc} alt="Event Preview" className="w-full h-full object-cover rounded" />
           </div>
         </div>
 
@@ -193,9 +194,13 @@ const PastEventViewPage: React.FC = () => {
             {/* eventURL */}
             <div className="flex items-center mb-6">
               <span className="font-semibold text-xl text-gray-700">Link:</span>
-              <a href={event.eventURL} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-2">
-                {event.eventURL}
-              </a>
+                  {event.eventURL ? (
+                    <a href={event.eventURL} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-2">
+                      {event.eventURL}
+                    </a>
+                  ) : (
+                    <span className="ml-2 text-gray-600">No external event link provided.</span>
+                  )}
             </div>
           </div>
         </div>
@@ -205,7 +210,7 @@ const PastEventViewPage: React.FC = () => {
           <h3 className="text-gray-700 font-semibold mb-2 text-3xl">Sessions:</h3>
           {Object.entries(event.eventSessions)
             .filter(([_, session]) =>
-              session.endTime && DateTime.fromJSDate(session.endTime.toDate()) <= DateTime.now()
+              session.endTime && DateTime.fromJSDate(session.endTime) <= DateTime.now()
             )
             .map(([sessionId, session]) => (
               <div key={sessionId} className="border border-gray-200 p-3 rounded mb-2">
@@ -215,7 +220,7 @@ const PastEventViewPage: React.FC = () => {
                     <span className="font-bold text-gray-700">Start Time:</span>
                     <span className="ml-2 text-gray-700">
                       {session.startTime
-                        ? DateTime.fromJSDate(session.startTime.toDate())
+                        ? DateTime.fromJSDate(session.startTime)
                           .setZone('America/New_York')
                           .toFormat("yyyy-MM-dd' 'HH:mm")
                         : 'N/A'}
@@ -225,7 +230,7 @@ const PastEventViewPage: React.FC = () => {
                     <span className="font-bold text-gray-700">End Time:</span>
                     <span className="ml-2 text-gray-700">
                       {session.endTime
-                        ? DateTime.fromJSDate(session.endTime.toDate())
+                        ? DateTime.fromJSDate(session.endTime)
                           .setZone('America/New_York')
                           .toFormat("yyyy-MM-dd' 'HH:mm")
                         : 'N/A'}

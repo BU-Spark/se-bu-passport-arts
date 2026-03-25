@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Event } from "../interfaces/Event";
+import { getEventVisualSrc } from '../utils/eventVisuals';
 
 const EventBox = ({ event }: { event: Event }) => {
     const navigate = useNavigate();
+    const eventVisualSrc = getEventVisualSrc(event);
 
     const handleEdit = () => {
         navigate(`/edit-event/${event.eventID}`);
@@ -13,13 +15,13 @@ const EventBox = ({ event }: { event: Event }) => {
         <div
             className="relative event-box p-4 border rounded-lg shadow-md text-white overflow-hidden"
             style={{
-                backgroundImage: `url(${event.eventPhoto})`,
+                backgroundImage: `url(${eventVisualSrc})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 minHeight: '200px',
             }}
         >
-            <div className="absolute inset-0 bg-black opacity-40 rounded-lg pointer-events-none"></div>
+            <div className="absolute inset-0 bg-black/20 rounded-lg pointer-events-none"></div>
             {/* "Go Edit Event" Button */}
             <button
                 onClick={handleEdit}

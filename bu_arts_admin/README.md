@@ -59,6 +59,7 @@ development, ensuring that admins can view the platform statistics and manage ev
     ```text
     PUBLIC_URL="/"
     VITE_GOOGLE_MAPS_API_KEY="key"
+    VITE_BU_EVENTS_API_URL="/api/bu-events?cid=20"
     VITE_FIREBASE_API_KEY="key"
     VITE_FIREBASE_AUTH_DOMAIN="domain"
     VITE_FIREBASE_DATABASE_URL="url"

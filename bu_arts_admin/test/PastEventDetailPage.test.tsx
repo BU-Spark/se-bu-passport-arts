@@ -4,11 +4,15 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import PastEventDetailPage from '../src/pages/PastEventDetailPage';
-import { fetchSingleEvent, fetchEventAttendanceWithProfiles } from '../src/firebase/firebaseService';
+import { fetchEventAttendanceWithProfiles } from '../src/firebase/firebaseService';
+import { fetchSingleBuEvent } from '../src/services/buEventsService';
 
 vi.mock('../src/firebase/firebaseService', () => ({
-    fetchSingleEvent: vi.fn(),
     fetchEventAttendanceWithProfiles: vi.fn(),
+}));
+
+vi.mock('../src/services/buEventsService', () => ({
+    fetchSingleBuEvent: vi.fn(),
 }));
 
 describe('PastEventDetailPage', () => {
@@ -23,8 +27,10 @@ describe('PastEventDetailPage', () => {
         eventSessions: {
             session1: {
                 sessionId: 'session1',
-                startTime: { toDate: () => new Date('2023-01-01T10:00:00Z') },
-                endTime: { toDate: () => new Date('2023-01-01T12:00:00Z') },
+                startTime: new Date('2023-01-01T10:00:00Z'),
+                endTime: new Date('2023-01-01T12:00:00Z'),
+                savedUsers: [],
+                occurrenceId: null,
             },
         },
     };
@@ -38,7 +44,7 @@ describe('PastEventDetailPage', () => {
     ];
 
     beforeEach(() => {
-        (fetchSingleEvent as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockEvent);
+        (fetchSingleBuEvent as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockEvent);
         (fetchEventAttendanceWithProfiles as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
             mockAttendanceProfiles.map(profile => ({ attendance: {}, userProfile: profile }))
         );
