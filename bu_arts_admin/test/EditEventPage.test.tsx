@@ -57,7 +57,7 @@ describe('EditEventPage', () => {
         );
 
         await waitFor(() => {
-            expect(screen.getByText(/Upcoming Event/i)).toBeInTheDocument();
+            expect(screen.getByText(/Event Details/i)).toBeInTheDocument();
         });
     });
 
@@ -71,27 +71,18 @@ describe('EditEventPage', () => {
         );
 
         await waitFor(() => {
-            // Check if eventPhoto is rendered
-            expect(screen.getByAltText('Event Preview')).toHaveAttribute('src', getEventVisualSrc(mockEvent));
-
-            // Check if eventTitle is rendered
             expect(screen.getByText(mockEvent.eventTitle)).toBeInTheDocument();
 
-            // Check if eventCategories are rendered
             mockEvent.eventCategories.forEach(category => {
                 expect(screen.getByText(category)).toBeInTheDocument();
             });
 
-            // Check if eventPoints are rendered
-            expect(screen.getByText(`Pts: ${mockEvent.eventPoints}`)).toBeInTheDocument();
+            expect(screen.getByText(mockEvent.eventPoints.toString())).toBeInTheDocument();
 
-            // Check if eventLocation is rendered
             expect(screen.getByText(mockEvent.eventLocation)).toBeInTheDocument();
 
-            // Check if eventDescription is rendered
             expect(screen.getByText(mockEvent.eventDescription)).toBeInTheDocument();
 
-            // Check if eventURL is rendered
             expect(screen.getByText(mockEvent.eventURL)).toHaveAttribute('href', mockEvent.eventURL);
         });
     });

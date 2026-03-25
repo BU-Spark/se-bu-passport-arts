@@ -5,13 +5,6 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { fetchSingleBuEvent } from '../services/buEventsService';
 
 import { Event } from "../interfaces/Event";
-import TitleEdit from '../components/eventEdit/TitleEdit.tsx'
-import CategoryEdit from '../components/eventEdit/CategoryEdit.tsx'
-import PointEdit from '../components/eventEdit/PointEdit.tsx'
-import PhotoEdit from '../components/eventEdit/PhotoEdit.tsx';
-import DescriptionEdit from '../components/eventEdit/DescriptionEdit.tsx';
-import URLEdit from '../components/eventEdit/LinkEdit.tsx';
-import LocationEdit from '../components/eventEdit/LocationEdit.tsx';
 import { googleMapKey } from '../config';
 
 
@@ -49,17 +42,16 @@ const EditEvent: React.FC = () => {
     navigate("/events/upcoming");
   };
 
-  const handleSave = async () => {
-    setError("BU API events are read-only in the admin.");
-  };
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
   if (!event) return <p>Event not found</p>;
 
+  const sessions = Object.values(event.eventSessions).sort(
+    (left, right) => left.startTime.getTime() - right.startTime.getTime()
+  );
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <FaArrowLeftLong
@@ -67,87 +59,120 @@ const EditEvent: React.FC = () => {
             className="text-bured mr-4 cursor-pointer hover:text-red-900"
             onClick={handleArrowClick}
           />
-          <h2 className="text-2xl font-bold text-bured">Upcoming Events</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-bured">Event Details</h2>
+            <p className="text-sm text-gray-500">Read-only preview from the BU events API.</p>
+          </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow-md overflow-y-auto">
-        <div className="mb-4 rounded-md bg-yellow-50 p-4 text-sm text-yellow-800">
-          Events now load directly from the BU events API. This view is read-only and does not save changes back to Firebase.
-        </div>
-        <PhotoEdit event={event} setEvent={setEvent}></PhotoEdit>
-        <TitleEdit event={event} setEvent={setEvent}></TitleEdit>
-        <CategoryEdit event={event} setEvent={setEvent}></CategoryEdit>
 
-        <hr className="border-gray-400 mb-4" />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <PointEdit event={event} setEvent={setEvent}></PointEdit>
-            <hr className="border-gray-400 mb-4" />
-            <LocationEdit event={event} setEvent={setEvent} googleMapKey={googleMapKey}></LocationEdit>
-          </div>
-
-          <div>
-            <DescriptionEdit event={event} setEvent={setEvent}></DescriptionEdit>
-            <URLEdit event={event} setEvent={setEvent}></URLEdit>
-          </div>
+      <div className="rounded-2xl bg-white p-6 shadow-md">
+        <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+          Events now load directly from the BU events API. Editing is disabled in the admin.
         </div>
 
-        {/* Sessions */}
         <div className="mb-6">
-          <h3 className="text-gray-700 font-semibold mb-2 text-3xl">Sessions:</h3>
-          {Object.entries(event.eventSessions).map(([sessionId, session]) => (
-            <div key={sessionId} className="border border-gray-200 p-3 rounded mb-2">
-              <p className="font-semibold">Session ID: {session.sessionId}</p>
-              <div className="mb-2">
-                <label className="block text-gray-700">Start Time</label>
-                <input
-                  type="datetime-local"
-                  className="w-full border border-gray-300 p-2 rounded mt-1"
-                  readOnly
-                  value={
-                    session.startTime
-                      ? DateTime.fromJSDate(session.startTime)
-                        .setZone('America/New_York')
-                        .toFormat("yyyy-MM-dd'T'HH:mm")
-                      : ''
-                  }
-                />
-                <label className="block text-gray-700">End Time</label>
-                <input
-                  type="datetime-local"
-                  className="w-full border border-gray-300 p-2 rounded mt-1"
-                  readOnly
-                  value={
-                    session.endTime
-                      ? DateTime.fromJSDate(session.endTime)
-                        .setZone('America/New_York')
-                        .toFormat("yyyy-MM-dd'T'HH:mm")
-                      : ''
-                  }
-                />
+          <h1 className="mb-4 text-4xl font-bold text-sidebar-grey">{event.eventTitle}</h1>
+          <div className="flex flex-wrap gap-2">
+            {event.eventCategories.map((category) => (
+              <span
+                key={category}
+                className="rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-bured"
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-xl border border-gray-200 p-4">
+            <p className="mb-1 text-sm font-medium text-gray-500">Points</p>
+            <p className="text-3xl font-bold text-sidebar-grey">{event.eventPoints}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 p-4 md:col-span-2">
+            <p className="mb-1 text-sm font-medium text-gray-500">Location</p>
+            <p className="text-lg font-semibold text-sidebar-grey">{event.eventLocation}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div>
+            <h3 className="mb-3 text-2xl font-semibold text-sidebar-grey">Description</h3>
+            <div className="rounded-xl border border-gray-200 p-4">
+              <p className="leading-7 text-gray-600">{event.eventDescription}</p>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="mb-3 text-2xl font-semibold text-sidebar-grey">Event Link</h3>
+              <div className="rounded-xl border border-gray-200 p-4">
+                {event.eventURL ? (
+                  <a
+                    href={event.eventURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="break-words text-blue-600 underline"
+                  >
+                    {event.eventURL}
+                  </a>
+                ) : (
+                  <p className="text-gray-500">No external link available.</p>
+                )}
               </div>
             </div>
-          ))}
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-2xl font-semibold text-sidebar-grey">Location</h3>
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              <iframe
+                width="100%"
+                height="260"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps/embed/v1/place?key=${googleMapKey}&q=${encodeURIComponent(event.eventLocation)}`}
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
         </div>
 
-        {/* Save and Cancel Buttons */}
-        <div className="flex justify-end space-x-3">
+        <div className="mt-8">
+          <h3 className="mb-4 text-2xl font-semibold text-sidebar-grey">Sessions</h3>
+          <div className="space-y-4">
+            {sessions.map((session) => (
+              <div key={session.sessionId} className="rounded-xl border border-gray-200 p-4">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                  Session ID: {session.sessionId}
+                </p>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="mb-1 text-sm font-medium text-gray-500">Start</p>
+                    <p className="text-lg font-semibold text-sidebar-grey">
+                      {DateTime.fromJSDate(session.startTime)
+                        .setZone('America/New_York')
+                        .toFormat("MM/dd/yyyy, hh:mm a")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="mb-1 text-sm font-medium text-gray-500">End</p>
+                    <p className="text-lg font-semibold text-sidebar-grey">
+                      {DateTime.fromJSDate(session.endTime)
+                        .setZone('America/New_York')
+                        .toFormat("MM/dd/yyyy, hh:mm a")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-end">
           <button
             onClick={() => navigate("/events/upcoming")}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 transition-colors duration-200"
+            className="rounded-full bg-bured px-5 py-2 text-white transition-colors duration-200 hover:bg-red-700"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled
-            className="px-5 py-2 bg-gray-400 text-white rounded-full cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
-          >
-            <span>Read Only</span>
-            <span>
-              <img className="w-5" src="/public/icons/save.png" alt="save" />
-            </span>
+            Back to events
           </button>
         </div>
       </div>

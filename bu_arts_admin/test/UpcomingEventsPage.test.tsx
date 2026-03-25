@@ -4,18 +4,21 @@ import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import UpcomingEventsPage from '../src/pages/UpcomingEventsPage';
-import { fetchFutureBuEvents } from '../src/services/buEventsService';
+import { fetchFutureBuEvents, getAvailableEventCategories } from '../src/services/buEventsService';
 import { Event } from '../src/interfaces/Event';
 
 // Mock fetchPastEvents function
 vi.mock('../src/services/buEventsService', () => ({
     fetchFutureBuEvents: vi.fn(),
+    getAvailableEventCategories: vi.fn(() => []),
 }));
 
 describe('UpcomingEventsPage', () => {
     const mockFetchUpcomingEvents = fetchFutureBuEvents as Mock;
+    const mockGetAvailableEventCategories = getAvailableEventCategories as Mock;
     beforeEach(() => {
         vi.clearAllMocks();
+        mockGetAvailableEventCategories.mockReturnValue([]);
     });
 
     it('renders without crashing', async () => {
