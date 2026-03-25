@@ -8,8 +8,8 @@ const isPlaceholderEventPhoto = (eventPhoto: string): boolean =>
 const buildPlaceholderDataUri = (): string => {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="none">
-      <rect width="1200" height="630" fill="#9ca3af" />
-      <rect width="1200" height="630" fill="#000000" opacity="0.16" />
+      <rect width="1200" height="630" fill="#7A7A7A" />
+      <rect width="1200" height="630" fill="#ffffff" opacity="0.04" />
     </svg>
   `;
 

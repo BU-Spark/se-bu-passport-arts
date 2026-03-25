@@ -10,6 +10,7 @@ interface BuEventsApiResponse {
 interface EventFilters {
   searchText?: string;
   selectedDate?: string;
+  selectedCategory?: string;
 }
 
 const DEFAULT_EVENT_PHOTO = '/bu.svg';
@@ -135,6 +136,14 @@ const matchesDate = (event: Event, selectedDate?: string): boolean => {
   });
 };
 
+const matchesCategory = (event: Event, selectedCategory?: string): boolean => {
+  if (!selectedCategory) {
+    return true;
+  }
+
+  return event.eventCategories.includes(selectedCategory);
+};
+
 const filterEventSessions = (
   event: Event,
   predicate: (session: Session) => boolean,
@@ -194,10 +203,21 @@ export const fetchSingleBuEvent = async (eventId: string): Promise<Event | null>
 export const fetchFilteredBuEvents = async ({
   searchText = '',
   selectedDate,
+  selectedCategory,
 }: EventFilters = {}): Promise<Event[]> => {
   const events = await fetchAllBuEvents();
-  return events.filter((event) => matchesSearch(event, searchText) && matchesDate(event, selectedDate));
+  return events.filter(
+    (event) =>
+      matchesSearch(event, searchText) &&
+      matchesDate(event, selectedDate) &&
+      matchesCategory(event, selectedCategory),
+  );
 };
+
+export const getAvailableEventCategories = (events: Event[]): string[] =>
+  [...new Set(events.flatMap((event) => event.eventCategories))].sort((left, right) =>
+    left.localeCompare(right),
+  );
 
 export const fetchFutureBuEvents = async (filters: EventFilters = {}): Promise<Event[]> => {
   const now = Date.now();

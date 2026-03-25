@@ -2,17 +2,19 @@
 import React, { useEffect, useState } from 'react';
 import { Event } from "../interfaces/Event"
 import EventBox from "../components/EventBox"
-import { fetchFutureBuEvents } from '../services/buEventsService';
+import { fetchFutureBuEvents, getAvailableEventCategories } from '../services/buEventsService';
 
 interface FetchAllEventsProps {
 }
 
 const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
     const [loading, setLoading] = useState<boolean>(true);
+    const [baseEvents, setBaseEvents] = useState<Event[]>([]);
     const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +31,7 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                 const futureEvents = await fetchFutureBuEvents({ searchText, selectedDate });
 
                 if (isMounted) {
-                    setEvents(futureEvents);
+                    setBaseEvents(futureEvents);
                 }
             } catch (error) {
                 if (isMounted) {
@@ -49,6 +51,25 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
             isMounted = false;
         };
     }, [searchText, selectedDate]);
+
+    const availableCategories = getAvailableEventCategories(baseEvents);
+
+    useEffect(() => {
+        if (selectedCategory && !availableCategories.includes(selectedCategory)) {
+            setSelectedCategory('');
+        }
+    }, [availableCategories, selectedCategory]);
+
+    useEffect(() => {
+        if (!selectedCategory) {
+            setEvents(baseEvents);
+            return;
+        }
+
+        setEvents(
+            baseEvents.filter((event) => event.eventCategories.includes(selectedCategory))
+        );
+    }, [baseEvents, selectedCategory]);
 
     if (loading) return <p className="text-center text-lg text-gray-500">Loading events...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -73,6 +94,18 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                     onChange={(event) => setSelectedDate(event.target.value)}
                     className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
+                <select
+                    value={selectedCategory}
+                    onChange={(event) => setSelectedCategory(event.target.value)}
+                    className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                >
+                    <option value="">All Categories</option>
+                    {availableCategories.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
+                        </option>
+                    ))}
+                </select>
             </div>
             <div className="min-h-screen flex flex-col mx-auto p-6 overflow-x-hidden">
                 <div className="flex-grow h-96 overflow-y-auto bg-slate-50 px-4">

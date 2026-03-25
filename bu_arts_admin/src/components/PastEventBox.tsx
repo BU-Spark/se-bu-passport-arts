@@ -10,10 +10,21 @@ const PastEventBox = ({ event }: { event: Event }) => {
         navigate(`/view-event/${event.eventID}`);
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleEdit();
+        }
+    };
+
     return (
         
         <div
-            className="relative event-box p-4 border rounded-lg shadow-md text-white overflow-hidden"
+            className="relative event-box p-4 border rounded-lg shadow-md text-white overflow-hidden cursor-pointer"
+            onClick={handleEdit}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
             style={{
                 backgroundImage: `url(${eventVisualSrc})`,
                 backgroundSize: 'cover',
@@ -22,17 +33,16 @@ const PastEventBox = ({ event }: { event: Event }) => {
             }}
         >
             <div className="absolute inset-0 bg-black/20 rounded-lg pointer-events-none"></div>
-            {/* "See Event Details" Button */}
-            <button
-                onClick={handleEdit}
-                className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 rounded-md text-sm"
-            >
-                See Event Details
-            </button>
 
-            {/* "Free!" Label */}
-            <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-md text-sm">
-                {event.eventCategories[0]|| ""}
+            <div className="absolute top-2 right-2 flex max-w-[55%] flex-wrap justify-end gap-2">
+                {event.eventCategories.map((category) => (
+                    <span
+                        key={category}
+                        className="bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                    >
+                        {category}
+                    </span>
+                ))}
             </div>
 
             {/* Event Details */}
