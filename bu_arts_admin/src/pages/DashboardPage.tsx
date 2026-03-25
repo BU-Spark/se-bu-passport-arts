@@ -34,23 +34,49 @@ const DashboardPage: React.FC = () => {
   }, [range]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p className="text-gray-500">Loading dashboard...</p>;
   }
 
   if (data.length === 0) {
-    return <p>No data available.</p>;
+    return <p className="text-gray-500">No dashboard data available.</p>;
   }
 
-  const xLabels = data.map((item) => item.month); // Extract months for x-axis
-  const yData = data.map((item) => item.count);   // Extract counts for y-axis
+  const xLabels = data.map((item) => item.month);
+  const yData = data.map((item) => item.count);
+  const trackedMonths = data.length;
+  const peakMonth = data.reduce((highest, current) => (current.count > highest.count ? current : highest), data[0]);
+  const formattedPeakMonth = new Date(`${peakMonth.month}-01T00:00:00`).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
-    <div>
-      <div className="flex items-center space-x-4 mb-4">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-6">
         <h1 className="text-2xl font-semibold text-bured">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Overview of recent user registrations and current BU Arts events.
+        </p>
       </div>
-      <div className="flex justify-normal items-start w-full space-x-1 m-6">
-        <div className="w-max mr-9 ml-9">
+
+      <div className="rounded-2xl bg-white p-6 shadow-md">
+        <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="rounded-xl border border-gray-200 p-6">
+            <p className="text-sm font-medium text-gray-500">Tracked Months</p>
+            <p className="mt-2 text-4xl font-bold text-sidebar-grey">{trackedMonths}</p>
+            <p className="mt-1 text-sm text-gray-500">Visible points in the selected registration range.</p>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 p-6">
+            <p className="text-sm font-medium text-gray-500">Peak Month</p>
+            <p className="mt-2 text-4xl font-bold text-sidebar-grey">{peakMonth.count}</p>
+            <p className="mt-1 text-sm text-gray-500">{formattedPeakMonth}</p>
+          </div>
+
+          <MonthlyEventCountWidget />
+        </div>
+
+        <div>
           <NewUserLineChart
             xLabels={xLabels}
             yData={yData}
@@ -58,13 +84,8 @@ const DashboardPage: React.FC = () => {
             setRange={setRange}
           />
         </div>
-        {/* Widget: 4/12 of the width */}
-        <div className="w-96">
-          <MonthlyEventCountWidget />
-        </div>
       </div>
     </div>
-
   );
 };
 

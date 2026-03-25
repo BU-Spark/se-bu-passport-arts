@@ -13,12 +13,11 @@ interface UserChartProps {
 const NewUserLineChart: React.FC<UserChartProps> = ({
   xLabels,
   yData,
-  width = 800,
-  height = 300,
+  width = 920,
+  height = 320,
   range,
   setRange,
 }) => {
-  // Map range values to descriptive text
   const getRangeDescription = (range: string): string => {
     switch (range) {
       case '3':
@@ -36,29 +35,29 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
   const totalUsers = yData.reduce((sum, value) => sum + value, 0);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 w-max mx-auto">
-      {/* Header Section */}
-      <div className="flex flex-col items-start mb-4">
-        <h2 className="text-gray-600 text-lg font-medium">Total New Users</h2>
-        <p className="text-red-600 text-5xl font-bold underline">{totalUsers}</p>
-        <p className="text-gray-500 text-sm mt-1">{getRangeDescription(range)}</p>
-      </div>
+    <div className="rounded-xl border border-gray-200 bg-white p-6">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col items-start">
+          <h2 className="text-lg font-medium text-gray-600">Total New Users</h2>
+          <p className="mt-2 text-5xl font-bold text-bured">{totalUsers}</p>
+          <p className="mt-1 text-sm text-gray-500">{getRangeDescription(range)}</p>
+          <p className="mt-3 text-sm text-gray-500">
+            User registration trend across the selected time range.
+          </p>
+        </div>
 
-      {/* Time Range Selector */}
-      <div className="flex justify-between items-center mb-4 w-full">
-        <div></div> {/* Empty div for spacing */}
         <div className="flex items-center">
-          <label htmlFor="rangeSelect" className="text-sm font-medium text-gray-600 mr-2">
+          <label htmlFor="rangeSelect" className="mr-2 text-sm font-medium text-gray-600">
             Select Time Range:
           </label>
           <select
             id="rangeSelect"
             value={range}
             onChange={(e) => {
-              e.preventDefault(); // Prevent any default browser behavior
-              setRange(e.target.value); // Update the state
+              e.preventDefault();
+              setRange(e.target.value);
             }}
-            className="p-2 border rounded w-40 text-gray-700"
+            className="w-40 rounded-lg border border-gray-300 bg-white p-2 text-gray-700"
           >
             <option value="3">Last 3 Months</option>
             <option value="6">Last 6 Months</option>
@@ -68,13 +67,12 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
         </div>
       </div>
 
-      {/* Chart Section */}
-      <div className="w-full">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 px-2 py-4">
         <LineChart
           width={width}
           height={height}
           series={[
-            { data: yData, label: 'New Users', color: 'orange' },
+            { data: yData, label: 'New Users', color: '#CC0000' },
           ]}
           xAxis={[
             {
