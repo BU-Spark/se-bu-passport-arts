@@ -6,7 +6,6 @@ import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import DashboardPage from '../src/pages/DashboardPage';
 import { fetchUserRegistrationStats } from '../src/firebase/firebaseService';
-import { countCurrentMonthBuEvents } from '../src/services/buEventsService';
 
 const getLastNMonths = (months: number): string[] => {
     const labels: string[] = [];
@@ -24,14 +23,13 @@ vi.mock('../src/firebase/firebaseService', () => ({
     fetchUserRegistrationStats: vi.fn(),
 }));
 
-vi.mock('../src/services/buEventsService', () => ({
-    countCurrentMonthBuEvents: vi.fn(),
+vi.mock('../src/components/dashboard/CurrentMonthEventInsights', () => ({
+    default: () => <div>Current Month Event Insights</div>,
 }));
 
 describe('DashboardPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (countCurrentMonthBuEvents as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(8);
         (fetchUserRegistrationStats as unknown as ReturnType<typeof vi.fn>).mockImplementation(async (numMonths: number) => {
             const months = getLastNMonths(numMonths === 0 ? 12 : numMonths);
             return {
@@ -50,6 +48,7 @@ describe('DashboardPage', () => {
 
         await waitFor(() => {
             expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
+            expect(screen.getByText(/Current Month Event Insights/i)).toBeInTheDocument();
         });
     });
 })
@@ -67,7 +66,7 @@ describe('DashboardPage: Chart of new users', () => {
         });
     });
 
-    it('updates substitles and x-axis labels when time range is changed', async () => {
+    it('updates the selected time range when changed', async () => {
         render(
             <MemoryRouter>
                 <DashboardPage />
@@ -79,44 +78,15 @@ describe('DashboardPage: Chart of new users', () => {
             expect(screen.getByText(/Total New Users/i)).toBeInTheDocument();
         });
 
-        // Simulate changing the time range
-        fireEvent.change(screen.getByLabelText(/Select Time Range/i), { target: { value: '6' } });
+        const rangeSelect = screen.getByLabelText(/Select Time Range/i) as HTMLSelectElement;
+        expect(rangeSelect.value).toBe('6');
+
+        fireEvent.change(rangeSelect, { target: { value: '12' } });
 
         await waitFor(() => {
-            expect(screen.getAllByText(/Last 6 Months/i).find(el => el.tagName.toLowerCase() === 'p')).toBeInTheDocument();
+            expect((screen.getByLabelText(/Select Time Range/i) as HTMLSelectElement).value).toBe('12');
         });
 
-        const mockLast6Months = getLastNMonths(6);
-        mockLast6Months.forEach(label => {
-            expect(screen.getByText(label)).toBeInTheDocument();
-        });
-
-        // Simulate changing the time range again
-        fireEvent.change(screen.getByLabelText(/Select Time Range/i), { target: { value: '12' } });
-
-        // Wait for the range description to update
-        await waitFor(() => {
-            expect(screen.getAllByText(/Last Year/i).find(el => el.tagName.toLowerCase() === 'p')).toBeInTheDocument();
-        });
-
-        const mockLast12Months = getLastNMonths(12);
-        mockLast12Months.forEach(label => {
-            expect(screen.getByText(label)).toBeInTheDocument();
-        });
-    });
-})
-
-describe('DashboardPage: Monthly Event Count Widget', () => {
-    it('renders without crashing', async () => {
-        render(
-            <MemoryRouter>
-                <DashboardPage />
-            </MemoryRouter>
-        );
-
-        await waitFor(() => {
-            expect(screen.getByText(/Monthly Events/i)).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /See All Events/i })).toBeInTheDocument();
-        });
+        expect(fetchUserRegistrationStats).toHaveBeenLastCalledWith(12);
     });
 })

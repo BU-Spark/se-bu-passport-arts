@@ -55,9 +55,6 @@ const CurrentMonthEventInsightsSection: React.FC = () => {
       <div className="h-full rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="text-lg font-medium text-gray-600">Upcoming Events by Signups</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            All upcoming events, sorted in ascending signup order.
-          </p>
         </div>
 
         {insights && insights.topEvents.length > 0 ? (
@@ -91,9 +88,6 @@ const CurrentMonthEventInsightsSection: React.FC = () => {
       <div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="text-lg font-medium text-gray-600">Event Category Split</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Category distribution across all upcoming events.
-          </p>
         </div>
 
         {pieData.length > 0 ? (

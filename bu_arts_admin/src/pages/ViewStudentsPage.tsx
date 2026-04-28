@@ -13,7 +13,7 @@ const ViewStudentsPage = () => {
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const text = event.target.value;
         setSearchText(text);
-        let result = await searchUsers(text);
+        const result = await searchUsers(text);
         setUsers(result);
     };
 

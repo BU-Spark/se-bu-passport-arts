@@ -1,44 +1,40 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { User } from '../../interfaces/User';
 
 interface StudentRowProps {
     user: User;
+    index: number;
 }
 
-const StudentRow: React.FC<StudentRowProps> = ({ user }) => {
-    const navigate = useNavigate();
-
-    const handleButtonClick = () => {
-        navigate(`/students/${user.userUID}`);
-    };
+const StudentRow: React.FC<StudentRowProps> = ({ user, index }) => {
     return (
-        <tr className="border-b hover:bg-gray-100">
-            <td className="py-4 px-4 flex items-center">
-                <img
-                    src={user.userProfileURL || "https://via.placeholder.com/50"}
-                    alt="Profile"
-                    className="w-14 h-14 rounded-full mr-4"
-                />
-                <span className="font-medium text-gray-800">
-                    {user.firstName} {user.lastName}
-                </span>
+        <tr className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/70'}>
+            <td className="px-4 py-4 text-base font-medium text-sidebar-grey">
+                <div className="flex items-center gap-4">
+                    <img
+                        src={user.userProfileURL || "https://via.placeholder.com/50"}
+                        alt="Profile"
+                        className="h-12 w-12 rounded-full object-cover"
+                    />
+                    <div className="min-w-0">
+                        <Link
+                            to={`/students/${user.userUID}`}
+                            className="font-medium text-sidebar-grey hover:text-bured hover:underline"
+                        >
+                            {user.firstName} {user.lastName}
+                        </Link>
+                        <p className="text-xs text-gray-500">{user.userEmail}</p>
+                    </div>
+                </div>
             </td>
-            <td className="py-4 px-4 text-gray-600">{user.userBUID}</td>
-            <td className="py-4 px-12">
+            <td className="whitespace-nowrap px-4 py-4 text-base font-medium text-sidebar-grey">{user.userBUID}</td>
+            <td className="whitespace-nowrap px-4 py-4 text-base font-medium text-sidebar-grey">
                 <img
                     src="public/icons/ranking_badge.png"
                     alt="Ranking"
-                    className="w-10 h-10"
+                    className="h-10 w-10"
                 />
-            </td>
-            <td className="py-4 px-4">
-                <button
-                    className="bg-bured text-white px-4 py-2 rounded-md font-bold hover:bg-red-800"
-                    onClick={handleButtonClick}
-                >
-                    Check Profile
-                </button>
             </td>
         </tr>
     );

@@ -48,9 +48,6 @@ const DashboardPage: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-bured">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Overview of recent user registrations and current BU Arts events.
-        </p>
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-md">

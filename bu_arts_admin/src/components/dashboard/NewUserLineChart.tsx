@@ -52,9 +52,6 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
         </div>
 
         <div className="flex items-center">
-          <label htmlFor="rangeSelect" className="mr-2 text-sm font-medium text-gray-600">
-            Select Time Range:
-          </label>
           <select
             id="rangeSelect"
             value={range}
