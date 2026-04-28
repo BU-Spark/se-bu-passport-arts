@@ -13,7 +13,7 @@ interface EventFilters {
   selectedCategory?: string;
 }
 
-const DEFAULT_EVENT_PHOTO = '/bu.svg';
+const DEFAULT_EVENT_PHOTO = '/logo.png';
 const DEFAULT_EVENT_POINTS = 0;
 
 const TOPIC_LABELS: Record<string, string> = {

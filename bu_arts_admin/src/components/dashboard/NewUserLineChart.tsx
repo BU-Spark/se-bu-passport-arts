@@ -18,21 +18,30 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
   range,
   setRange,
 }) => {
-  const getRangeDescription = (range: string): string => {
-    switch (range) {
-      case '3':
-        return 'Last 3 Months';
-      case '6':
-        return 'Last 6 Months';
-      case '12':
-        return 'Last Year';
-      case 'all':
-        return 'All Time';
-      default:
-        return '';
-    }
+  const formatMonthLabel = (value: string): string => {
+    const [year, month] = value.split('-');
+    const date = new Date(Number(year), Number(month) - 1, 1);
+
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    });
   };
   const totalUsers = yData.reduce((sum, value) => sum + value, 0);
+  const maxYValue = Math.max(...yData);
+  const yTicks =
+    maxYValue <= 4
+      ? Array.from({ length: maxYValue + 1 }, (_, index) => index)
+      : (() => {
+          const step = Math.ceil(maxYValue / 4);
+          const ticks = Array.from({ length: Math.floor(maxYValue / step) + 1 }, (_, index) => index * step);
+
+          if (ticks[ticks.length - 1] !== maxYValue) {
+            ticks.push(maxYValue);
+          }
+
+          return ticks;
+        })();
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
@@ -40,10 +49,6 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
         <div className="flex flex-col items-start">
           <h2 className="text-lg font-medium text-gray-600">Total New Users</h2>
           <p className="mt-2 text-5xl font-bold text-bured">{totalUsers}</p>
-          <p className="mt-1 text-sm text-gray-500">{getRangeDescription(range)}</p>
-          <p className="mt-3 text-sm text-gray-500">
-            User registration trend across the selected time range.
-          </p>
         </div>
 
         <div className="flex items-center">
@@ -78,9 +83,23 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
             {
               scaleType: 'point',
               data: xLabels,
-              label: 'Month',
+              valueFormatter: (value) => formatMonthLabel(value),
             },
           ]}
+          yAxis={[
+            {
+              min: 0,
+              tickMinStep: 1,
+              tickInterval: yTicks,
+              valueFormatter: (value) => {
+                const numericValue = Number(value);
+                const roundedValue = Math.round(numericValue);
+
+                return Math.abs(numericValue - roundedValue) < 0.000001 ? String(roundedValue) : '';
+              },
+            },
+          ]}
+          slotProps={{ legend: { hidden: true } }}
         />
       </div>
     </div>

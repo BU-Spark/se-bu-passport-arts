@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Event } from "../interfaces/Event";
-import { getEventVisualSrc } from '../utils/eventVisuals';
 
 const PastEventBox = ({ event }: { event: Event }) => {
     const navigate = useNavigate();
-    const eventVisualSrc = getEventVisualSrc(event);
 
     const handleEdit = () => {
         navigate(`/view-event/${event.eventID}`);
@@ -18,23 +16,16 @@ const PastEventBox = ({ event }: { event: Event }) => {
     };
 
     return (
-        
         <div
-            className="relative event-box p-4 border rounded-lg shadow-md text-white overflow-hidden cursor-pointer"
+            className="relative flex min-h-[200px] cursor-pointer flex-col rounded-lg border border-gray-200 bg-white p-4 text-sidebar-grey shadow-sm transition-shadow hover:shadow-md"
             onClick={handleEdit}
             onKeyDown={handleKeyDown}
             role="button"
             tabIndex={0}
-            style={{
-                backgroundImage: `url(${eventVisualSrc})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                minHeight: '200px',
-            }}
         >
-            <div className="absolute inset-0 bg-black/20 rounded-lg pointer-events-none"></div>
+            <div className="absolute right-0 top-0 h-5 w-5 rounded-tr-lg border-r-4 border-t-4 border-black" />
 
-            <div className="absolute top-2 right-2 flex max-w-[55%] flex-wrap justify-end gap-2">
+            <div className="mb-4 flex flex-wrap gap-2">
                 {event.eventCategories.map((category) => (
                     <span
                         key={category}
@@ -45,8 +36,7 @@ const PastEventBox = ({ event }: { event: Event }) => {
                 ))}
             </div>
 
-            {/* Event Details */}
-            <div className="absolute bottom-4 left-4">
+            <div className="mt-auto">
                 <h3 className="text-lg font-semibold">{event.eventTitle}</h3>
                 <p className="text-sm">{event.eventLocation}</p>
             </div>

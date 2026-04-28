@@ -5,10 +5,27 @@ import { Event } from "../interfaces/Event";
 import { User } from "../interfaces/User";
 import { Attendance } from "../interfaces/Attendance";
 import { getLastXMonths, generateMonthRange } from "../utils/utils";
-import { fetchAllBuEvents } from "../services/buEventsService";
+import { fetchAllBuEvents, fetchFutureBuEvents } from "../services/buEventsService";
 
 const userTableName = "users";
 const attendanceTableName = "attendances";
+
+export interface UpcomingTopEvent {
+  eventID: string;
+  eventTitle: string;
+  signupCount: number;
+  categories: string[];
+}
+
+export interface UpcomingCategorySplit {
+  category: string;
+  count: number;
+}
+
+export interface UpcomingEventInsights {
+  topEvents: UpcomingTopEvent[];
+  categorySplit: UpcomingCategorySplit[];
+}
 
 export const fetchAllUsers = async (): Promise<User[]> => {
   const querySnapshot = await getDocs(collection(db, userTableName));
@@ -93,6 +110,51 @@ export const fetchUserRegistrationStats = async (numMonths: number) => {
 
   const registrations = months.map((month) => registrationsByMonth[month] || 0);
   return { months, registrations };
+};
+
+export const fetchUpcomingEventInsights = async (): Promise<UpcomingEventInsights> => {
+  const [attendanceSnapshot, upcomingEvents] = await Promise.all([
+    getDocs(collection(db, attendanceTableName)),
+    fetchFutureBuEvents(),
+  ]);
+  const upcomingEventIds = new Set(upcomingEvents.map((event) => event.eventID));
+  const signupCountsByEvent = new Map<string, number>();
+
+  attendanceSnapshot.docs.forEach((document) => {
+    const attendance = document.data() as Attendance;
+
+    if (!upcomingEventIds.has(attendance.eventID)) {
+      return;
+    }
+
+    signupCountsByEvent.set(attendance.eventID, (signupCountsByEvent.get(attendance.eventID) || 0) + 1);
+  });
+
+  const topEvents = upcomingEvents
+    .map((event) => ({
+      eventID: event.eventID,
+      eventTitle: event.eventTitle,
+      signupCount: signupCountsByEvent.get(event.eventID) || 0,
+      categories: event.eventCategories,
+    }))
+    .sort(
+      (left, right) =>
+        left.signupCount - right.signupCount || left.eventTitle.localeCompare(right.eventTitle),
+    )
+
+  const categoryCounts = new Map<string, number>();
+
+  upcomingEvents.forEach((event) => {
+    event.eventCategories.forEach((category) => {
+      categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+    });
+  });
+
+  const categorySplit = Array.from(categoryCounts.entries())
+    .map(([category, count]) => ({ category, count }))
+    .sort((left, right) => right.count - left.count || left.category.localeCompare(right.category));
+
+  return { topEvents, categorySplit };
 };
 
 export const fetchEventAttendance = async (eventId: string): Promise<Attendance[]> => {

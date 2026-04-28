@@ -10,7 +10,7 @@ const NavMenu: React.FC = () => {
         <nav className="flex-grow w-full">
             <ul className="space-y-2 w-full">
                 <NoncollapsibleMenu
-                    title="Home"
+                    title="Dashboard"
                     image="/icons/home_grey.png"
                     hoverImage="/icons/home_red.png"
                     to="/dashboard"
@@ -44,14 +44,6 @@ const NavMenu: React.FC = () => {
                         </NavLink>
                     </li>
                 </CollapsibleMenu>
-                <NoncollapsibleMenu
-                    title="Download History"
-                    image="/icons/download_grey.png"
-                    hoverImage="/icons/download_red.png"
-                    to="/download_history"
-                    activeLink={activeLink}
-                    setActiveLink={setActiveLink}
-                />
                 <NoncollapsibleMenu
                     title="Students"
                     image="/icons/student_grey.png"

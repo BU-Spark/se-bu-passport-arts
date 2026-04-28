@@ -84,7 +84,7 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                         placeholder="Search anything here..."
                         value={searchText}
                         onChange={handleInputChange}
-                        className="border border-gray-300 rounded-full py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="border border-gray-300 rounded-full py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-bured"
                     />
                     <img className="w-5 h-5 text-gray-400 absolute right-3 top-2.5" src="/public/icons/search.png" alt="search_icon" />
                 </div>
@@ -92,20 +92,31 @@ const UpcomingEventsPage: React.FC<FetchAllEventsProps> = () => {
                     type="date"
                     value={selectedDate}
                     onChange={(event) => setSelectedDate(event.target.value)}
-                    className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-bured"
                 />
-                <select
-                    value={selectedCategory}
-                    onChange={(event) => setSelectedCategory(event.target.value)}
-                    className="border border-gray-300 rounded-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
-                >
-                    <option value="">All Categories</option>
-                    {availableCategories.map((category) => (
-                        <option key={category} value={category}>
-                            {category}
-                        </option>
-                    ))}
-                </select>
+                <div className="relative">
+                    <select
+                        value={selectedCategory}
+                        onChange={(event) => setSelectedCategory(event.target.value)}
+                        className="appearance-none border border-gray-300 rounded-full py-2 pl-4 pr-12 text-gray-700 focus:outline-none focus:ring-2 focus:ring-bured bg-white"
+                    >
+                        <option value="">All Categories</option>
+                        {availableCategories.map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
+                    </select>
+                    <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
+                        <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    </span>
+                </div>
             </div>
             <div className="min-h-screen flex flex-col mx-auto p-6 overflow-x-hidden">
                 <div className="flex-grow h-96 overflow-y-auto bg-slate-50 px-4">

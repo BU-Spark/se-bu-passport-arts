@@ -1,6 +1,6 @@
 import { Event } from '../interfaces/Event';
 
-const PLACEHOLDER_EVENT_PHOTOS = new Set(['', '/bu.svg']);
+const PLACEHOLDER_EVENT_PHOTOS = new Set(['', '/bu.svg', '/logo.png']);
 
 const isPlaceholderEventPhoto = (eventPhoto: string): boolean =>
   PLACEHOLDER_EVENT_PHOTOS.has(eventPhoto.trim());

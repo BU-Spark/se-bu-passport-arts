@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUserRegistrationStats } from '../firebase/firebaseService';
+import CurrentMonthEventInsightsSection from '../components/dashboard/CurrentMonthEventInsights';
 import NewUserLineChart from '../components/dashboard/NewUserLineChart';
-import MonthlyEventCountWidget from '../components/dashboard/MonthlyEventCountWidget';
 
 const DashboardPage: React.FC = () => {
   const [data, setData] = useState<{ month: string; count: number }[]>([]);
@@ -43,12 +43,6 @@ const DashboardPage: React.FC = () => {
 
   const xLabels = data.map((item) => item.month);
   const yData = data.map((item) => item.count);
-  const trackedMonths = data.length;
-  const peakMonth = data.reduce((highest, current) => (current.count > highest.count ? current : highest), data[0]);
-  const formattedPeakMonth = new Date(`${peakMonth.month}-01T00:00:00`).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -60,21 +54,7 @@ const DashboardPage: React.FC = () => {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-md">
-        <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-xl border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-500">Tracked Months</p>
-            <p className="mt-2 text-4xl font-bold text-sidebar-grey">{trackedMonths}</p>
-            <p className="mt-1 text-sm text-gray-500">Visible points in the selected registration range.</p>
-          </div>
-
-          <div className="rounded-xl border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-500">Peak Month</p>
-            <p className="mt-2 text-4xl font-bold text-sidebar-grey">{peakMonth.count}</p>
-            <p className="mt-1 text-sm text-gray-500">{formattedPeakMonth}</p>
-          </div>
-
-          <MonthlyEventCountWidget />
-        </div>
+        <CurrentMonthEventInsightsSection />
 
         <div>
           <NewUserLineChart
