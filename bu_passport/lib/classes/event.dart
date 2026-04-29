@@ -4,6 +4,7 @@ import 'package:bu_passport/classes/sticker.dart';
 class Event {
   final String eventID;
   final String eventTitle;
+  final List<String> eventCategories;
   final String eventPhoto;
   final String eventLocation;
   final String eventDescription;
@@ -16,6 +17,7 @@ class Event {
   Event({
     required this.eventID,
     required this.eventTitle,
+    this.eventCategories = const [],
     required this.eventPhoto,
     required this.eventLocation,
     required this.eventDescription,
@@ -31,6 +33,7 @@ class Event {
     return 'NewEvent\n'
         '(ID: $eventID,\n'
         ' Title: $eventTitle, \n'
+        'Categories: $eventCategories, \n'
         'Photo URL: $eventPhoto, \n'
         'Location: $eventLocation, \n'
         //'Description: $eventDescription, \n'
@@ -45,14 +48,13 @@ class Event {
       final endOfDay = startOfDay.add(Duration(days: 1));
 
       return (session.sessionStartTime.isAfter(startOfDay) &&
-          session.sessionStartTime.isBefore(endOfDay)) ||
+              session.sessionStartTime.isBefore(endOfDay)) ||
           (session.sessionEndTime.isAfter(startOfDay) &&
               session.sessionEndTime.isBefore(endOfDay));
     });
   }
 
   bool hasUpcomingSessions(DateTime time) {
-
     // Check if there are any sessions that haven't ended
     for (var session in eventSessions) {
       if (session.sessionEndTime.isAfter(time)) {
@@ -61,10 +63,12 @@ class Event {
     }
     return false; // No active sessions
   }
+
   bool isEventHappening() {
     DateTime now = DateTime.now();
     for (var session in eventSessions) {
-      if (session.sessionStartTime.isBefore(now) && session.sessionEndTime.isAfter(now)) {
+      if (session.sessionStartTime.isBefore(now) &&
+          session.sessionEndTime.isAfter(now)) {
         return true; // Event is happening
       }
     }

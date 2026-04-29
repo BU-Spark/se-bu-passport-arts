@@ -7,8 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../classes/categorized_events.dart';
 import '../classes/event.dart';
-import '../classes/session.dart';
 import '../classes/sticker.dart';
+import 'bu_events_service.dart';
 
 class FirebaseService {
   final FirebaseFirestore db;
@@ -20,69 +20,22 @@ class FirebaseService {
 
   const FirebaseService({required this.db});
 
+  BuEventsService get _buEventsService => BuEventsService(db: db);
+
   // Function to fetch events from Firestore
   Future<List<Event>> fetchEvents() async {
-    List<Event> eventList = [];
-
     try {
-      QuerySnapshot snapshot = await this.db.collection(EVENT_COLLECTION).get();
-      snapshot.docs.forEach((doc) {
-        final eventData = doc.data() as Map<String, dynamic>;
-        final sessionData = eventData['eventSessions'] as Map<String, dynamic>;
-
-        List<Session> sessions = [];
-        if (sessionData != null) {
-          sessions = sessionData.entries.map((entry) {
-            final sessionID = entry.key;
-            final sessionDetails = entry.value as Map<String, dynamic>;
-
-            return Session(
-              sessionID: sessionID,
-              sessionStartTime: sessionDetails['startTime'] != null
-                  ? (sessionDetails['startTime'] as Timestamp).toDate()
-                  : DateTime.now(), // Default if startTime is null
-              sessionEndTime: sessionDetails['endTime'] != null
-                  ? (sessionDetails['endTime'] as Timestamp).toDate()
-                  : DateTime.now(), // Default if endTime is null
-              savedUsers: sessionDetails['savedUsers'] != null
-                  ? List<String>.from(sessionDetails['savedUsers'])
-                  : [], // Default if null
-            );
-          }).toList();
-        }
-
-        Event event = Event(
-          eventID: doc.id,
-          eventTitle: eventData['eventTitle'] ?? '',
-          eventURL: eventData['eventURL'] ?? '',
-          eventPhoto: eventData['eventPhoto'] ?? '',
-          eventLocation: eventData['eventLocation'] ?? '',
-          eventDescription: eventData['eventDescription'] ?? '',
-          eventPoints: eventData['eventPoints'] ?? 0,
-          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
-          eventSessions: sessions,
-          eventStickers: (eventData['eventStickers'] as List<dynamic>?)
-              ?.map((stickerName) => Sticker(name: stickerName as String))
-              .toList() ?? [],
-        );
-
-        eventList.add(event);
-      });
-      return eventList;
+      return await _buEventsService.fetchEvents();
     } catch (error) {
       print("Failed to fetch events: $error");
       return [];
     }
   }
 
-
-
   // Function to fetch events which have sessions happening on a particular day
   List<Event> fetchEventsForDay(DateTime date, List<Event> events) {
     return events.where((event) => event.hasSessionOnDay(date)).toList();
   }
-
-
 
   // Function to filter events based on a search query
   List<Event> filterEvents(List<Event> events, String query) {
@@ -98,15 +51,17 @@ class FirebaseService {
   Future<Users?> fetchUser(String userUID) async {
     try {
       DocumentSnapshot snapshot =
-      await this.db.collection('users').doc(userUID).get();
+          await this.db.collection('users').doc(userUID).get();
 
       if (snapshot.exists) {
         final userData = snapshot.data() as Map<String, dynamic>;
 
-        Map<String, bool> stickerData = Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
+        Map<String, bool> stickerData =
+            Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
 
         // Convert Map<String, bool> to Map<Sticker, bool>
-        Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
+        Map<Sticker, bool> stickerCollection = stickerData
+            .map((name, owned) => MapEntry(Sticker(name: name), owned));
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
@@ -117,8 +72,10 @@ class FirebaseService {
           userUID: userData['userUID'],
           userYear: userData['userYear'],
           userPoints: userData['userPoints'],
-          userSavedEvents: Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
-          userCollectedStickers: Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
+          userSavedEvents:
+              Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userCollectedStickers:
+              Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
           userPhotos: List<String>.from(userData['userPhotos'] ?? []),
           userCreatedAt: userData['userCreatedAt'],
         );
@@ -143,9 +100,9 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': false,
       });
-      await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
+      await this.db.collection(EVENT_COLLECTION).doc(eventId).set({
         'savedUsers': FieldValue.arrayUnion([userUID]),
-      });
+      }, SetOptions(merge: true));
     } catch (error) {
       print("Failed to save event: $error");
     }
@@ -161,30 +118,33 @@ class FirebaseService {
       await userDoc.update({
         'userSavedEvents.$eventId': FieldValue.delete(),
       });
-      await this.db.collection(EVENT_COLLECTION).doc(eventId).update({
+      await this.db.collection(EVENT_COLLECTION).doc(eventId).set({
         'savedUsers': FieldValue.arrayRemove([userUID]),
-      });
+      }, SetOptions(merge: true));
     } catch (error) {
       print("Failed to unsave event: $error");
     }
   }
 
-
   // Function to check if a user has saved an event
   Future<bool> hasUserSavedEvent(String userUID, String eventId) async {
-    DocumentSnapshot userDocSnapshot =
-    await this.db.collection('users').doc(userUID).get();
+    try {
+      DocumentSnapshot userDocSnapshot =
+          await this.db.collection('users').doc(userUID).get();
 
-    if (userDocSnapshot.exists) {
-      final userData = userDocSnapshot.data() as Map<String, dynamic>;
-      if (userData['userSavedEvents'] is Map) {
-        Map<String, dynamic> savedEvents = userData['userSavedEvents'] != null
-            ? Map<String, dynamic>.from(userData['userSavedEvents'])
-            : {};
+      if (userDocSnapshot.exists) {
+        final userData = userDocSnapshot.data() as Map<String, dynamic>;
+        if (userData['userSavedEvents'] is Map) {
+          Map<String, dynamic> savedEvents = userData['userSavedEvents'] != null
+              ? Map<String, dynamic>.from(userData['userSavedEvents'])
+              : {};
 
-        // Check if the eventId exists in the list
-        return savedEvents.containsKey(eventId);
+          // Check if the eventId exists in the list
+          return savedEvents.containsKey(eventId);
+        }
       }
+    } catch (error) {
+      print("Error checking saved event: $error");
     }
     return false;
   }
@@ -198,7 +158,7 @@ class FirebaseService {
     }
 
     final userDoc =
-    await FirebaseFirestore.instance.collection('users').doc(userUID).get();
+        await FirebaseFirestore.instance.collection('users').doc(userUID).get();
     if (!userDoc.exists) {
       throw Exception("User document does not exist");
     }
@@ -211,15 +171,17 @@ class FirebaseService {
     final List<Event> userSavedEvents = [];
 
     await Future.forEach(savedEvents.entries,
-            (MapEntry<String, dynamic> entry) async {
-          String eventId = entry.key;
-          Event? event = await fetchEventById(eventId);
-          if (event != null) {
-            userSavedEvents.add(event);
-          }
-        });
+        (MapEntry<String, dynamic> entry) async {
+      String eventId = entry.key;
+      Event? event = await fetchEventById(eventId);
+      if (event != null) {
+        userSavedEvents.add(event);
+      }
+    });
 
-    final attendanceQuerySnapshot = await this.db.collection(ATTENDANCE_COLLECTION)
+    final attendanceQuerySnapshot = await this
+        .db
+        .collection(ATTENDANCE_COLLECTION)
         .where('userID', isEqualTo: userUID)
         .get();
 
@@ -239,59 +201,22 @@ class FirebaseService {
 
   // Function to fetch an event by its ID
   Future<Event?> fetchEventById(String eventId) async {
-    DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await this.db.collection(EVENT_COLLECTION).doc(eventId).get();
-    if (snapshot.exists && snapshot.data() != null) {
-      final eventData = snapshot.data() as Map<String, dynamic>;
-      final sessionData = eventData['eventSessions'] as Map<String, dynamic>;
-
-      List<Session> sessions = [];
-      if (sessionData != null) {
-        sessions = sessionData.entries.map((entry) {
-          final sessionID = entry.key;
-          final sessionDetails = entry.value as Map<String, dynamic>;
-
-          return Session(
-            sessionID: sessionID,
-            sessionStartTime: sessionDetails['startTime'] != null
-                ? (sessionDetails['startTime'] as Timestamp).toDate()
-                : DateTime.now(), // Default if startTime is null
-            sessionEndTime: sessionDetails['endTime'] != null
-                ? (sessionDetails['endTime'] as Timestamp).toDate()
-                : DateTime.now(), // Default if endTime is null
-            savedUsers: sessionDetails['savedUsers'] != null
-                ? List<String>.from(sessionDetails['savedUsers'])
-                : [], // Default if null
-          );
-        }).toList();
+    final events = await fetchEvents();
+    for (final event in events) {
+      if (event.eventID == eventId) {
+        return event;
       }
-
-      Event event = Event(
-        eventID: eventId,
-        eventTitle: eventData['eventTitle'] ?? '',
-        eventURL: eventData['eventURL'] ?? '',
-        eventPhoto: eventData['eventPhoto'] ?? '',
-        eventLocation: eventData['eventLocation'] ?? '',
-        eventDescription: eventData['eventDescription'] ?? '',
-        eventPoints: eventData['eventPoints'] ?? 0,
-        savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
-        eventSessions: sessions,
-        eventStickers: (eventData['eventStickers'] as List<dynamic>?)
-            ?.map((stickerName) => Sticker(name: stickerName as String))
-            .toList() ?? [],
-      );
-      return event;
     }
-    throw Exception("Event not found");
+    return null;
   }
 
-
-
   // Function to check in a user for an event
-  void checkInUserForEvent(String eventID, int eventPoints, List<Sticker> stickers) {
+  void checkInUserForEvent(
+      String eventID, int eventPoints, List<Sticker> stickers) {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     final attendanceDocID = '${eventID}_$userUID';
-    final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
+    final attendanceDoc =
+        this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
     if (userUID == null) {
       throw Exception("User is not logged in");
     }
@@ -307,7 +232,7 @@ class FirebaseService {
         'eventID': eventID,
         'userID': userUID,
       });
-      for(Sticker s in stickers){
+      for (Sticker s in stickers) {
         addStickerToUserCollection(userUID, s);
       }
       //
@@ -319,7 +244,8 @@ class FirebaseService {
   // Function to check if a user has checked in for an event
   Future<bool> isUserCheckedInForEvent(String userUID, String eventId) async {
     final attendanceDocID = '${eventId}_$userUID';
-    final attendanceDoc = this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
+    final attendanceDoc =
+        this.db.collection(ATTENDANCE_COLLECTION).doc(attendanceDocID);
 
     try {
       final docSnapshot = await attendanceDoc.get();
@@ -351,55 +277,11 @@ class FirebaseService {
   // Function to fetch events after current time for explore page
   Future<List<Event>> fetchEventsFromNow() async {
     final now = DateTime.now();
-    List<Event> eventList = [];
-
     try {
-      QuerySnapshot snapshot = await this.db.collection(EVENT_COLLECTION).get();
-      snapshot.docs.forEach((doc) {
-        final eventData = doc.data() as Map<String, dynamic>;
-        final sessionData = eventData['eventSessions'] as Map<String, dynamic>;
-
-        List<Session> sessions = [];
-        if (sessionData != null) {
-          sessions = sessionData.entries.map((entry) {
-            final sessionID = entry.key;
-            final sessionDetails = entry.value as Map<String, dynamic>;
-
-            return Session(
-              sessionID: sessionID,
-              sessionStartTime: sessionDetails['startTime'] != null
-                  ? (sessionDetails['startTime'] as Timestamp).toDate()
-                  : DateTime.now(), // Default if startTime is null
-              sessionEndTime: sessionDetails['endTime'] != null
-                  ? (sessionDetails['endTime'] as Timestamp).toDate()
-                  : DateTime.now(), // Default if endTime is null
-              savedUsers: sessionDetails['savedUsers'] != null
-                  ? List<String>.from(sessionDetails['savedUsers'])
-                  : [], // Default if null
-            );
-          }).toList();
-        }
-
-        Event event = Event(
-          eventID: doc.id,
-          eventTitle: eventData['eventTitle'] ?? '',
-          eventURL: eventData['eventURL'] ?? '',
-          eventPhoto: eventData['eventPhoto'] ?? '',
-          eventLocation: eventData['eventLocation'] ?? '',
-          eventDescription: eventData['eventDescription'] ?? '',
-          eventPoints: eventData['eventPoints'] ?? 0,
-          savedUsers: List<String>.from(eventData['savedUsers'] ?? []),
-          eventSessions: sessions,
-          eventStickers: (eventData['eventStickers'] as List<dynamic>?)
-              ?.map((stickerName) => Sticker(name: stickerName as String))
-              .toList() ?? [],
-        );
-
-        eventList.add(event);
-      });
-      eventList =
-          eventList.where((event) => event.hasUpcomingSessions(now)).toList();
-      return eventList;
+      final eventList = await fetchEvents();
+      return eventList
+          .where((event) => event.hasUpcomingSessions(now))
+          .toList();
     } catch (error) {
       print("Failed to fetch events: $error");
       return [];
@@ -412,13 +294,15 @@ class FirebaseService {
 
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot =
-      await this.db.collection('users').get();
+          await this.db.collection('users').get();
       snapshot.docs.forEach((doc) {
         final userData = doc.data();
-        Map<String, bool> stickerData = Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
+        Map<String, bool> stickerData =
+            Map<String, bool>.from(userData['userCollectedStickers'] ?? {});
 
         // Convert Map<String, bool> to Map<Sticker, bool>
-        Map<Sticker, bool> stickerCollection = stickerData.map((name, owned) => MapEntry(Sticker(name: name), owned));
+        Map<Sticker, bool> stickerCollection = stickerData
+            .map((name, owned) => MapEntry(Sticker(name: name), owned));
         Users user = Users(
           firstName: userData['firstName'],
           lastName: userData['lastName'],
@@ -429,8 +313,10 @@ class FirebaseService {
           userUID: userData['userUID'],
           userYear: userData['userYear'],
           userPoints: userData['userPoints'],
-          userSavedEvents: Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
-          userCollectedStickers: Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
+          userSavedEvents:
+              Map<String, dynamic>.from(userData['userSavedEvents'] ?? {}),
+          userCollectedStickers:
+              Map<int, bool>.from(userData['userCollectedStickers'] ?? {}),
           userPhotos: List<String>.from(userData['userPhotos'] ?? []),
           userCreatedAt: userData['userCreatedAt'],
         );
@@ -443,8 +329,8 @@ class FirebaseService {
     }
   }
 
-
-  Future<String> uploadCheckinImage(String eventID, Uint8List imageBytes) async {
+  Future<String> uploadCheckinImage(
+      String eventID, Uint8List imageBytes) async {
     final userUID = FirebaseAuth.instance.currentUser?.uid;
     String fileName = "checkin_${userUID}_${eventID}.jpg";
 
@@ -465,14 +351,14 @@ class FirebaseService {
         'checkInPhoto': downloadUrl,
       });
       return downloadUrl;
-
     } catch (e) {
       print("Error uploading image: $e");
       return "null";
     }
   }
 
-  Future<void> addStickerToUserCollection(String userID, Sticker sticker) async {
+  Future<void> addStickerToUserCollection(
+      String userID, Sticker sticker) async {
     try {
       final userDocRef = db.collection(USER_COLLECTION).doc(userID);
 
@@ -480,13 +366,16 @@ class FirebaseService {
         final userDoc = await transaction.get(userDocRef);
 
         if (userDoc.exists) {
-           Map<String, bool> stickers =
-              (userDoc.data()?['userCollectedStickers'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as bool)) ?? {};
+          Map<String, bool> stickers = (userDoc.data()?['userCollectedStickers']
+                      as Map<String, dynamic>?)
+                  ?.map((key, value) => MapEntry(key, value as bool)) ??
+              {};
 
           if (!stickers.containsKey(sticker.name)) {
             stickers[sticker.name] = true;
 
-            transaction.set(userDocRef, {'userCollectedStickers': stickers}, SetOptions(merge: true));
+            transaction.set(userDocRef, {'userCollectedStickers': stickers},
+                SetOptions(merge: true));
           }
         } else {
           throw Exception("User document does not exist.");
@@ -499,6 +388,4 @@ class FirebaseService {
       throw Exception("Failed to add sticker to user's collection.");
     }
   }
-
-
 }

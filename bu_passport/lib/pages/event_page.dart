@@ -20,7 +20,6 @@ import '../components/checkin_options_dialog.dart';
 import '../components/checkin_success_dialog.dart';
 import '../components/time_span.dart';
 import '../services/firebase_service.dart';
-import '../services/web_image_service.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -45,7 +44,6 @@ class _EventPageState extends State<EventPage> {
   bool _isCheckedIn = false; // To track if the user has checked in
   String photoUrl = "";
 
-
   Future<ui.Image> _loadImage(File file) async {
     final bytes = await file.readAsBytes();
     return await decodeImageFromList(bytes);
@@ -67,6 +65,7 @@ class _EventPageState extends State<EventPage> {
     ui.decodeImageFromList(bytes, completer.complete);
     return completer.future;
   }
+
 // Checks if user saved event -- if so, the button will reflect that
   @override
   void initState() {
@@ -165,26 +164,33 @@ class _EventPageState extends State<EventPage> {
   }
 
   Future<void> checkInWithPhoto() async {
-    try{
-      firebaseService.checkInUserForEvent(
-          widget.event.eventID, widget.event.eventPoints+5, widget.event.eventStickers);
+    try {
+      firebaseService.checkInUserForEvent(widget.event.eventID,
+          widget.event.eventPoints + 5, widget.event.eventStickers);
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.camera);
-      if(pickedFile!=null){
+      if (pickedFile != null) {
         final Uint8List imageBytes = await pickedFile.readAsBytes();
         firebaseService.uploadCheckinImage(widget.event.eventID, imageBytes);
         final photo = await _loadImage(File(pickedFile.path));
-        final frame = await _loadImageFromAssets('assets/images/stickers/frame.png');
+        final frame =
+            await _loadImageFromAssets('assets/images/stickers/frame.png');
         ui.Image? sticker1;
         ui.Image? sticker2;
-        if (widget.event.eventStickers.isNotEmpty) sticker1 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[0].name+".png");
-        if (widget.event.eventStickers.length > 1) sticker2 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[1].name+".png");
+        if (widget.event.eventStickers.isNotEmpty)
+          sticker1 = await _loadImageFromAssets('assets/images/stickers/' +
+              widget.event.eventStickers[0].name +
+              ".png");
+        if (widget.event.eventStickers.length > 1)
+          sticker2 = await _loadImageFromAssets('assets/images/stickers/' +
+              widget.event.eventStickers[1].name +
+              ".png");
         widget.onUpdateEventPage();
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return SuccessDialog(
-              points: widget.event.eventPoints+5,
+              points: widget.event.eventPoints + 5,
               eventTitle: widget.event.eventTitle,
               image: photo,
               frame: frame,
@@ -193,25 +199,27 @@ class _EventPageState extends State<EventPage> {
             );
           },
         );
-      }else{
-
-      }
-
-    }catch(e){
+      } else {}
+    } catch (e) {
       print("Unable to checkin: ${e.toString()}");
       return;
     }
-
   }
 
-  Future<void> checkInWithoutPhoto()async {
-    try{
-      firebaseService.checkInUserForEvent(
-          widget.event.eventID, widget.event.eventPoints, widget.event.eventStickers);
+  Future<void> checkInWithoutPhoto() async {
+    try {
+      firebaseService.checkInUserForEvent(widget.event.eventID,
+          widget.event.eventPoints, widget.event.eventStickers);
       ui.Image? sticker1;
       ui.Image? sticker2;
-      if (widget.event.eventStickers.isNotEmpty) sticker1 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[0].name+".png");
-      if (widget.event.eventStickers.length > 1) sticker2 = await _loadImageFromAssets('assets/images/stickers/'+widget.event.eventStickers[1].name+".png");
+      if (widget.event.eventStickers.isNotEmpty)
+        sticker1 = await _loadImageFromAssets('assets/images/stickers/' +
+            widget.event.eventStickers[0].name +
+            ".png");
+      if (widget.event.eventStickers.length > 1)
+        sticker2 = await _loadImageFromAssets('assets/images/stickers/' +
+            widget.event.eventStickers[1].name +
+            ".png");
       final icon = await _loadImageFromUrl(widget.event.eventPhoto);
       showDialog(
         context: context,
@@ -225,31 +233,23 @@ class _EventPageState extends State<EventPage> {
           );
         },
       );
-    }catch(e){
+    } catch (e) {
       return;
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
     double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
+    final mapsUrl = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(widget.event.eventLocation)}',
+    );
 
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
-        // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image(
-            image: WebImageService.buildImageProvider(widget.event.eventPhoto), // Use the helper function
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: screenHeight * 0.4,
-          ),
           Padding(
             padding: EdgeInsets.all(edgeInsets * 2.5),
             child: Column(
@@ -263,45 +263,27 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ),
                 SizedBox(height: sizedBoxHeight),
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 16.0, color: Colors.black),
-                    children: [
-                      WidgetSpan(
-                        child: Icon(Icons.location_on),
-                      ),
-                      TextSpan(
-                        text: " ${widget.event.eventLocation}",
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: sizedBoxHeight),
-                AllSessionsDisplay(
-                  sessions: widget.event.eventSessions,
-                ),
-                SizedBox(height: sizedBoxHeight),
-                GestureDetector(
-                  onTap: () async {
-                    var url = Uri.parse(widget.event.eventURL);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    if (await canLaunchUrl(mapsUrl)) {
+                      await launchUrl(
+                        mapsUrl,
+                        mode: LaunchMode.externalApplication,
+                      );
                     } else {
-                      throw 'Could not launch $url';
+                      throw 'Could not launch $mapsUrl';
                     }
                   },
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(fontSize: 16.0, color: Colors.black),
-                      children: [
-                        WidgetSpan(
-                          child: Icon(Icons.link),
-                        ),
-                        TextSpan(
-                          text: "  ${widget.event.eventURL}",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ],
+                  icon: const Icon(Icons.location_on_outlined),
+                  label: Text(
+                    widget.event.eventLocation,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
                     ),
                   ),
                 ),
@@ -320,6 +302,37 @@ class _EventPageState extends State<EventPage> {
                     ],
                   ),
                 ),
+                SizedBox(height: sizedBoxHeight),
+                if (widget.event.eventURL.isNotEmpty)
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      var url = Uri.parse(widget.event.eventURL);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    icon: const Icon(Icons.link),
+                    label: Text(
+                      widget.event.eventURL,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
+                    ),
+                  ),
+                SizedBox(height: sizedBoxHeight),
+                AllSessionsDisplay(
+                  sessions: widget.event.eventSessions,
+                ),
               ],
             ),
           ),
@@ -329,12 +342,9 @@ class _EventPageState extends State<EventPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: (
-                          !widget.event.isEventHappening() ||
-                          _isCheckedIn)
+                  onPressed: (!widget.event.isEventHappening() || _isCheckedIn)
                       ? null
                       : () async {
-
                           // Your check-in logic here. On successful check-in, update the _isCheckedIn state.
                           bool success = await checkIn();
                           if (success) {
@@ -344,23 +354,21 @@ class _EventPageState extends State<EventPage> {
                                 return CheckInOptionsDialog();
                               },
                             );
-                            if(withPhoto){
+                            if (withPhoto) {
                               checkInWithPhoto();
                             } else {
                               checkInWithoutPhoto();
                             }
-
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text(
-                                    "Unable to check in: location too far or permission denied.")));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Unable to check in: location too far or permission denied.")));
                           }
                         },
                   child: Text(_isCheckedIn ? 'Checked In' : 'Check In'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isCheckedIn
-                        ? Colors.grey
-                        : (Colors.red),
+                    backgroundColor: _isCheckedIn ? Colors.grey : (Colors.red),
                   ),
                 ),
                 SizedBox(width: sizedBoxHeight * 3), // Optional spacing

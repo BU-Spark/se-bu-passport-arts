@@ -19,9 +19,7 @@
   "public_header_files": "Classes/**/*.h",
   "module_map": "Classes/ImagePickerPlugin.modulemap",
   "dependencies": {
-    "Flutter": [
-
-    ]
+    "Flutter": []
   },
   "platforms": {
     "ios": "12.0"

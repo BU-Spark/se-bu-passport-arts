@@ -4,11 +4,8 @@ import 'package:bu_passport/pages/event_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 
 import '../services/firebase_service.dart';
-import '../services/web_image_service.dart';
 
 class EventWidget extends StatefulWidget {
   final Event event;
@@ -22,6 +19,10 @@ class EventWidget extends StatefulWidget {
 }
 
 class _EventWidgetState extends State<EventWidget> {
+  static const Color _cardBorderColor = Color(0xFFE5E7EB);
+  static const Color _categoryChipColor = Color(0xFFC62828);
+  static const Color _mutedTextColor = Color(0xFF5F6368);
+
   bool _isSaved = false;
   bool _isCheckedIn = false;
   String userUID = FirebaseAuth.instance.currentUser?.uid ?? "";
@@ -41,30 +42,42 @@ class _EventWidgetState extends State<EventWidget> {
   void checkIfUserSaved() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
-      print("User is not logged in.");
       return;
     }
-    bool isSaved =
-        await firebaseService.hasUserSavedEvent(userUID, widget.event.eventID);
-    setState(() {
-      // changing save to saved
-      _isSaved = isSaved;
-    });
+    try {
+      bool isSaved = await firebaseService.hasUserSavedEvent(
+          userUID, widget.event.eventID);
+      if (!mounted) return;
+      setState(() {
+        _isSaved = isSaved;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSaved = false;
+      });
+    }
   }
 
   // Function to check if user has checked in to the event
   void checkIfUserCheckedIn() async {
     // Ensure there's a user logged in
     if (userUID.isEmpty) {
-      print("User is not logged in.");
       return;
     }
-    bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
-        userUID, widget.event.eventID);
-    setState(() {
-      // changing save to saved
-      _isCheckedIn = isCheckedIn;
-    });
+    try {
+      bool isCheckedIn = await firebaseService.isUserCheckedInForEvent(
+          userUID, widget.event.eventID);
+      if (!mounted) return;
+      setState(() {
+        _isCheckedIn = isCheckedIn;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isCheckedIn = false;
+      });
+    }
   }
 
   // Function to update the event page
@@ -75,12 +88,9 @@ class _EventWidgetState extends State<EventWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    double sizedBoxHeight = (MediaQuery.of(context).size.height * 0.02);
-    double edgeInsets = (MediaQuery.of(context).size.width * 0.02);
-    double widgetHeight = (MediaQuery.of(context).size.height * 0.25);
+    final categories = widget.event.eventCategories.isNotEmpty
+        ? widget.event.eventCategories
+        : ['BU Arts'];
 
     return GestureDetector(
       onTap: () {
@@ -95,105 +105,188 @@ class _EventWidgetState extends State<EventWidget> {
         );
       },
       child: Container(
-        height: widgetHeight,
+        height: 224,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: Colors.grey),
-          image: DecorationImage(
-            image: WebImageService.buildImageProvider(widget.event.eventPhoto),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.3), BlendMode.multiply),
-          ),
-          // put a black gradient
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: _cardBorderColor),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Stack(
           children: [
-            Positioned(
-              bottom: widgetHeight * 0.01,
-              left: edgeInsets,
-              right: edgeInsets,
-              child: Container(
-                padding: EdgeInsets.all(edgeInsets),
+            const Positioned(
+              top: 0,
+              right: 0,
+              child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Colors.transparent, // Make background transparent
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(16),
+                  ),
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 4),
+                    right: BorderSide(color: Colors.black, width: 4),
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, // Align text left
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: screenWidth * 0.65,
+                child: SizedBox(width: 20, height: 20),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 36),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: categories
+                          .map(
+                            (category) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _categoryChipColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               child: Text(
-                                widget.event.eventTitle,
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w700,
+                                category,
+                                style: const TextStyle(
                                   color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            SizedBox(height: sizedBoxHeight * 0.5),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.event.eventTitle,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              widget.event.eventLocation,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: _mutedTextColor,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
                             EventDateRangeDisplay(
                               sessions: widget.event.eventSessions,
+                              textColor: _mutedTextColor,
                             ),
-                          ],
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: '${widget.event.eventPoints}',
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: ' pts',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                            if (_isCheckedIn) ...[
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: const Text(
+                                  'Checked in',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ],
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                    SizedBox(height: sizedBoxHeight * 0.5),
-                  ],
-                ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        '${widget.event.eventPoints} pts',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            // Positioned Heart Icon remains the same
             Positioned(
-              top: sizedBoxHeight,
-              right: sizedBoxHeight,
+              top: 14,
+              right: 14,
               child: GestureDetector(
                 onTap: () async {
-                  _isSaved = await firebaseService.hasUserSavedEvent(
-                      userUID, widget.event.eventID);
-                  if (_isSaved) {
-                    firebaseService.unsaveEvent(widget.event.eventID);
-                  } else {
-                    firebaseService.saveEvent(widget.event.eventID);
+                  if (userUID.isEmpty) {
+                    return;
                   }
-                  setState(() {
-                    _isSaved = !_isSaved; // Toggle saved status
-                  });
+
+                  try {
+                    final isSaved = await firebaseService.hasUserSavedEvent(
+                      userUID,
+                      widget.event.eventID,
+                    );
+
+                    if (isSaved) {
+                      await firebaseService.unsaveEvent(widget.event.eventID);
+                    } else {
+                      await firebaseService.saveEvent(widget.event.eventID);
+                    }
+
+                    if (!mounted) return;
+                    setState(() {
+                      _isSaved = !isSaved;
+                    });
+                  } catch (_) {
+                    if (!mounted) return;
+                    setState(() {
+                      _isSaved = false;
+                    });
+                  }
                 },
-                child: Icon(
-                  _isSaved ? Icons.favorite : Icons.favorite_border,
-                  color: _isSaved ? Colors.red : Colors.grey,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: _cardBorderColor),
+                  ),
+                  child: Icon(
+                    _isSaved ? Icons.favorite : Icons.favorite_border,
+                    size: 18,
+                    color: _isSaved ? Colors.red : _mutedTextColor,
+                  ),
                 ),
               ),
             ),

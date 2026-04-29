@@ -18,12 +18,8 @@
     "ios": "11.0"
   },
   "dependencies": {
-    "Flutter": [
-
-    ],
-    "firebase_core": [
-
-    ],
+    "Flutter": [],
+    "firebase_core": [],
     "Firebase/Firestore": [
       "10.24.0"
     ]
