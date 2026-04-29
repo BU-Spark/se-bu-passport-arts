@@ -2,18 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>291452008264-7v1dr41uunhqkuhr4e8en19im6bn2p3n.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.291452008264-7v1dr41uunhqkuhr4e8en19im6bn2p3n</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDB-0rxfn8BysrqjdSsWddOiJseJlvvIyo</string>
+	<string>AIzaSyBKpAIfitgSwl_sh_DIsdz-n8nZOZ31y3c</string>
 	<key>GCM_SENDER_ID</key>
-	<string>429645705382</string>
+	<string>291452008264</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.buPassport</string>
 	<key>PROJECT_ID</key>
-	<string>se-bu-passport</string>
+	<string>bu-arts-passport</string>
 	<key>STORAGE_BUCKET</key>
-	<string>se-bu-passport.appspot.com</string>
+	<string>bu-arts-passport.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:429645705382:ios:df49216a57278e0b47c467</string>
+	<string>1:291452008264:ios:3ea6efe7baa82c76b2a57d</string>
+	<key>DATABASE_URL</key>
+	<string>https://bu-arts-passport-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>

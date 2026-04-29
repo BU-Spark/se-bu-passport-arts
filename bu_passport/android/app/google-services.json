@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "429645705382",
-    "project_id": "se-bu-passport",
-    "storage_bucket": "se-bu-passport.appspot.com"
+    "project_number": "291452008264",
+    "firebase_url": "https://bu-arts-passport-default-rtdb.firebaseio.com",
+    "project_id": "bu-arts-passport",
+    "storage_bucket": "bu-arts-passport.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:429645705382:android:9f0f8af5edb9341147c467",
+        "mobilesdk_app_id": "1:291452008264:android:3c14d62bb71aed8eb2a57d",
         "android_client_info": {
           "package_name": "com.example.bu_passport"
         }
@@ -15,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCoIG5QDtwfePSWyYQWOBZQgMLy3RPetc4"
+          "current_key": "AIzaSyBbwZTwPH1VcjRKGpvSrgEZPJwXJK4U0lE"
         }
       ],
       "services": {

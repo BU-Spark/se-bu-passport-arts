@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'firebase_options.dart';
 
-
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -42,19 +41,22 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCoIG5QDtwfePSWyYQWOBZQgMLy3RPetc4',
-    appId: '1:429645705382:android:9f0f8af5edb9341147c467',
-    messagingSenderId: '429645705382',
-    projectId: 'se-bu-passport',
-    storageBucket: 'se-bu-passport.appspot.com',
+    apiKey: 'AIzaSyBbwZTwPH1VcjRKGpvSrgEZPJwXJK4U0lE',
+    appId: '1:291452008264:android:3c14d62bb71aed8eb2a57d',
+    messagingSenderId: '291452008264',
+    projectId: 'bu-arts-passport',
+    databaseURL: 'https://bu-arts-passport-default-rtdb.firebaseio.com',
+    storageBucket: 'bu-arts-passport.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDB-0rxfn8BysrqjdSsWddOiJseJlvvIyo',
-    appId: '1:429645705382:ios:df49216a57278e0b47c467',
-    messagingSenderId: '429645705382',
-    projectId: 'se-bu-passport',
-    storageBucket: 'se-bu-passport.appspot.com',
+    apiKey: 'AIzaSyBKpAIfitgSwl_sh_DIsdz-n8nZOZ31y3c',
+    appId: '1:291452008264:ios:3ea6efe7baa82c76b2a57d',
+    messagingSenderId: '291452008264',
+    projectId: 'bu-arts-passport',
+    databaseURL: 'https://bu-arts-passport-default-rtdb.firebaseio.com',
+    storageBucket: 'bu-arts-passport.firebasestorage.app',
     iosBundleId: 'com.example.buPassport',
   );
+
 }
