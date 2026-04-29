@@ -54,6 +54,7 @@ const NewUserLineChart: React.FC<UserChartProps> = ({
         <div className="flex items-center">
           <select
             id="rangeSelect"
+            aria-label="Select Time Range"
             value={range}
             onChange={(e) => {
               e.preventDefault();

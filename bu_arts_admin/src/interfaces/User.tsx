@@ -12,7 +12,8 @@ export interface User {
     userUID: string;
     userYear: string;
     userSavedEvents: Map<string, string>;
-    userCreated: Timestamp;
+    userCreated?: Timestamp;
+    userCreatedAt?: Timestamp;
 }
 
 export interface AttendanceUser {
@@ -26,6 +27,7 @@ export interface AttendanceUser {
     userUID: string;
     userYear: string;
     userSavedEvents: Map<string, string>;
-    userCreated: Timestamp;
+    userCreated?: Timestamp;
+    userCreatedAt?: Timestamp;
     isAttended: boolean;
 }

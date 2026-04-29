@@ -1,4 +1,6 @@
 import { buEventsApiUrl } from '../config';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
 import { BuEventsApiEvent, Event } from '../interfaces/Event';
 import { Session } from '../interfaces/Session';
 
@@ -15,6 +17,7 @@ interface EventFilters {
 
 const DEFAULT_EVENT_PHOTO = '/logo.png';
 const DEFAULT_EVENT_POINTS = 0;
+const EVENT_COLLECTION = 'new_events';
 
 const TOPIC_LABELS: Record<string, string> = {
   '5796': 'Student Life',
@@ -67,7 +70,37 @@ const getFallbackDescription = (title: string, location: string): string => {
   return `${title}${locationText}. More details are available on the BU Arts calendar.`;
 };
 
-const toGroupedEvents = (rawEvents: BuEventsApiEvent[]): Event[] => {
+const stringOrFallback = (value: unknown, fallback: string): string =>
+  typeof value === 'string' && value.trim() ? value : fallback;
+
+const intOrFallback = (value: unknown, fallback: number): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.round(value);
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const parsedValue = Number(value);
+    if (Number.isFinite(parsedValue)) {
+      return Math.round(parsedValue);
+    }
+  }
+
+  return fallback;
+};
+
+const fetchEventMetadataById = async (): Promise<Record<string, Record<string, unknown>>> => {
+  const snapshot = await getDocs(collection(db, EVENT_COLLECTION));
+
+  return snapshot.docs.reduce<Record<string, Record<string, unknown>>>((metadata, document) => {
+    metadata[document.id] = document.data() as Record<string, unknown>;
+    return metadata;
+  }, {});
+};
+
+const toGroupedEvents = (
+  rawEvents: BuEventsApiEvent[],
+  metadataById: Record<string, Record<string, unknown>>,
+): Event[] => {
   const groupedEvents = new Map<string, Event>();
 
   rawEvents.forEach((rawEvent) => {
@@ -78,15 +111,20 @@ const toGroupedEvents = (rawEvents: BuEventsApiEvent[]): Event[] => {
     const eventURL = rawEvent.url || '';
 
     if (!groupedEvents.has(eventID)) {
+      const metadata = metadataById[eventID];
+
       groupedEvents.set(eventID, {
         eventID,
-        eventTitle: title,
+        eventTitle: stringOrFallback(metadata?.eventTitle, title),
         eventCategories: getEventCategories(rawEvent.topics),
-        eventDescription: getFallbackDescription(title, location),
-        eventLocation: location,
-        eventURL,
-        eventPhoto: DEFAULT_EVENT_PHOTO,
-        eventPoints: DEFAULT_EVENT_POINTS,
+        eventDescription: stringOrFallback(
+          metadata?.eventDescription,
+          getFallbackDescription(title, location),
+        ),
+        eventLocation: stringOrFallback(metadata?.eventLocation, location),
+        eventURL: stringOrFallback(metadata?.eventURL, eventURL),
+        eventPhoto: stringOrFallback(metadata?.eventPhoto, DEFAULT_EVENT_PHOTO),
+        eventPoints: intOrFallback(metadata?.eventPoints, DEFAULT_EVENT_POINTS),
         eventSessions: { [session.sessionId]: session },
       });
       return;
@@ -172,7 +210,10 @@ export const fetchAllBuEvents = async (): Promise<Event[]> => {
   }
 
   cachedEventsPromise = (async () => {
-    const response = await fetch(buEventsApiUrl);
+    const [response, metadataById] = await Promise.all([
+      fetch(buEventsApiUrl),
+      fetchEventMetadataById(),
+    ]);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch BU events: ${response.status}`);
@@ -184,7 +225,7 @@ export const fetchAllBuEvents = async (): Promise<Event[]> => {
       throw new Error('BU events API returned an invalid payload.');
     }
 
-    cachedEvents = toGroupedEvents(data.events);
+    cachedEvents = toGroupedEvents(data.events, metadataById);
     return cachedEvents;
   })();
 
@@ -193,6 +234,11 @@ export const fetchAllBuEvents = async (): Promise<Event[]> => {
   } finally {
     cachedEventsPromise = null;
   }
+};
+
+export const clearBuEventsCache = (): void => {
+  cachedEvents = null;
+  cachedEventsPromise = null;
 };
 
 export const fetchSingleBuEvent = async (eventId: string): Promise<Event | null> => {

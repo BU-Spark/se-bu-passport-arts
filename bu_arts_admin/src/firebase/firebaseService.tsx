@@ -1,5 +1,5 @@
 // src/firebase/firebaseService.ts
-import { collection, getDocs, getDoc, doc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, setDoc, query, where, writeBatch, increment } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import { Event } from "../interfaces/Event";
 import { User } from "../interfaces/User";
@@ -9,11 +9,12 @@ import { fetchAllBuEvents, fetchFutureBuEvents } from "../services/buEventsServi
 
 const userTableName = "users";
 const attendanceTableName = "attendances";
+const eventTableName = "new_events";
 
 export interface UpcomingTopEvent {
   eventID: string;
   eventTitle: string;
-  signupCount: number;
+  savedCount: number;
   categories: string[];
 }
 
@@ -81,17 +82,89 @@ export const fetchSingleUser = async (userId: string): Promise<User | null> => {
   }
 };
 
+export const updateEventMetadata = async (
+  eventId: string,
+  metadata: Partial<Pick<Event, 'eventPoints' | 'eventPhoto' | 'eventDescription' | 'eventLocation' | 'eventURL' | 'eventTitle'>>,
+) => {
+  await setDoc(doc(db, eventTableName, eventId), metadata, { merge: true });
+};
+
+export const updateEventPoints = async (
+  eventId: string,
+  previousPoints: number,
+  nextPoints: number,
+) => {
+  const roundedNextPoints = Math.round(nextPoints);
+  const pointsDelta = roundedNextPoints - previousPoints;
+
+  await setDoc(
+    doc(db, eventTableName, eventId),
+    { eventPoints: roundedNextPoints },
+    { merge: true },
+  );
+
+  if (pointsDelta === 0) {
+    return;
+  }
+
+  const attendanceSnapshot = await getDocs(
+    query(collection(db, attendanceTableName), where('eventID', '==', eventId)),
+  );
+
+  const uniqueUserIds = new Set(
+    attendanceSnapshot.docs
+      .map((document) => (document.data() as Attendance).userID)
+      .filter(Boolean),
+  );
+
+  if (uniqueUserIds.size === 0) {
+    return;
+  }
+
+  const batch = writeBatch(db);
+
+  uniqueUserIds.forEach((userId) => {
+    batch.update(doc(db, userTableName, userId), {
+      userPoints: increment(pointsDelta),
+    });
+  });
+
+  await batch.commit();
+};
+
 export const fetchUserRegistrationStats = async (numMonths: number) => {
   const userCollection = collection(db, userTableName);
   const snapshot = await getDocs(userCollection);
   const userData = snapshot.docs.map((document) => document.data());
   const registrationsByMonth: { [month: string]: number } = {};
+  const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+  const getUserCreatedDate = (userCreated: unknown): Date | null => {
+    if (!userCreated) {
+      return null;
+    }
+
+    if (userCreated instanceof Date) {
+      return userCreated;
+    }
+
+    if (typeof userCreated === 'object' && userCreated !== null) {
+      if ('toDate' in userCreated && typeof userCreated.toDate === 'function') {
+        return userCreated.toDate();
+      }
+
+      if ('seconds' in userCreated && typeof userCreated.seconds === 'number') {
+        return new Date(userCreated.seconds * 1000);
+      }
+    }
+
+    return null;
+  };
 
   userData.forEach((user) => {
-    const userCreated = user.userCreated;
+    const date = getUserCreatedDate(user.userCreated ?? user.userCreatedAt);
 
-    if (userCreated) {
-      const date = new Date(userCreated.seconds * 1000);
+    if (date) {
       const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       registrationsByMonth[month] = (registrationsByMonth[month] || 0) + 1;
     }
@@ -101,8 +174,8 @@ export const fetchUserRegistrationStats = async (numMonths: number) => {
 
   if (numMonths === 0) {
     const allMonths = Object.keys(registrationsByMonth).sort();
-    const startMonth = allMonths[0];
-    const endMonth = allMonths[allMonths.length - 1];
+    const startMonth = allMonths[0] || currentMonth;
+    const endMonth = currentMonth;
     months = generateMonthRange(startMonth, endMonth);
   } else {
     months = getLastXMonths(numMonths);
@@ -113,34 +186,39 @@ export const fetchUserRegistrationStats = async (numMonths: number) => {
 };
 
 export const fetchUpcomingEventInsights = async (): Promise<UpcomingEventInsights> => {
-  const [attendanceSnapshot, upcomingEvents] = await Promise.all([
-    getDocs(collection(db, attendanceTableName)),
+  const [users, upcomingEvents] = await Promise.all([
+    fetchAllUsers(),
     fetchFutureBuEvents(),
   ]);
   const upcomingEventIds = new Set(upcomingEvents.map((event) => event.eventID));
-  const signupCountsByEvent = new Map<string, number>();
+  const savedCountsByEvent = new Map<string, number>();
 
-  attendanceSnapshot.docs.forEach((document) => {
-    const attendance = document.data() as Attendance;
+  users.forEach((user) => {
+    const savedEvents =
+      user.userSavedEvents instanceof Map
+        ? Array.from(user.userSavedEvents.keys())
+        : Object.keys((user.userSavedEvents as Record<string, unknown>) || {});
 
-    if (!upcomingEventIds.has(attendance.eventID)) {
-      return;
-    }
+    savedEvents.forEach((eventID) => {
+      if (!upcomingEventIds.has(eventID)) {
+        return;
+      }
 
-    signupCountsByEvent.set(attendance.eventID, (signupCountsByEvent.get(attendance.eventID) || 0) + 1);
+      savedCountsByEvent.set(eventID, (savedCountsByEvent.get(eventID) || 0) + 1);
+    });
   });
 
   const topEvents = upcomingEvents
     .map((event) => ({
       eventID: event.eventID,
       eventTitle: event.eventTitle,
-      signupCount: signupCountsByEvent.get(event.eventID) || 0,
+      savedCount: savedCountsByEvent.get(event.eventID) || 0,
       categories: event.eventCategories,
     }))
     .sort(
       (left, right) =>
-        left.signupCount - right.signupCount || left.eventTitle.localeCompare(right.eventTitle),
-    )
+        right.savedCount - left.savedCount || left.eventTitle.localeCompare(right.eventTitle),
+    );
 
   const categoryCounts = new Map<string, number>();
 

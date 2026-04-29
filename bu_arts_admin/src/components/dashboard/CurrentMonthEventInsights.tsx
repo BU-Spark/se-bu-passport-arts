@@ -54,7 +54,7 @@ const CurrentMonthEventInsightsSection: React.FC = () => {
     <div className="mb-8 grid grid-cols-1 items-stretch gap-4 xl:grid-cols-2">
       <div className="h-full rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-4">
-          <h2 className="text-lg font-medium text-gray-600">Upcoming Events by Signups</h2>
+          <h2 className="text-lg font-medium text-gray-600">Upcoming Events by Saved</h2>
         </div>
 
         {insights && insights.topEvents.length > 0 ? (
@@ -65,7 +65,7 @@ const CurrentMonthEventInsightsSection: React.FC = () => {
                   <th className="w-12 pb-3 pr-4 font-medium">#</th>
                   <th className="pb-3 pr-4 font-medium">Event</th>
                   <th className="pb-3 pr-4 font-medium">Category</th>
-                  <th className="w-24 pb-3 text-right font-medium">Signups</th>
+                  <th className="w-24 pb-3 text-right font-medium">Saved</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,7 +74,7 @@ const CurrentMonthEventInsightsSection: React.FC = () => {
                     <td className="py-3 pr-4 text-gray-500">{index + 1}</td>
                     <td className="py-3 pr-4 font-medium text-sidebar-grey">{event.eventTitle}</td>
                     <td className="py-3 pr-4 text-gray-500">{event.categories.join(', ')}</td>
-                    <td className="py-3 text-right font-semibold text-bured">{event.signupCount}</td>
+                    <td className="py-3 text-right font-semibold text-bured">{event.savedCount}</td>
                   </tr>
                 ))}
               </tbody>
